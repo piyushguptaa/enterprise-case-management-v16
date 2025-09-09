@@ -1,0 +1,25 @@
+{
+  "name": "case-management-system",
+  "version": "1.6.0",
+  "description": "Enterprise Case Management System",
+  "main": "simple-demo.js",
+  "scripts": {
+    "demo": "node simple-demo.js",
+    "start": "node simple-demo.js",
+    "backend": "cd backend && node server.js",
+    "frontend": "cd frontend && node simple-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "keywords": [
+    "case-management",
+    "crm",
+    "enterprise",
+    "react",
+    "nodejs"
+  ],
+  "author": "Case Management System",
+  "license": "MIT"
+}
