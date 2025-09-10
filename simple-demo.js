@@ -97,6 +97,9 @@ const htmlTemplate = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Case Management - CRM Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -2070,34 +2073,467 @@ const htmlTemplate = `
         function showReportsModal() {
             const modal = document.createElement('div');
             modal.className = 'modal';
-            modal.innerHTML = 
-                '<div class="modal-content">' +
-                '<div class="modal-header">' +
-                '<h2 class="modal-title">Reports & Exports</h2>' +
-                '<button class="close-btn" onclick="this.closest(&quot;.modal&quot;).remove()">&times;</button>' +
+            modal.style.cssText = 'z-index: 10000;';
+            modal.innerHTML = generateAdvancedReportsHTML();
+            document.body.appendChild(modal);
+            
+            setTimeout(() => {
+                showReportsTab('dashboard');
+            }, 100);
+        }
+
+        function generateAdvancedReportsHTML() {
+            return '<div class="modal-content" style="max-width: 1600px; width: 95vw; max-height: 95vh; overflow-y: auto;">' +
+                '<div class="modal-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border-radius: 12px 12px 0 0;">' +
+                '<h2 class="modal-title" style="color: white; font-size: 24px;">📊 Advanced Reports & Analytics Dashboard v1.7</h2>' +
+                '<button class="close-btn" onclick="this.closest(&quot;.modal&quot;).remove()" style="color: white; background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;">&times;</button>' +
                 '</div>' +
-                '<div class="modal-body">' +
-                '<div class="actions-grid">' +
-                '<button class="action-card" onclick="showNotification(&quot;Weekly report generated&quot;, &quot;success&quot;)">' +
-                '<span class="action-icon">📊</span>' +
-                '<div class="action-title">Weekly Summary</div>' +
-                '</button>' +
-                '<button class="action-card" onclick="showNotification(&quot;Monthly report exported&quot;, &quot;success&quot;)">' +
-                '<span class="action-icon">📈</span>' +
-                '<div class="action-title">Monthly Analytics</div>' +
-                '</button>' +
-                '<button class="action-card" onclick="showNotification(&quot;Team performance report ready&quot;, &quot;success&quot;)">' +
-                '<span class="action-icon">👥</span>' +
-                '<div class="action-title">Team Performance</div>' +
-                '</button>' +
-                '<button class="action-card" onclick="showNotification(&quot;Custom report builder opened&quot;, &quot;info&quot;)">' +
-                '<span class="action-icon">🔧</span>' +
-                '<div class="action-title">Custom Report</div>' +
-                '</button>' +
+                '<div class="modal-body" style="padding: 0;">' +
+                
+                '<!-- Report Navigation Tabs -->' +
+                '<div class="reports-nav" style="display: flex; background: #f8fafc; border-bottom: 2px solid #e2e8f0; overflow-x: auto;">' +
+                '<button class="reports-tab-btn active" onclick="showReportsTab(&quot;dashboard&quot;)" data-tab="dashboard" style="flex: 1; padding: 16px; border: none; background: transparent; color: #059669; cursor: pointer; font-weight: 600; transition: all 0.3s; border-bottom: 3px solid #059669; min-width: 120px;">📈 Dashboard</button>' +
+                '<button class="reports-tab-btn" onclick="showReportsTab(&quot;performance&quot;)" data-tab="performance" style="flex: 1; padding: 16px; border: none; background: transparent; color: #64748b; cursor: pointer; font-weight: 600; transition: all 0.3s; border-bottom: 3px solid transparent; min-width: 120px;">🎯 Performance</button>' +
+                '<button class="reports-tab-btn" onclick="showReportsTab(&quot;trends&quot;)" data-tab="trends" style="flex: 1; padding: 16px; border: none; background: transparent; color: #64748b; cursor: pointer; font-weight: 600; transition: all 0.3s; border-bottom: 3px solid transparent; min-width: 120px;">📊 Trends</button>' +
+                '<button class="reports-tab-btn" onclick="showReportsTab(&quot;custom&quot;)" data-tab="custom" style="flex: 1; padding: 16px; border: none; background: transparent; color: #64748b; cursor: pointer; font-weight: 600; transition: all 0.3s; border-bottom: 3px solid transparent; min-width: 120px;">🔧 Builder</button>' +
+                '<button class="reports-tab-btn" onclick="showReportsTab(&quot;exports&quot;)" data-tab="exports" style="flex: 1; padding: 16px; border: none; background: transparent; color: #64748b; cursor: pointer; font-weight: 600; transition: all 0.3s; border-bottom: 3px solid transparent; min-width: 120px;">📤 Exports</button>' +
+                '</div>' +
+                
+                '<!-- Report Content Area -->' +
+                '<div id="reportsTabContent" style="padding: 24px; min-height: 600px;">' +
+                '</div>' +
+                
+                '</div>' +
+                '</div>';
+        }
+
+        function showReportsTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.reports-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.cssText = btn.style.cssText.replace('color: #059669', 'color: #64748b').replace('border-bottom: 3px solid #059669', 'border-bottom: 3px solid transparent');
+            });
+            
+            const activeTab = document.querySelector('[data-tab="' + tabName + '"]');
+            if (activeTab) {
+                activeTab.classList.add('active');
+                activeTab.style.cssText = activeTab.style.cssText.replace('color: #64748b', 'color: #059669').replace('border-bottom: 3px solid transparent', 'border-bottom: 3px solid #059669');
+            }
+            
+            const content = document.getElementById('reportsTabContent');
+            switch(tabName) {
+                case 'dashboard':
+                    content.innerHTML = generateDashboardContent();
+                    setTimeout(() => initializeDashboardCharts(), 100);
+                    break;
+                case 'performance':
+                    content.innerHTML = generatePerformanceContent();
+                    setTimeout(() => initializePerformanceCharts(), 100);
+                    break;
+                case 'trends':
+                    content.innerHTML = generateTrendsContent();
+                    setTimeout(() => initializeTrendsCharts(), 100);
+                    break;
+                case 'custom':
+                    content.innerHTML = generateCustomBuilderContent();
+                    break;
+                case 'exports':
+                    content.innerHTML = generateExportsContent();
+                    break;
+            }
+        }
+
+        function generateDashboardContent() {
+            return '<div class="dashboard-content">' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">' +
+                
+                '<!-- Key Metrics Cards -->' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 16px; font-size: 18px;">📈 Executive Summary</h3>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">' +
+                '<div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 20px; border-radius: 12px;">' +
+                '<div style="font-size: 14px; opacity: 0.9;">Total Cases</div>' +
+                '<div style="font-size: 28px; font-weight: bold; margin: 8px 0;">847</div>' +
+                '<div style="font-size: 12px; opacity: 0.8;">↗ +12% from last month</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; padding: 20px; border-radius: 12px;">' +
+                '<div style="font-size: 14px; opacity: 0.9;">Resolution Rate</div>' +
+                '<div style="font-size: 28px; font-weight: bold; margin: 8px 0;">94.2%</div>' +
+                '<div style="font-size: 12px; opacity: 0.8;">↗ +2.3% improvement</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; padding: 20px; border-radius: 12px;">' +
+                '<div style="font-size: 14px; opacity: 0.9;">Avg Response</div>' +
+                '<div style="font-size: 28px; font-weight: bold; margin: 8px 0;">2.1h</div>' +
+                '<div style="font-size: 12px; opacity: 0.8;">↘ -15min faster</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 20px; border-radius: 12px;">' +
+                '<div style="font-size: 14px; opacity: 0.9;">Satisfaction</div>' +
+                '<div style="font-size: 28px; font-weight: bold; margin: 8px 0;">4.7★</div>' +
+                '<div style="font-size: 12px; opacity: 0.8;">↗ +0.2 rating increase</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Case Volume Chart -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📊 Case Volume Trends (Last 30 Days)</h4>' +
+                '<canvas id="caseVolumeChart" style="max-height: 300px;"></canvas>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Quick Actions Panel -->' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 16px; font-size: 18px;">⚡ Quick Actions</h3>' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px;">' +
+                '<button onclick="generateInstantReport()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; border-radius: 8px; font-weight: 500; margin-bottom: 12px; cursor: pointer;">📊 Generate Instant Report</button>' +
+                '<button onclick="exportToPDF()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; border: none; border-radius: 8px; font-weight: 500; margin-bottom: 12px; cursor: pointer;">📄 Export to PDF</button>' +
+                '<button onclick="scheduleReport()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border: none; border-radius: 8px; font-weight: 500; margin-bottom: 12px; cursor: pointer;">⏰ Schedule Report</button>' +
+                '<button onclick="shareReport()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">📧 Share Report</button>' +
+                '</div>' +
+                
+                '<!-- Top Insights -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">💡 Key Insights</h4>' +
+                '<div style="font-size: 14px; color: #4b5563; line-height: 1.6;">' +
+                '• <span style="color: #059669; font-weight: 600;">Peak hours:</span> 2-4 PM with 23% more cases<br>' +
+                '• <span style="color: #f59e0b; font-weight: 600;">Top category:</span> Technical support (34%)<br>' +
+                '• <span style="color: #3b82f6; font-weight: 600;">Best performer:</span> Sarah Johnson (98% resolution)<br>' +
+                '• <span style="color: #7c3aed; font-weight: 600;">Trend alert:</span> 15% increase in mobile issues<br>' +
+                '• <span style="color: #dc2626; font-weight: 600;">Action needed:</span> 3 SLA breaches require attention' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Bottom Charts Row -->' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">🎯 Priority Distribution</h4>' +
+                '<canvas id="priorityChart" style="max-height: 250px;"></canvas>' +
+                '</div>' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📈 Response Time Trends</h4>' +
+                '<canvas id="responseTimeChart" style="max-height: 250px;"></canvas>' +
                 '</div>' +
                 '</div>' +
                 '</div>';
-            document.body.appendChild(modal);
+        }
+
+        function initializeDashboardCharts() {
+            // Case Volume Chart
+            const ctx1 = document.getElementById('caseVolumeChart');
+            if (ctx1) {
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'New Cases',
+                            data: [45, 52, 48, 61],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }, {
+                            label: 'Resolved Cases',
+                            data: [42, 49, 46, 58],
+                            borderColor: '#059669',
+                            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'top' } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+
+            // Priority Distribution Chart
+            const ctx2 = document.getElementById('priorityChart');
+            if (ctx2) {
+                new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Critical', 'High', 'Medium', 'Low'],
+                        datasets: [{
+                            data: [8, 23, 45, 24],
+                            backgroundColor: ['#dc2626', '#f59e0b', '#3b82f6', '#059669'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+
+            // Response Time Chart
+            const ctx3 = document.getElementById('responseTimeChart');
+            if (ctx3) {
+                new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: ['9AM', '11AM', '1PM', '3PM', '5PM'],
+                        datasets: [{
+                            label: 'Avg Response Time (hours)',
+                            data: [1.2, 1.8, 2.9, 1.5, 2.4],
+                            backgroundColor: 'rgba(124, 58, 237, 0.8)',
+                            borderColor: '#7c3aed',
+                            borderWidth: 2,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Hours' } } }
+                    }
+                });
+            }
+        }
+
+        function generatePerformanceContent() {
+            return '<div class="performance-content">' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">' +
+                
+                '<!-- Agent Performance -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">👥 Agent Performance Ranking</h4>' +
+                '<div style="space-y: 12px;">' +
+                '<div style="display: flex; justify-content: between; align-items: center; padding: 12px; background: #f0fdf4; border-radius: 8px; margin-bottom: 8px;">' +
+                '<div><span style="font-weight: 600; color: #059669;">🥇 Sarah Johnson</span><div style="font-size: 12px; color: #6b7280;">Resolution Rate: 98.2%</div></div>' +
+                '<div style="text-align: right;"><div style="font-weight: 600;">47 cases</div><div style="font-size: 12px; color: #059669;">4.9★</div></div>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: between; align-items: center; padding: 12px; background: #fef3f2; border-radius: 8px; margin-bottom: 8px;">' +
+                '<div><span style="font-weight: 600; color: #dc2626;">🥈 Mike Chen</span><div style="font-size: 12px; color: #6b7280;">Resolution Rate: 94.7%</div></div>' +
+                '<div style="text-align: right;"><div style="font-weight: 600;">39 cases</div><div style="font-size: 12px; color: #f59e0b;">4.6★</div></div>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: between; align-items: center; padding: 12px; background: #fef7f0; border-radius: 8px; margin-bottom: 8px;">' +
+                '<div><span style="font-weight: 600; color: #f59e0b;">🥉 Emma Davis</span><div style="font-size: 12px; color: #6b7280;">Resolution Rate: 91.3%</div></div>' +
+                '<div style="text-align: right;"><div style="font-weight: 600;">34 cases</div><div style="font-size: 12px; color: #3b82f6;">4.4★</div></div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Performance Metrics Chart -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📊 Team Performance Overview</h4>' +
+                '<canvas id="performanceChart" style="max-height: 300px;"></canvas>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- SLA Compliance Section -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px;">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">⏱️ SLA Compliance Dashboard</h4>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">' +
+                '<div style="text-align: center; padding: 16px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #059669;">' +
+                '<div style="font-size: 24px; font-weight: bold; color: #059669;">96.2%</div>' +
+                '<div style="font-size: 14px; color: #4b5563;">Critical SLA</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Target: 95%</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 16px; background: #fef3f2; border-radius: 8px; border-left: 4px solid #dc2626;">' +
+                '<div style="font-size: 24px; font-weight: bold; color: #dc2626;">87.4%</div>' +
+                '<div style="font-size: 14px; color: #4b5563;">High Priority SLA</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Target: 90%</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 16px; background: #eff6ff; border-radius: 8px; border-left: 4px solid #3b82f6;">' +
+                '<div style="font-size: 24px; font-weight: bold; color: #3b82f6;">92.1%</div>' +
+                '<div style="font-size: 14px; color: #4b5563;">Medium Priority SLA</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Target: 85%</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 16px; background: #f7fee7; border-radius: 8px; border-left: 4px solid #65a30d;">' +
+                '<div style="font-size: 24px; font-weight: bold; color: #65a30d;">98.7%</div>' +
+                '<div style="font-size: 14px; color: #4b5563;">Low Priority SLA</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Target: 80%</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateTrendsContent() {
+            return '<div class="trends-content">' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">' +
+                
+                '<!-- Monthly Trends -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📈 Monthly Case Trends</h4>' +
+                '<canvas id="monthlyTrendsChart" style="max-height: 300px;"></canvas>' +
+                '</div>' +
+                
+                '<!-- Category Breakdown -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">🏷️ Category Distribution</h4>' +
+                '<canvas id="categoryChart" style="max-height: 300px;"></canvas>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Trend Insights -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">🔍 Trend Analysis & Predictions</h4>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">' +
+                '<div style="padding: 16px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 8px;">' +
+                '<div style="font-weight: 600; color: #1e40af; margin-bottom: 8px;">📊 Volume Prediction</div>' +
+                '<div style="font-size: 14px; color: #1f2937;">Next month: Expected 15% increase in technical cases based on product launch patterns.</div>' +
+                '</div>' +
+                '<div style="padding: 16px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 8px;">' +
+                '<div style="font-weight: 600; color: #166534; margin-bottom: 8px;">⏱️ Response Time Trend</div>' +
+                '<div style="font-size: 14px; color: #1f2937;">Improving: Average response time decreased by 23% over last quarter.</div>' +
+                '</div>' +
+                '<div style="padding: 16px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 8px;">' +
+                '<div style="font-weight: 600; color: #92400e; margin-bottom: 8px;">📱 Channel Analysis</div>' +
+                '<div style="font-size: 14px; color: #1f2937;">Mobile cases increased 34% - recommend mobile app improvements.</div>' +
+                '</div>' +
+                '<div style="padding: 16px; background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-radius: 8px;">' +
+                '<div style="font-weight: 600; color: #be185d; margin-bottom: 8px;">🎯 Seasonal Pattern</div>' +
+                '<div style="font-size: 14px; color: #1f2937;">Holiday season approaching - historically 45% volume increase expected.</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateCustomBuilderContent() {
+            return '<div class="custom-builder-content">' +
+                '<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">' +
+                
+                '<!-- Report Builder Panel -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">🔧 Custom Report Builder</h4>' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<label style="display: block; margin-bottom: 8px; font-weight: 500;">Report Type</label>' +
+                '<select id="reportType" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;">' +
+                '<option value="summary">Executive Summary</option>' +
+                '<option value="detailed">Detailed Analysis</option>' +
+                '<option value="comparison">Comparison Report</option>' +
+                '<option value="trend">Trend Analysis</option>' +
+                '</select>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<label style="display: block; margin-bottom: 8px; font-weight: 500;">Date Range</label>' +
+                '<select id="dateRange" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;">' +
+                '<option value="7d">Last 7 Days</option>' +
+                '<option value="30d">Last 30 Days</option>' +
+                '<option value="90d">Last 90 Days</option>' +
+                '<option value="custom">Custom Range</option>' +
+                '</select>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<label style="display: block; margin-bottom: 8px; font-weight: 500;">Metrics to Include</label>' +
+                '<div style="space-y: 8px;">' +
+                '<label style="display: flex; align-items: center; margin-bottom: 6px;"><input type="checkbox" checked style="margin-right: 8px;"> Case Volume</label>' +
+                '<label style="display: flex; align-items: center; margin-bottom: 6px;"><input type="checkbox" checked style="margin-right: 8px;"> Response Times</label>' +
+                '<label style="display: flex; align-items: center; margin-bottom: 6px;"><input type="checkbox" style="margin-right: 8px;"> Agent Performance</label>' +
+                '<label style="display: flex; align-items: center; margin-bottom: 6px;"><input type="checkbox" style="margin-right: 8px;"> Customer Satisfaction</label>' +
+                '<label style="display: flex; align-items: center; margin-bottom: 6px;"><input type="checkbox" checked style="margin-right: 8px;"> SLA Compliance</label>' +
+                '</div>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<label style="display: block; margin-bottom: 8px; font-weight: 500;">Chart Types</label>' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">' +
+                '<label style="display: flex; align-items: center;"><input type="checkbox" checked style="margin-right: 8px;"> Line Charts</label>' +
+                '<label style="display: flex; align-items: center;"><input type="checkbox" style="margin-right: 8px;"> Bar Charts</label>' +
+                '<label style="display: flex; align-items: center;"><input type="checkbox" checked style="margin-right: 8px;"> Pie Charts</label>' +
+                '<label style="display: flex; align-items: center;"><input type="checkbox" style="margin-right: 8px;"> Heat Maps</label>' +
+                '</div>' +
+                '</div>' +
+                
+                '<button onclick="generateCustomReport()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; margin-bottom: 12px;">📊 Generate Report</button>' +
+                '<button onclick="saveReportTemplate()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">💾 Save Template</button>' +
+                '</div>' +
+                
+                '<!-- Report Preview -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📋 Report Preview</h4>' +
+                '<div id="reportPreview" style="min-height: 400px; background: #f9fafb; border: 2px dashed #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6b7280;">' +
+                'Select options and click "Generate Report" to see preview' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Saved Templates -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 24px;">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📚 Saved Templates</h4>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">' +
+                '<div style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer;" onclick="loadTemplate(&quot;executive&quot;)">' +
+                '<div style="font-weight: 600; margin-bottom: 4px;">Executive Summary</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Monthly overview with key metrics</div>' +
+                '</div>' +
+                '<div style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer;" onclick="loadTemplate(&quot;performance&quot;)">' +
+                '<div style="font-weight: 600; margin-bottom: 4px;">Team Performance</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Agent rankings and metrics</div>' +
+                '</div>' +
+                '<div style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer;" onclick="loadTemplate(&quot;sla&quot;)">' +
+                '<div style="font-weight: 600; margin-bottom: 4px;">SLA Compliance</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Service level analysis</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateExportsContent() {
+            return '<div class="exports-content">' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">' +
+                
+                '<!-- Export Options -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📤 Export Options</h4>' +
+                '<div style="space-y: 16px;">' +
+                '<button onclick="exportToPDF()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center;"><span style="margin-right: 8px;">📄</span> Export to PDF</button>' +
+                '<button onclick="exportToExcel()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center;"><span style="margin-right: 8px;">📊</span> Export to Excel</button>' +
+                '<button onclick="exportToCSV()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center;"><span style="margin-right: 8px;">📋</span> Export to CSV</button>' +
+                '<button onclick="emailReport()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center;"><span style="margin-right: 8px;">📧</span> Email Report</button>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Scheduled Reports -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">⏰ Schedule Reports</h4>' +
+                '<div style="margin-bottom: 16px;">' +
+                '<label style="display: block; margin-bottom: 8px; font-weight: 500;">Frequency</label>' +
+                '<select style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 12px;">' +
+                '<option>Daily</option>' +
+                '<option>Weekly</option>' +
+                '<option>Monthly</option>' +
+                '<option>Quarterly</option>' +
+                '</select>' +
+                '</div>' +
+                '<div style="margin-bottom: 16px;">' +
+                '<label style="display: block; margin-bottom: 8px; font-weight: 500;">Recipients</label>' +
+                '<input type="email" placeholder="Enter email addresses..." style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 12px;">' +
+                '</div>' +
+                '<button onclick="scheduleReport()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">📅 Schedule Report</button>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Recent Exports -->' +
+                '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📥 Recent Exports</h4>' +
+                '<div style="space-y: 12px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px;">' +
+                '<div><div style="font-weight: 500;">Executive Summary - January 2025</div><div style="font-size: 12px; color: #6b7280;">PDF • 2.4 MB • 2 hours ago</div></div>' +
+                '<button style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">Download</button>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px;">' +
+                '<div><div style="font-weight: 500;">Agent Performance Report</div><div style="font-size: 12px; color: #6b7280;">Excel • 1.8 MB • 5 hours ago</div></div>' +
+                '<button style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">Download</button>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f9fafb; border-radius: 8px;">' +
+                '<div><div style="font-weight: 500;">Case Data Export</div><div style="font-size: 12px; color: #6b7280;">CSV • 892 KB • 1 day ago</div></div>' +
+                '<button style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">Download</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
         }
 
         function showPerformanceModal() {
@@ -5200,6 +5636,231 @@ const htmlTemplate = `
             setTimeout(() => {
                 notification.remove();
             }, 3000);
+        }
+
+        function initializePerformanceCharts() {
+            const ctx = document.getElementById('performanceChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Resolution Rate', 'Response Time', 'Customer Rating', 'Case Load', 'SLA Compliance', 'First Contact Resolution'],
+                        datasets: [{
+                            label: 'Sarah Johnson',
+                            data: [98, 85, 95, 75, 96, 89],
+                            backgroundColor: 'rgba(5, 150, 105, 0.2)',
+                            borderColor: '#059669',
+                            borderWidth: 2
+                        }, {
+                            label: 'Mike Chen',
+                            data: [94, 78, 88, 82, 87, 76],
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 2
+                        }, {
+                            label: 'Emma Davis',
+                            data: [91, 92, 85, 68, 92, 83],
+                            backgroundColor: 'rgba(249, 158, 11, 0.2)',
+                            borderColor: '#f59e0b',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initializeTrendsCharts() {
+            // Monthly Trends Chart
+            const ctx1 = document.getElementById('monthlyTrendsChart');
+            if (ctx1) {
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+                        datasets: [{
+                            label: 'Total Cases',
+                            data: [156, 189, 234, 298, 312],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }, {
+                            label: 'Resolved Cases',
+                            data: [142, 178, 221, 276, 294],
+                            borderColor: '#059669',
+                            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'top' } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+
+            // Category Chart
+            const ctx2 = document.getElementById('categoryChart');
+            if (ctx2) {
+                new Chart(ctx2, {
+                    type: 'polarArea',
+                    data: {
+                        labels: ['Technical Support', 'Billing', 'Account Management', 'Product Features', 'Bug Reports', 'Other'],
+                        datasets: [{
+                            data: [145, 89, 67, 45, 34, 12],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(5, 150, 105, 0.8)',
+                                'rgba(249, 158, 11, 0.8)',
+                                'rgba(124, 58, 237, 0.8)',
+                                'rgba(220, 38, 38, 0.8)',
+                                'rgba(107, 114, 128, 0.8)'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+        }
+
+        // Export Functions
+        function exportToPDF() {
+            showNotification('🔄 Generating PDF report...', 'info');
+            
+            setTimeout(() => {
+                // Simulate PDF generation
+                const link = document.createElement('a');
+                link.href = 'data:application/pdf;base64,JVBERi0xLjMKJf////8';
+                link.download = 'case-management-report.pdf';
+                link.click();
+                showNotification('📄 PDF report downloaded successfully!', 'success');
+            }, 2000);
+        }
+
+        function exportToExcel() {
+            showNotification('🔄 Generating Excel report...', 'info');
+            
+            setTimeout(() => {
+                // Simulate Excel generation
+                const csvContent = "data:text/csv;charset=utf-8," +
+                    "Case ID,Title,Priority,Status,Agent,Created Date,Resolution Date\\n" +
+                    "CASE-001,Login Issue,High,Resolved,Sarah Johnson,2025-01-01,2025-01-02\\n" +
+                    "CASE-002,Billing Question,Medium,Open,Mike Chen,2025-01-03,\\n" +
+                    "CASE-003,Feature Request,Low,In Progress,Emma Davis,2025-01-04,\\n";
+                
+                const link = document.createElement('a');
+                link.href = encodeURI(csvContent);
+                link.download = 'case-management-data.csv';
+                link.click();
+                showNotification('📊 Excel report downloaded successfully!', 'success');
+            }, 1500);
+        }
+
+        function exportToCSV() {
+            showNotification('🔄 Generating CSV export...', 'info');
+            
+            setTimeout(() => {
+                const csvContent = "data:text/csv;charset=utf-8," +
+                    "Metric,Value,Period\\n" +
+                    "Total Cases,847,January 2025\\n" +
+                    "Resolution Rate,94.2%,January 2025\\n" +
+                    "Avg Response Time,2.1 hours,January 2025\\n" +
+                    "Customer Satisfaction,4.7 stars,January 2025\\n";
+                
+                const link = document.createElement('a');
+                link.href = encodeURI(csvContent);
+                link.download = 'case-metrics-export.csv';
+                link.click();
+                showNotification('📋 CSV data exported successfully!', 'success');
+            }, 1000);
+        }
+
+        function emailReport() {
+            showNotification('📧 Opening email client with report...', 'info');
+            
+            const subject = encodeURIComponent('Case Management Report - January 2025');
+            const body = encodeURIComponent('Please find the attached case management report for January 2025.\\n\\nKey Highlights:\\n• Total Cases: 847\\n• Resolution Rate: 94.2%\\n• Customer Satisfaction: 4.7★\\n\\nBest regards,\\nCase Management System');
+            
+            window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+        }
+
+        function scheduleReport() {
+            showNotification('📅 Report scheduling configured successfully!', 'success');
+        }
+
+        function generateInstantReport() {
+            showNotification('🔄 Generating instant report...', 'info');
+            
+            setTimeout(() => {
+                showNotification('📊 Instant report generated! Check your downloads.', 'success');
+            }, 2000);
+        }
+
+        function shareReport() {
+            showNotification('📧 Report sharing link copied to clipboard!', 'success');
+        }
+
+        // Custom Report Builder Functions
+        function generateCustomReport() {
+            const reportType = document.getElementById('reportType')?.value || 'summary';
+            const dateRange = document.getElementById('dateRange')?.value || '30d';
+            
+            showNotification('🔄 Generating custom report...', 'info');
+            
+            setTimeout(() => {
+                const preview = document.getElementById('reportPreview');
+                if (preview) {
+                    preview.innerHTML = 
+                        '<div style="padding: 20px; text-align: left;">' +
+                        '<h3 style="margin-bottom: 16px; color: #059669;">📊 Custom Report Preview</h3>' +
+                        '<div style="background: #f0fdf4; padding: 12px; border-radius: 8px; margin-bottom: 12px;">' +
+                        '<strong>Report Type:</strong> ' + reportType.charAt(0).toUpperCase() + reportType.slice(1) +
+                        '</div>' +
+                        '<div style="background: #eff6ff; padding: 12px; border-radius: 8px; margin-bottom: 12px;">' +
+                        '<strong>Date Range:</strong> ' + dateRange +
+                        '</div>' +
+                        '<div style="background: #fef3f2; padding: 12px; border-radius: 8px; margin-bottom: 12px;">' +
+                        '<strong>Generated:</strong> ' + new Date().toLocaleString() +
+                        '</div>' +
+                        '<div style="margin-top: 16px; padding: 16px; background: #f9fafb; border-radius: 8px;">' +
+                        '<h4>Sample Data Preview:</h4>' +
+                        '<p style="margin: 8px 0;">• Total Cases: 847</p>' +
+                        '<p style="margin: 8px 0;">• Resolution Rate: 94.2%</p>' +
+                        '<p style="margin: 8px 0;">• Avg Response Time: 2.1h</p>' +
+                        '<p style="margin: 8px 0;">• Customer Satisfaction: 4.7★</p>' +
+                        '</div>' +
+                        '</div>';
+                }
+                showNotification('📊 Custom report preview generated!', 'success');
+            }, 1500);
+        }
+
+        function saveReportTemplate() {
+            showNotification('💾 Report template saved successfully!', 'success');
+        }
+
+        function loadTemplate(templateName) {
+            showNotification('📚 Loading ' + templateName + ' template...', 'info');
+            
+            setTimeout(() => {
+                showNotification('✅ ' + templateName.charAt(0).toUpperCase() + templateName.slice(1) + ' template loaded!', 'success');
+            }, 500);
         }
 
         // Initialize app
