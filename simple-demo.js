@@ -13,6 +13,10 @@ const mockUser = {
   role: 'admin'
 };
 
+// Global navigation variables
+let currentView = 'dashboard';
+let currentCustomerId = null;
+
 const mockStats = {
   overview: {
     totalCases: 25,
@@ -434,6 +438,64 @@ const htmlTemplate = `
         .customer-status.inactive { background: #fef2f2; color: #991b1b; }
         .customer-status.prospect { background: #fef3c7; color: #92400e; }
         .customer-status.churned { background: #f3f4f6; color: #374151; }
+        
+        /* Customer Profile Page Tabs */
+        .profile-tab {
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        
+        .profile-tab:hover {
+            color: #334155;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .profile-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px 8px 0 0;
+        }
+        
+        /* Contact Cards */
+        .contact-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .contact-card:hover {
+            border-color: #6366f1;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .contact-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .contact-type-badge.primary { background: #dbeafe; color: #1d4ed8; }
+        .contact-type-badge.technical { background: #ecfdf5; color: #065f46; }
+        .contact-type-badge.billing { background: #fef3c7; color: #92400e; }
+        .contact-type-badge.executive { background: #fce7f3; color: #be185d; }
         
         /* Main Content */
         .main-content {
@@ -2730,28 +2792,51 @@ const htmlTemplate = `
         }
 
         function showCustomersModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.cssText = 'z-index: 10000;';
-            modal.innerHTML = generateAdvancedCustomerManagementHTML();
-            document.body.appendChild(modal);
-            initializeCustomerManagement();
+            // Show customers as a page instead of modal
+            showCustomersPage();
         }
 
-        function generateAdvancedCustomerManagementHTML() {
-            return '<div class="modal-content" style="width: 95vw; max-width: 1400px; height: 90vh; max-height: none;">' +
-                '<div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px 12px 0 0;">' +
+        function showCustomersPage() {
+            // Update page title
+            const pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) {
+                pageTitle.textContent = '🏢 Customers';
+            }
+            
+            // Replace dashboard content with customers page
+            const dashboardContent = document.getElementById('dashboardContent');
+            if (dashboardContent) {
+                dashboardContent.innerHTML = generateAdvancedCustomerPageHTML();
+                initializeCustomerManagement();
+            }
+            
+            currentView = 'customers';
+        }
+
+        function generateAdvancedCustomerPageHTML() {
+            return '<div style="background: #f8fafc; margin: -20px; min-height: calc(100vh - 100px);">' +
+                '<!-- Breadcrumbs -->' +
+                '<div style="background: white; padding: 16px 32px; border-bottom: 1px solid #e5e7eb;">' +
+                '<nav style="display: flex; align-items: center; gap: 8px; font-size: 14px;">' +
+                '<a href="#" onclick="showDashboard(); return false;" style="color: #6b7280; text-decoration: none;">Dashboard</a>' +
+                '<span style="color: #9ca3af;">›</span>' +
+                '<span style="color: #1f2937; font-weight: 500;">Customers</span>' +
+                '</nav>' +
+                '</div>' +
+                
+                '<!-- Page Header -->' +
+                '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 32px;">' +
                 '<div style="display: flex; align-items: center; justify-content: space-between;">' +
                 '<div>' +
-                '<h2 class="modal-title" style="color: white; margin: 0; font-size: 24px;">🏢 Advanced Customer Management</h2>' +
-                '<p style="color: rgba(255,255,255,0.8); margin: 4px 0 0 0; font-size: 14px;">Enterprise CRM • Customer 360° • Sales Intelligence</p>' +
+                '<h2 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">🏢 Customer Management Center</h2>' +
+                '<p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">Enterprise CRM • Customer 360° • Sales Intelligence</p>' +
                 '</div>' +
-                '<button class="close-btn" onclick="this.closest(&quot;.modal&quot;).remove()" style="color: white; font-size: 24px;">&times;</button>' +
+                '<button onclick="showDashboard()" style="color: white; font-size: 14px; background: rgba(255,255,255,0.2); border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">← Back to Dashboard</button>' +
                 '</div>' +
                 '</div>' +
 
                 '<!-- Customer Management Tabs -->' +
-                '<div style="display: flex; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">' +
+                '<div style="display: flex; background: white; border-bottom: 1px solid #e2e8f0; padding: 0 32px;">' +
                 '<button class="customer-tab active" onclick="showCustomerTab(&quot;directory&quot;)" data-tab="directory">📁 Master Directory</button>' +
                 '<button class="customer-tab" onclick="showCustomerTab(&quot;profiles&quot;)" data-tab="profiles">👤 Customer Profiles</button>' +
                 '<button class="customer-tab" onclick="showCustomerTab(&quot;segments&quot;)" data-tab="segments">📊 Segments & Analytics</button>' +
@@ -2761,8 +2846,8 @@ const htmlTemplate = `
                 '</div>' +
 
                 '<!-- Tab Content Area -->' +
-                '<div class="modal-body" style="flex: 1; overflow: hidden; padding: 0;">' +
-                '<div id="customerTabContent" style="height: 100%; overflow-y: auto; padding: 20px;">' +
+                '<div style="background: white; margin: 0 32px 32px 32px; padding: 32px; border-radius: 0 0 12px 12px; min-height: 500px;">' +
+                '<div id="customerTabContent">' +
                 generateCustomerDirectoryHTML() +
                 '</div>' +
                 '</div>' +
@@ -3041,7 +3126,8 @@ const htmlTemplate = `
         }
 
         function viewCustomerDetail(customerId) {
-            showNotification('👤 Opening detailed profile for customer ID: ' + customerId, 'info');
+            // Open customer detail as a page, not a modal
+            openCustomerProfilePage(customerId);
         }
 
         function createCase(email) {
@@ -3059,13 +3145,163 @@ const htmlTemplate = `
         // Advanced Customer Module Tab Content Functions
         function generateCustomerProfilesHTML() {
             return '<div style="padding: 20px;">' +
-                '<h3 style="color: #1f2937; margin-bottom: 20px;">👤 Customer 360° Profiles</h3>' +
-                '<div style="text-align: center; padding: 60px 20px; color: #64748b;">' +
-                '<div style="font-size: 48px; margin-bottom: 16px;">👥</div>' +
-                '<h4 style="color: #1f2937;">Advanced Customer Profiles</h4>' +
-                '<p>Comprehensive customer profiles with custom fields, relationship mapping, and interaction history coming soon.</p>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 20px;">👤 Customer 360° Profiles</h3>' +
+                '<p style="color: #64748b; margin: 4px 0 0 0; font-size: 14px;">Comprehensive customer profiles with contacts, interactions & custom fields</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="addCustomProfile()" class="btn" style="background: #f59e0b; color: white; padding: 8px 16px; border-radius: 8px; border: none;">➕ Add Profile</button>' +
+                '<button onclick="bulkProfileActions()" class="btn" style="background: #6366f1; color: white; padding: 8px 16px; border-radius: 8px; border: none;">⚙️ Bulk Actions</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Profile Search and Filters -->' +
+                '<div style="display: grid; grid-template-columns: 1fr auto auto; gap: 16px; margin-bottom: 24px; padding: 20px; background: #f8fafc; border-radius: 12px;">' +
+                '<input type="text" placeholder="🔍 Search profiles by name, company, role..." style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;" onkeyup="searchCustomerProfiles(this.value)">' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;" onchange="filterProfilesByType(this.value)">' +
+                '<option value="">All Profile Types</option>' +
+                '<option value="primary">Primary Contacts</option>' +
+                '<option value="technical">Technical Contacts</option>' +
+                '<option value="billing">Billing Contacts</option>' +
+                '<option value="executive">Executive Contacts</option>' +
+                '</select>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;" onchange="filterProfilesByActivity(this.value)">' +
+                '<option value="">All Activity</option>' +
+                '<option value="recent">Recent (7 days)</option>' +
+                '<option value="active">Active (30 days)</option>' +
+                '<option value="inactive">Inactive (90+ days)</option>' +
+                '</select>' +
+                '</div>' +
+
+                '<!-- Customer Profile Cards -->' +
+                '<div id="customerProfilesList" style="display: grid; gap: 20px;">' +
+                generateCustomerProfileCards() +
                 '</div>' +
                 '</div>';
+        }
+
+        function generateCustomerProfileCards() {
+            const customerProfiles = [
+                {
+                    id: 'microsoft',
+                    company: 'Microsoft Corporation',
+                    primaryContact: 'Satya Nadella',
+                    totalContacts: 8,
+                    recentActivity: '2 hours ago',
+                    health: '98.2%',
+                    segment: 'Enterprise',
+                    logo: '🏢',
+                    color: '#0078d4',
+                    tags: ['Strategic', 'High-Value', 'Partnership']
+                },
+                {
+                    id: 'salesforce',
+                    company: 'Salesforce Inc',
+                    primaryContact: 'Marc Benioff',
+                    totalContacts: 6,
+                    recentActivity: '1 day ago',
+                    health: '96.7%',
+                    segment: 'Enterprise',
+                    logo: '⚡',
+                    color: '#00a1e0',
+                    tags: ['Strategic', 'Integration', 'API']
+                },
+                {
+                    id: 'adobe',
+                    company: 'Adobe Systems',
+                    primaryContact: 'Shantanu Narayen',
+                    totalContacts: 5,
+                    recentActivity: '3 hours ago',
+                    health: '94.1%',
+                    segment: 'Enterprise',
+                    logo: '🎨',
+                    color: '#ff0000',
+                    tags: ['Creative', 'High-Value', 'Expansion']
+                },
+                {
+                    id: 'techstart',
+                    company: 'TechStart Solutions',
+                    primaryContact: 'Sarah Wilson',
+                    totalContacts: 3,
+                    recentActivity: '5 hours ago',
+                    health: '87.3%',
+                    segment: 'Mid-Market',
+                    logo: '🚀',
+                    color: '#10b981',
+                    tags: ['Growing', 'SaaS', 'Potential']
+                },
+                {
+                    id: 'acme',
+                    company: 'Acme Corporation',
+                    primaryContact: 'John Anderson',
+                    totalContacts: 2,
+                    recentActivity: '1 week ago',
+                    health: '72.1%',
+                    segment: 'SMB',
+                    logo: '🏭',
+                    color: '#f59e0b',
+                    tags: ['At-Risk', 'Manufacturing', 'Traditional']
+                }
+            ];
+
+            let html = '';
+            customerProfiles.forEach(profile => {
+                html += '<div class="customer-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; transition: all 0.3s ease; cursor: pointer;" onclick="openCustomerProfilePage(&quot;' + profile.id + '&quot;)" onmouseover="this.style.transform=&quot;translateY(-4px)&quot;; this.style.boxShadow=&quot;0 8px 25px rgba(0,0,0,0.15)&quot;" onmouseout="this.style.transform=&quot;&quot;; this.style.boxShadow=&quot;&quot;">' +
+                    '<!-- Profile Header -->' +
+                    '<div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">' +
+                    '<div style="display: flex; align-items: center;">' +
+                    '<div style="width: 56px; height: 56px; background: ' + profile.color + '; color: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' + profile.logo + '</div>' +
+                    '<div>' +
+                    '<h4 style="color: #1f2937; margin: 0 0 6px 0; font-size: 20px; font-weight: 700;">' + profile.company + '</h4>' +
+                    '<p style="color: #64748b; margin: 0; font-size: 14px;">👤 ' + profile.primaryContact + ' • ' + profile.segment + ' Segment</p>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<div style="font-size: 16px; font-weight: 600; color: ' + (parseFloat(profile.health) > 90 ? '#059669' : parseFloat(profile.health) > 80 ? '#f59e0b' : '#dc2626') + '; margin-bottom: 4px;">' + profile.health + '</div>' +
+                    '<div style="font-size: 12px; color: #64748b;">Health Score</div>' +
+                    '</div>' +
+                    '</div>' +
+
+                    '<!-- Profile Stats -->' +
+                    '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 16px; margin-bottom: 20px; padding: 16px; background: #f8fafc; border-radius: 12px;">' +
+                    '<div style="text-align: center;">' +
+                    '<div style="font-size: 20px; font-weight: 700; color: #1f2937; margin-bottom: 4px;">' + profile.totalContacts + '</div>' +
+                    '<div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 500;">Contacts</div>' +
+                    '</div>' +
+                    '<div style="text-align: center;">' +
+                    '<div style="font-size: 20px; font-weight: 700; color: #6366f1; margin-bottom: 4px;">4.8</div>' +
+                    '<div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 500;">Rating</div>' +
+                    '</div>' +
+                    '<div style="text-align: center;">' +
+                    '<div style="font-size: 20px; font-weight: 700; color: #10b981; margin-bottom: 4px;">12</div>' +
+                    '<div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 500;">Interactions</div>' +
+                    '</div>' +
+                    '</div>' +
+
+                    '<!-- Profile Tags -->' +
+                    '<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">';
+                
+                profile.tags.forEach(tag => {
+                    const tagColor = tag === 'Strategic' ? '#6366f1' : tag === 'High-Value' ? '#059669' : tag === 'At-Risk' ? '#dc2626' : '#64748b';
+                    html += '<span style="background: ' + tagColor + '20; color: ' + tagColor + '; padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 500;">' + tag + '</span>';
+                });
+
+                html += '</div>' +
+
+                    '<!-- Profile Actions -->' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #f3f4f6;">' +
+                    '<div style="font-size: 12px; color: #64748b;">Last activity: ' + profile.recentActivity + '</div>' +
+                    '<div style="display: flex; gap: 8px;">' +
+                    '<button onclick="event.stopPropagation(); quickCallCustomer(&quot;' + profile.id + '&quot;)" style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer;">📞 Call</button>' +
+                    '<button onclick="event.stopPropagation(); quickEmailCustomer(&quot;' + profile.id + '&quot;)" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer;">📧 Email</button>' +
+                    '<button onclick="event.stopPropagation(); viewProfileDetails(&quot;' + profile.id + '&quot;)" style="background: #6366f1; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer;">👁️ View</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+
+            return html;
         }
 
         function generateSegmentsAnalyticsHTML() {
@@ -3373,33 +3609,1225 @@ const htmlTemplate = `
             showNotification('📊 Generating enterprise report for: ' + company, 'info');
         }
 
-        function showContactHistoryModal() {
+        // Customer Profile Management Functions
+        function openCustomerProfilePage(customerId) {
+            // Close any open modals first
+            document.querySelectorAll('.modal').forEach(modal => modal.remove());
+            
+            // Navigate to customer profile page instead of modal
+            currentView = 'customer-profile';
+            currentCustomerId = customerId;
+            
+            // Update the page title
+            const pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) {
+                pageTitle.textContent = '🏢 Customer Profile';
+            }
+            
+            // Replace dashboard content with customer profile
+            const dashboardContent = document.getElementById('dashboardContent');
+            if (dashboardContent) {
+                dashboardContent.innerHTML = generateDetailedCustomerProfilePageHTML(customerId);
+                initializeCustomerProfilePage(customerId);
+            }
+        }
+
+        function generateDetailedCustomerProfilePageHTML(customerId) {
+            const customerData = getCustomerDataById(customerId);
+            
+            return '<div style="background: #f8fafc; padding: 0; margin: -20px;">' +
+                '<!-- Breadcrumbs -->' +
+                '<div style="background: white; padding: 16px 32px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between;">' +
+                '<nav style="display: flex; align-items: center; gap: 8px; font-size: 14px;">' +
+                '<a href="#" onclick="showDashboard(); return false;" style="color: #6b7280; text-decoration: none; hover: color: #3b82f6;">Dashboard</a>' +
+                '<span style="color: #9ca3af;">›</span>' +
+                '<a href="#" onclick="showCustomersModal(); return false;" style="color: #6b7280; text-decoration: none;">Customers</a>' +
+                '<span style="color: #9ca3af;">›</span>' +
+                '<span style="color: #1f2937; font-weight: 500;">' + customerData.company + '</span>' +
+                '</nav>' +
+                '<button onclick="goBackToCustomers()" style="color: #6b7280; font-size: 14px; background: white; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 6px; cursor: pointer;">← Back</button>' +
+                '</div>' +
+                
+                '<!-- Customer Profile Header -->' +
+                '<div style="background: linear-gradient(135deg, ' + customerData.color + ', ' + customerData.secondaryColor + '); color: white; padding: 32px; position: relative;">' +
+                
+                '<div style="display: flex; align-items: center; margin-bottom: 24px;">' +
+                '<div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-right: 24px;">' + customerData.logo + '</div>' +
+                '<div style="flex: 1;">' +
+                '<h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 800;">' + customerData.company + '</h1>' +
+                '<div style="display: flex; align-items: center; gap: 20px; opacity: 0.9;">' +
+                '<span style="font-size: 16px;">📍 ' + customerData.location + '</span>' +
+                '<span style="font-size: 16px;">🏢 ' + customerData.industry + '</span>' +
+                '<span style="font-size: 16px;">👥 ' + customerData.employees + ' employees</span>' +
+                '</div>' +
+                '</div>' +
+                '<div style="text-align: right;">' +
+                '<div style="font-size: 36px; font-weight: 800; margin-bottom: 4px;">' + customerData.health + '</div>' +
+                '<div style="opacity: 0.9;">Health Score</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Key Metrics Row -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">' +
+                '<div style="text-align: center; background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px;">' +
+                '<div style="font-size: 24px; font-weight: bold;">' + customerData.arr + '</div>' +
+                '<div style="opacity: 0.9; font-size: 14px;">Annual Revenue</div>' +
+                '</div>' +
+                '<div style="text-align: center; background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px;">' +
+                '<div style="font-size: 24px; font-weight: bold;">' + customerData.totalContacts + '</div>' +
+                '<div style="opacity: 0.9; font-size: 14px;">Total Contacts</div>' +
+                '</div>' +
+                '<div style="text-align: center; background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px;">' +
+                '<div style="font-size: 24px; font-weight: bold;">' + customerData.activeCases + '</div>' +
+                '<div style="opacity: 0.9; font-size: 14px;">Active Cases</div>' +
+                '</div>' +
+                '<div style="text-align: center; background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px;">' +
+                '<div style="font-size: 24px; font-weight: bold;">' + customerData.lastActivity + '</div>' +
+                '<div style="opacity: 0.9; font-size: 14px;">Last Activity</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Navigation Tabs -->' +
+                '<div style="display: flex; background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0 32px;">' +
+                '<button class="profile-tab active" onclick="showProfileTab(&quot;overview&quot;, &quot;' + customerId + '&quot;)" data-tab="overview">📊 Overview</button>' +
+                '<button class="profile-tab" onclick="showProfileTab(&quot;contacts&quot;, &quot;' + customerId + '&quot;)" data-tab="contacts">👥 Contacts (' + customerData.totalContacts + ')</button>' +
+                '<button class="profile-tab" onclick="showProfileTab(&quot;interactions&quot;, &quot;' + customerId + '&quot;)" data-tab="interactions">💬 Interactions</button>' +
+                '<button class="profile-tab" onclick="showProfileTab(&quot;cases&quot;, &quot;' + customerId + '&quot;)" data-tab="cases">📝 Cases (' + customerData.activeCases + ')</button>' +
+                '<button class="profile-tab" onclick="showProfileTab(&quot;documents&quot;, &quot;' + customerId + '&quot;)" data-tab="documents">📁 Documents</button>' +
+                '<button class="profile-tab" onclick="showProfileTab(&quot;analytics&quot;, &quot;' + customerId + '&quot;)" data-tab="analytics">📈 Analytics</button>' +
+                '</div>' +
+
+                '<!-- Tab Content Area -->' +
+                '<div style="flex: 1; overflow-y: auto; padding: 32px;" id="profileTabContent">' +
+                generateCustomerOverviewTab(customerData) +
+                '</div>' +
+                '</div>';
+        }
+
+        function getCustomerDataById(customerId) {
+            const customerDatabase = {
+                'microsoft': {
+                    company: 'Microsoft Corporation',
+                    logo: '🏢',
+                    color: '#0078d4',
+                    secondaryColor: '#106ebe',
+                    location: 'Redmond, WA, USA',
+                    industry: 'Technology & Software',
+                    employees: '221,000+',
+                    health: '98.2%',
+                    arr: '$2.4M',
+                    totalContacts: 8,
+                    activeCases: 12,
+                    lastActivity: '2 hours ago',
+                    website: 'https://microsoft.com',
+                    founded: '1975',
+                    description: 'Multinational technology corporation that produces computer software, consumer electronics, personal computers, and related services.',
+                    contacts: [
+                        {
+                            id: 'satya-nadella',
+                            name: 'Satya Nadella',
+                            title: 'CEO',
+                            email: 'satya.nadella@microsoft.com',
+                            phone: '+1 (425) 882-8080',
+                            department: 'Executive',
+                            role: 'Decision Maker',
+                            contactType: 'primary',
+                            lastContact: '2 hours ago',
+                            interactions: 47,
+                            avatar: 'SN',
+                            status: 'active',
+                            expertise: ['Strategic Planning', 'Cloud Computing', 'AI'],
+                            preferredContact: 'Email',
+                            timezone: 'PST',
+                            socialLinkedIn: 'https://linkedin.com/in/satyanadella'
+                        },
+                        {
+                            id: 'brad-smith',
+                            name: 'Brad Smith',
+                            title: 'President & Chief Legal Officer',
+                            email: 'brad.smith@microsoft.com',
+                            phone: '+1 (425) 882-8081',
+                            department: 'Legal',
+                            role: 'Stakeholder',
+                            contactType: 'executive',
+                            lastContact: '1 day ago',
+                            interactions: 23,
+                            avatar: 'BS',
+                            status: 'active',
+                            expertise: ['Legal Affairs', 'Government Relations', 'Policy'],
+                            preferredContact: 'Phone',
+                            timezone: 'PST',
+                            socialLinkedIn: 'https://linkedin.com/in/bradsmith'
+                        },
+                        {
+                            id: 'scott-guthrie',
+                            name: 'Scott Guthrie',
+                            title: 'Executive VP, Cloud + AI',
+                            email: 'scott.guthrie@microsoft.com',
+                            phone: '+1 (425) 882-8082',
+                            department: 'Engineering',
+                            role: 'Technical Lead',
+                            contactType: 'technical',
+                            lastContact: '3 hours ago',
+                            interactions: 65,
+                            avatar: 'SG',
+                            status: 'active',
+                            expertise: ['Azure', 'Cloud Architecture', 'AI/ML'],
+                            preferredContact: 'Teams',
+                            timezone: 'PST',
+                            socialLinkedIn: 'https://linkedin.com/in/scottgu'
+                        },
+                        {
+                            id: 'amy-hood',
+                            name: 'Amy Hood',
+                            title: 'CFO',
+                            email: 'amy.hood@microsoft.com',
+                            phone: '+1 (425) 882-8083',
+                            department: 'Finance',
+                            role: 'Financial Lead',
+                            contactType: 'billing',
+                            lastContact: '1 week ago',
+                            interactions: 18,
+                            avatar: 'AH',
+                            status: 'active',
+                            expertise: ['Financial Planning', 'Budget Management', 'Strategy'],
+                            preferredContact: 'Email',
+                            timezone: 'PST',
+                            socialLinkedIn: 'https://linkedin.com/in/amyhood'
+                        },
+                        {
+                            id: 'kathleen-hogan',
+                            name: 'Kathleen Hogan',
+                            title: 'Chief People Officer',
+                            email: 'kathleen.hogan@microsoft.com',
+                            phone: '+1 (425) 882-8084',
+                            department: 'Human Resources',
+                            role: 'Operations',
+                            contactType: 'operations',
+                            lastContact: '2 weeks ago',
+                            interactions: 12,
+                            avatar: 'KH',
+                            status: 'active',
+                            expertise: ['HR Strategy', 'Talent Management', 'Culture'],
+                            preferredContact: 'Email',
+                            timezone: 'PST',
+                            socialLinkedIn: 'https://linkedin.com/in/kathleenhogan'
+                        }
+                    ]
+                },
+                'salesforce': {
+                    company: 'Salesforce Inc',
+                    logo: '⚡',
+                    color: '#00a1e0',
+                    secondaryColor: '#0071c1',
+                    location: 'San Francisco, CA, USA',
+                    industry: 'Cloud Software & CRM',
+                    employees: '73,000+',
+                    health: '96.7%',
+                    arr: '$1.85M',
+                    totalContacts: 6,
+                    activeCases: 8,
+                    lastActivity: '1 day ago',
+                    website: 'https://salesforce.com',
+                    founded: '1999',
+                    description: 'American cloud-based software company headquartered in San Francisco, California. It provides customer relationship management software and applications.',
+                    contacts: [
+                        {
+                            id: 'marc-benioff',
+                            name: 'Marc Benioff',
+                            title: 'Chairman & CEO',
+                            email: 'marc.benioff@salesforce.com',
+                            phone: '+1 (415) 901-7000',
+                            department: 'Executive',
+                            role: 'Decision Maker',
+                            contactType: 'primary',
+                            lastContact: '1 day ago',
+                            interactions: 34,
+                            avatar: 'MB',
+                            status: 'active',
+                            expertise: ['CRM Strategy', 'Cloud Computing', 'Innovation'],
+                            preferredContact: 'Phone',
+                            timezone: 'PST',
+                            socialLinkedIn: 'https://linkedin.com/in/marcbenioff'
+                        },
+                        {
+                            id: 'parker-harris',
+                            name: 'Parker Harris',
+                            title: 'Co-Founder & CTO',
+                            email: 'parker.harris@salesforce.com',
+                            phone: '+1 (415) 901-7001',
+                            department: 'Engineering',
+                            role: 'Technical Lead',
+                            contactType: 'technical',
+                            lastContact: '2 days ago',
+                            interactions: 28,
+                            avatar: 'PH',
+                            status: 'active',
+                            expertise: ['Platform Architecture', 'API Development', 'Integration'],
+                            preferredContact: 'Slack',
+                            timezone: 'PST',
+                            socialLinkedIn: 'https://linkedin.com/in/parkerharris'
+                        }
+                    ]
+                }
+                // Adding default data for other customers with basic contact info
+            };
+
+            // Return specific customer data or default template
+            return customerDatabase[customerId] || createDefaultCustomerData(customerId);
+        }
+
+        function createDefaultCustomerData(customerId) {
+            const defaults = {
+                'adobe': {
+                    company: 'Adobe Systems',
+                    logo: '🎨',
+                    color: '#ff0000',
+                    secondaryColor: '#cc0000',
+                    location: 'San Jose, CA, USA',
+                    industry: 'Creative Software',
+                    totalContacts: 5
+                },
+                'techstart': {
+                    company: 'TechStart Solutions', 
+                    logo: '🚀',
+                    color: '#10b981',
+                    secondaryColor: '#059669',
+                    location: 'Austin, TX, USA',
+                    industry: 'SaaS',
+                    totalContacts: 3
+                },
+                'acme': {
+                    company: 'Acme Corporation',
+                    logo: '🏭',
+                    color: '#f59e0b',
+                    secondaryColor: '#d97706',
+                    location: 'Chicago, IL, USA',
+                    industry: 'Manufacturing',
+                    totalContacts: 2
+                }
+            };
+
+            const defaultData = defaults[customerId] || defaults['acme'];
+            return {
+                ...defaultData,
+                employees: '500+',
+                health: '87.3%',
+                arr: '$285K',
+                activeCases: 4,
+                lastActivity: '5 hours ago',
+                website: 'https://example.com',
+                founded: '2010',
+                description: 'A growing company in the ' + defaultData.industry + ' sector.',
+                contacts: [
+                    {
+                        id: 'default-contact',
+                        name: 'John Smith',
+                        title: 'CEO',
+                        email: 'john@example.com',
+                        phone: '+1 (555) 123-4567',
+                        department: 'Executive',
+                        role: 'Decision Maker',
+                        contactType: 'primary',
+                        lastContact: '1 day ago',
+                        interactions: 15,
+                        avatar: 'JS',
+                        status: 'active'
+                    }
+                ]
+            };
+        }
+
+        // Customer Profile Page Management Functions
+        function initializeCustomerProfilePage(customerId) {
+            showProfileTab('overview', customerId);
+        }
+
+        function showProfileTab(tabName, customerId) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            document.querySelector('.profile-tab[data-tab="' + tabName + '"]').classList.add('active');
+            
+            // Show corresponding content
+            const content = document.getElementById('profileTabContent');
+            const customerData = getCustomerDataById(customerId);
+            
+            switch(tabName) {
+                case 'overview':
+                    content.innerHTML = generateCustomerOverviewTab(customerData);
+                    break;
+                case 'contacts':
+                    content.innerHTML = generateCustomerContactsTab(customerData);
+                    break;
+                case 'interactions':
+                    content.innerHTML = generateCustomerInteractionsTab(customerData);
+                    break;
+                case 'cases':
+                    content.innerHTML = generateCustomerCasesTab(customerData);
+                    break;
+                case 'documents':
+                    content.innerHTML = generateCustomerDocumentsTab(customerData);
+                    break;
+                case 'analytics':
+                    content.innerHTML = generateCustomerAnalyticsTab(customerData);
+                    break;
+            }
+        }
+
+        function generateCustomerOverviewTab(customerData) {
+            return '<div style="max-width: 1200px;">' +
+                '<!-- Company Information -->' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin-bottom: 16px;">Company Overview</h2>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<p style="color: #4b5563; line-height: 1.6; margin-bottom: 20px;">' + customerData.description + '</p>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">' +
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; font-weight: 500;">FOUNDED</div>' +
+                '<div style="font-weight: 600; color: #1f2937;">' + (customerData.founded || '2010') + '</div>' +
+                '</div>' +
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; font-weight: 500;">WEBSITE</div>' +
+                '<div style="font-weight: 600; color: #3b82f6;"><a href="' + customerData.website + '" target="_blank">Visit Website</a></div>' +
+                '</div>' +
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; font-weight: 500;">INDUSTRY</div>' +
+                '<div style="font-weight: 600; color: #1f2937;">' + customerData.industry + '</div>' +
+                '</div>' +
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; font-weight: 500;">SIZE</div>' +
+                '<div style="font-weight: 600; color: #1f2937;">' + customerData.employees + '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin-bottom: 16px;">Quick Actions</h2>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<div style="display: grid; gap: 12px;">' +
+                '<button onclick="scheduleCustomerMeeting(&quot;' + customerData.company + '&quot;)" class="btn btn-primary" style="width: 100%; justify-content: center;">📅 Schedule Meeting</button>' +
+                '<button onclick="createCustomerCase(&quot;' + customerData.company + '&quot;)" class="btn" style="width: 100%; background: #059669; color: white;">📝 Create Case</button>' +
+                '<button onclick="sendCustomerEmail(&quot;' + customerData.company + '&quot;)" class="btn" style="width: 100%; background: #3b82f6; color: white;">📧 Send Email</button>' +
+                '<button onclick="generateCustomerReport(&quot;' + customerData.company + '&quot;)" class="btn" style="width: 100%; background: #f59e0b; color: white;">📊 Generate Report</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Key Contacts Preview -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">' +
+                '<h2 style="color: #1f2937; margin: 0;">Key Contacts</h2>' +
+                '<button onclick="showProfileTab(&quot;contacts&quot;, &quot;' + customerData.company.toLowerCase().replace(/\s+/g, '') + '&quot;)" class="btn" style="background: #6366f1; color: white; font-size: 14px;">View All (' + customerData.totalContacts + ')</button>' +
+                '</div>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">' +
+                generateTopContactsPreview(customerData.contacts || []) +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateTopContactsPreview(contacts) {
+            let html = '';
+            const topContacts = contacts.slice(0, 3); // Show first 3 contacts
+            
+            topContacts.forEach(contact => {
+                html += '<div class="contact-card" onclick="openContactDetail(&quot;' + contact.id + '&quot;)">' +
+                    '<div style="display: flex; align-items: center; margin-bottom: 16px;">' +
+                    '<div style="width: 48px; height: 48px; background: #6366f1; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; margin-right: 16px;">' + contact.avatar + '</div>' +
+                    '<div style="flex: 1;">' +
+                    '<h4 style="margin: 0 0 4px 0; color: #1f2937; font-size: 16px;">' + contact.name + '</h4>' +
+                    '<p style="margin: 0; color: #6b7280; font-size: 14px;">' + contact.title + '</p>' +
+                    '</div>' +
+                    '<span class="contact-type-badge ' + contact.contactType + '">' + contact.contactType + '</span>' +
+                    '</div>' +
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">' +
+                    '<div><span style="color: #6b7280;">📧</span> ' + contact.email.split('@')[0] + '@...</div>' +
+                    '<div><span style="color: #6b7280;">📞</span> ' + contact.phone.substring(0, 8) + '...</div>' +
+                    '<div><span style="color: #6b7280;">🏢</span> ' + contact.department + '</div>' +
+                    '<div><span style="color: #6b7280;">💬</span> ' + contact.interactions + ' interactions</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+
+            return html || '<div style="text-align: center; padding: 40px; color: #6b7280;">No contacts available</div>';
+        }
+
+        function generateCustomerContactsTab(customerData) {
+            return '<div>' +
+                '<!-- Contacts Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin: 0;">👥 Customer Contacts</h2>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0;">Complete contact directory for ' + customerData.company + '</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="addNewContact(&quot;' + customerData.company + '&quot;)" class="btn btn-primary">➕ Add Contact</button>' +
+                '<button onclick="importContacts(&quot;' + customerData.company + '&quot;)" class="btn" style="background: #f59e0b; color: white;">📥 Import</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Contact Filters -->' +
+                '<div style="display: grid; grid-template-columns: 1fr auto auto auto; gap: 16px; margin-bottom: 24px; padding: 20px; background: #f8fafc; border-radius: 12px;">' +
+                '<input type="text" placeholder="🔍 Search contacts by name, title, department..." style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Departments</option>' +
+                '<option value="executive">Executive</option>' +
+                '<option value="engineering">Engineering</option>' +
+                '<option value="finance">Finance</option>' +
+                '<option value="legal">Legal</option>' +
+                '</select>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Contact Types</option>' +
+                '<option value="primary">Primary</option>' +
+                '<option value="technical">Technical</option>' +
+                '<option value="billing">Billing</option>' +
+                '<option value="executive">Executive</option>' +
+                '</select>' +
+                '<button onclick="exportContactList(&quot;' + customerData.company + '&quot;)" class="btn" style="background: #059669; color: white;">📊 Export</button>' +
+                '</div>' +
+
+                '<!-- Contacts List -->' +
+                '<div style="display: grid; gap: 16px;">' +
+                generateDetailedContactsList(customerData.contacts || []) +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateDetailedContactsList(contacts) {
+            if (!contacts.length) {
+                return '<div style="text-align: center; padding: 60px 20px; color: #6b7280;">' +
+                    '<div style="font-size: 48px; margin-bottom: 16px;">👥</div>' +
+                    '<h3 style="color: #1f2937; margin-bottom: 8px;">No Contacts Found</h3>' +
+                    '<p>Add contacts to start managing this customer relationship.</p>' +
+                    '</div>';
+            }
+
+            let html = '';
+            contacts.forEach(contact => {
+                const statusColor = contact.status === 'active' ? '#10b981' : '#6b7280';
+                const roleColor = contact.role === 'Decision Maker' ? '#dc2626' : contact.role === 'Technical Lead' ? '#3b82f6' : '#6b7280';
+
+                html += '<div class="contact-card" onclick="openContactDetail(&quot;' + contact.id + '&quot;)">' +
+                    '<!-- Contact Header -->' +
+                    '<div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">' +
+                    '<div style="display: flex; align-items: center;">' +
+                    '<div style="width: 56px; height: 56px; background: #6366f1; color: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; margin-right: 20px;">' + contact.avatar + '</div>' +
+                    '<div>' +
+                    '<h3 style="margin: 0 0 6px 0; color: #1f2937; font-size: 20px; font-weight: 700;">' + contact.name + '</h3>' +
+                    '<p style="margin: 0 0 4px 0; color: #6b7280; font-size: 16px;">' + contact.title + '</p>' +
+                    '<div style="display: flex; align-items: center; gap: 12px;">' +
+                    '<span class="contact-type-badge ' + contact.contactType + '">' + contact.contactType + '</span>' +
+                    '<span style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: ' + statusColor + ';"><span style="width: 6px; height: 6px; background: ' + statusColor + '; border-radius: 3px;"></span>' + contact.status + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<div style="font-size: 14px; font-weight: 600; color: ' + roleColor + '; margin-bottom: 4px;">' + contact.role + '</div>' +
+                    '<div style="font-size: 12px; color: #6b7280;">Last: ' + contact.lastContact + '</div>' +
+                    '</div>' +
+                    '</div>' +
+
+                    '<!-- Contact Details Grid -->' +
+                    '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; padding: 20px; background: #f8fafc; border-radius: 12px;">' +
+                    '<div>' +
+                    '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">' +
+                    '<span style="font-size: 16px;">📧</span>' +
+                    '<span style="font-size: 12px; color: #6b7280; font-weight: 500;">EMAIL</span>' +
+                    '</div>' +
+                    '<div style="color: #1f2937; font-weight: 500;">' + contact.email + '</div>' +
+                    '</div>' +
+                    '<div>' +
+                    '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">' +
+                    '<span style="font-size: 16px;">📞</span>' +
+                    '<span style="font-size: 12px; color: #6b7280; font-weight: 500;">PHONE</span>' +
+                    '</div>' +
+                    '<div style="color: #1f2937; font-weight: 500;">' + contact.phone + '</div>' +
+                    '</div>' +
+                    '<div>' +
+                    '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">' +
+                    '<span style="font-size: 16px;">🏢</span>' +
+                    '<span style="font-size: 12px; color: #6b7280; font-weight: 500;">DEPARTMENT</span>' +
+                    '</div>' +
+                    '<div style="color: #1f2937; font-weight: 500;">' + contact.department + '</div>' +
+                    '</div>' +
+                    '<div>' +
+                    '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">' +
+                    '<span style="font-size: 16px;">💬</span>' +
+                    '<span style="font-size: 12px; color: #6b7280; font-weight: 500;">INTERACTIONS</span>' +
+                    '</div>' +
+                    '<div style="color: #1f2937; font-weight: 600;">' + contact.interactions + ' total</div>' +
+                    '</div>';
+
+                if (contact.expertise && contact.expertise.length > 0) {
+                    html += '<div>' +
+                        '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">' +
+                        '<span style="font-size: 16px;">💡</span>' +
+                        '<span style="font-size: 12px; color: #6b7280; font-weight: 500;">EXPERTISE</span>' +
+                        '</div>' +
+                        '<div style="display: flex; flex-wrap: wrap; gap: 4px;">';
+                    
+                    contact.expertise.forEach(skill => {
+                        html += '<span style="background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500;">' + skill + '</span>';
+                    });
+                    
+                    html += '</div>' +
+                        '</div>';
+                }
+
+                if (contact.preferredContact) {
+                    html += '<div>' +
+                        '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">' +
+                        '<span style="font-size: 16px;">⭐</span>' +
+                        '<span style="font-size: 12px; color: #6b7280; font-weight: 500;">PREFERRED</span>' +
+                        '</div>' +
+                        '<div style="color: #1f2937; font-weight: 500;">' + contact.preferredContact + '</div>' +
+                        '</div>';
+                }
+
+                html += '</div>' +
+
+                    '<!-- Contact Actions -->' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #e5e7eb;">' +
+                    '<div style="display: flex; gap: 8px;">';
+
+                if (contact.socialLinkedIn) {
+                    html += '<a href="' + contact.socialLinkedIn + '" target="_blank" style="color: #0077b5; text-decoration: none; font-size: 12px;">🔗 LinkedIn</a>';
+                }
+
+                html += '</div>' +
+                    '<div style="display: flex; gap: 8px;">' +
+                    '<button onclick="event.stopPropagation(); callContact(&quot;' + contact.id + '&quot;, &quot;' + contact.phone + '&quot;)" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer;">📞 Call</button>' +
+                    '<button onclick="event.stopPropagation(); emailContact(&quot;' + contact.id + '&quot;, &quot;' + contact.email + '&quot;)" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer;">📧 Email</button>' +
+                    '<button onclick="event.stopPropagation(); scheduleWithContact(&quot;' + contact.id + '&quot;)" style="background: #f59e0b; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer;">📅 Schedule</button>' +
+                    '<button onclick="event.stopPropagation(); viewContactHistory(&quot;' + contact.id + '&quot;)" style="background: #6b7280; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer;">📊 History</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+
+            return html;
+        }
+
+        // Additional Tab Content Functions (Placeholder implementations)
+        function generateCustomerInteractionsTab(customerData) {
+            return '<div style="text-align: center; padding: 60px 20px; color: #6b7280;">' +
+                '<div style="font-size: 48px; margin-bottom: 16px;">💬</div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 8px;">Customer Interactions</h3>' +
+                '<p>Interaction history and communication timeline for ' + customerData.company + '</p>' +
+                '</div>';
+        }
+
+        function generateCustomerCasesTab(customerData) {
+            const customerCases = getCustomerCases(customerData.company);
+            
+            return '<div>' +
+                '<!-- Cases Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin: 0;">📝 Customer Cases</h2>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0;">Support cases and tickets for ' + customerData.company + '</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="createNewCase(&quot;' + customerData.company + '&quot;)" class="btn btn-primary">➕ Create Case</button>' +
+                '<button onclick="exportCases(&quot;' + customerData.company + '&quot;)" class="btn" style="background: #059669; color: white;">📊 Export</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Cases Filters -->' +
+                '<div style="display: grid; grid-template-columns: 1fr auto auto auto; gap: 16px; margin-bottom: 24px; padding: 20px; background: white; border: 1px solid #e5e7eb; border-radius: 12px;">' +
+                '<input type="text" placeholder="🔍 Search cases by title, description, or case ID..." style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Priorities</option>' +
+                '<option value="critical">Critical</option>' +
+                '<option value="high">High</option>' +
+                '<option value="medium">Medium</option>' +
+                '<option value="low">Low</option>' +
+                '</select>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Status</option>' +
+                '<option value="open">Open</option>' +
+                '<option value="in-progress">In Progress</option>' +
+                '<option value="resolved">Resolved</option>' +
+                '<option value="closed">Closed</option>' +
+                '</select>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Categories</option>' +
+                '<option value="technical">Technical</option>' +
+                '<option value="billing">Billing</option>' +
+                '<option value="general">General</option>' +
+                '<option value="feature-request">Feature Request</option>' +
+                '</select>' +
+                '</div>' +
+
+                '<!-- Cases List -->' +
+                '<div style="display: grid; gap: 16px;">' +
+                generateCustomerCasesList(customerCases) +
+                '</div>' +
+                '</div>';
+        }
+
+        function getCustomerCases(companyName) {
+            // Generate realistic cases for the customer
+            const caseTemplates = [
+                {
+                    id: 'CASE-2024-001',
+                    title: 'API Integration Issues',
+                    description: 'Customer experiencing timeout errors when integrating with our REST API endpoints.',
+                    priority: 'high',
+                    status: 'in-progress',
+                    category: 'technical',
+                    created: '2024-01-15',
+                    updated: '2 hours ago',
+                    assignedTo: 'Tech Team',
+                    contactName: 'John Smith'
+                },
+                {
+                    id: 'CASE-2024-002',
+                    title: 'Billing Discrepancy - December Invoice',
+                    description: 'Customer reported incorrect charges on December invoice for additional user licenses.',
+                    priority: 'medium',
+                    status: 'resolved',
+                    category: 'billing',
+                    created: '2024-01-10',
+                    updated: '1 day ago',
+                    assignedTo: 'Finance Team',
+                    contactName: 'Sarah Johnson'
+                },
+                {
+                    id: 'CASE-2024-003',
+                    title: 'Feature Request - Advanced Reporting',
+                    description: 'Request for custom dashboard with advanced analytics and export capabilities.',
+                    priority: 'low',
+                    status: 'open',
+                    category: 'feature-request',
+                    created: '2024-01-08',
+                    updated: '3 days ago',
+                    assignedTo: 'Product Team',
+                    contactName: 'Michael Chen'
+                },
+                {
+                    id: 'CASE-2024-004',
+                    title: 'Performance Issues on Mobile App',
+                    description: 'Slow loading times and crashes reported on iOS mobile application.',
+                    priority: 'critical',
+                    status: 'open',
+                    category: 'technical',
+                    created: '2024-01-12',
+                    updated: '1 hour ago',
+                    assignedTo: 'Mobile Team',
+                    contactName: 'Lisa Anderson'
+                }
+            ];
+            
+            return caseTemplates;
+        }
+
+        function generateCustomerCasesList(cases) {
+            if (!cases.length) {
+                return '<div style="text-align: center; padding: 60px 20px; color: #6b7280;">' +
+                    '<div style="font-size: 48px; margin-bottom: 16px;">📝</div>' +
+                    '<h3 style="color: #1f2937; margin-bottom: 8px;">No Cases Found</h3>' +
+                    '<p>No support cases or tickets found for this customer.</p>' +
+                    '</div>';
+            }
+
+            let html = '';
+            cases.forEach(caseItem => {
+                const priorityColor = {
+                    'critical': '#dc2626',
+                    'high': '#f59e0b',
+                    'medium': '#3b82f6',
+                    'low': '#6b7280'
+                }[caseItem.priority] || '#6b7280';
+
+                const statusColor = {
+                    'open': '#f59e0b',
+                    'in-progress': '#3b82f6',
+                    'resolved': '#10b981',
+                    'closed': '#6b7280'
+                }[caseItem.status] || '#6b7280';
+
+                const categoryIcon = {
+                    'technical': '🔧',
+                    'billing': '💰',
+                    'general': '💬',
+                    'feature-request': '✨'
+                }[caseItem.category] || '📝';
+
+                html += '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer;" onclick="openCaseDetail(&quot;' + caseItem.id + '&quot;)">' +
+                    '<!-- Case Header -->' +
+                    '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">' +
+                    '<div style="flex: 1;">' +
+                    '<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">' +
+                    '<h3 style="margin: 0; color: #1f2937; font-size: 18px; font-weight: 600;">' + categoryIcon + ' ' + caseItem.title + '</h3>' +
+                    '<span style="background: ' + priorityColor + '; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; text-transform: uppercase;">' + caseItem.priority + '</span>' +
+                    '</div>' +
+                    '<div style="display: flex; align-items: center; gap: 16px; color: #6b7280; font-size: 14px;">' +
+                    '<span><strong>Case ID:</strong> ' + caseItem.id + '</span>' +
+                    '<span><strong>Created:</strong> ' + caseItem.created + '</span>' +
+                    '<span><strong>Contact:</strong> ' + caseItem.contactName + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<span style="display: inline-block; background: ' + statusColor + '; color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; margin-bottom: 4px;">' + caseItem.status.toUpperCase() + '</span>' +
+                    '<div style="color: #6b7280; font-size: 12px;">Updated: ' + caseItem.updated + '</div>' +
+                    '</div>' +
+                    '</div>' +
+
+                    '<!-- Case Description -->' +
+                    '<div style="margin-bottom: 16px;">' +
+                    '<p style="color: #4b5563; line-height: 1.6; margin: 0;">' + caseItem.description + '</p>' +
+                    '</div>' +
+
+                    '<!-- Case Footer -->' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #f3f4f6;">' +
+                    '<div style="display: flex; align-items: center; gap: 12px;">' +
+                    '<span style="background: #f3f4f6; color: #6b7280; padding: 4px 8px; border-radius: 6px; font-size: 12px;">' + caseItem.category + '</span>' +
+                    '<span style="color: #6b7280; font-size: 12px;">👤 ' + caseItem.assignedTo + '</span>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 8px;">' +
+                    '<button onclick="event.stopPropagation(); updateCaseStatus(&quot;' + caseItem.id + '&quot;)" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">📝 Update</button>' +
+                    '<button onclick="event.stopPropagation(); addCaseComment(&quot;' + caseItem.id + '&quot;)" style="background: #059669; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">💬 Comment</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+
+            return html;
+        }
+
+        function generateCustomerDocumentsTab(customerData) {
+            return '<div style="text-align: center; padding: 60px 20px; color: #6b7280;">' +
+                '<div style="font-size: 48px; margin-bottom: 16px;">📁</div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 8px;">Customer Documents</h3>' +
+                '<p>Contracts, proposals, and documents for ' + customerData.company + '</p>' +
+                '</div>';
+        }
+
+        function generateCustomerAnalyticsTab(customerData) {
+            return '<div style="text-align: center; padding: 60px 20px; color: #6b7280;">' +
+                '<div style="font-size: 48px; margin-bottom: 16px;">📈</div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 8px;">Customer Analytics</h3>' +
+                '<p>Performance metrics and analytics for ' + customerData.company + '</p>' +
+                '</div>';
+        }
+
+        // Customer Profile Action Functions
+        function addCustomProfile() {
+            showNotification('➕ Opening add customer profile form...', 'info');
+        }
+
+        function bulkProfileActions() {
+            showNotification('⚙️ Opening bulk profile actions...', 'info');
+        }
+
+        function searchCustomerProfiles(searchTerm) {
+            console.log('Searching customer profiles for: ' + searchTerm);
+        }
+
+        function filterProfilesByType(type) {
+            showNotification('Filtering profiles by type: ' + (type || 'All'), 'info');
+        }
+
+        function filterProfilesByActivity(activity) {
+            showNotification('Filtering profiles by activity: ' + (activity || 'All'), 'info');
+        }
+
+        function quickCallCustomer(customerId) {
+            showNotification('📞 Initiating call to customer: ' + customerId, 'info');
+        }
+
+        function quickEmailCustomer(customerId) {
+            showNotification('📧 Opening email composer for: ' + customerId, 'info');
+        }
+
+        function viewProfileDetails(customerId) {
+            openCustomerProfilePage(customerId);
+        }
+
+        // Customer Actions Functions
+        function scheduleCustomerMeeting(customerName) {
+            showNotification('📅 Scheduling meeting with: ' + customerName, 'info');
+        }
+
+        function createCustomerCase(customerName) {
+            showNotification('📝 Creating new case for: ' + customerName, 'info');
+        }
+
+        function sendCustomerEmail(customerName) {
+            showNotification('📧 Opening email composer for: ' + customerName, 'info');
+        }
+
+        function generateCustomerReport(customerName) {
+            showNotification('📊 Generating comprehensive report for: ' + customerName, 'success');
+        }
+
+        // Contact Management Functions
+        function openContactDetail(contactId) {
+            showNotification('👤 Opening detailed contact profile for: ' + contactId, 'info');
+        }
+
+        function addNewContact(customerName) {
+            showNotification('➕ Adding new contact for: ' + customerName, 'info');
+        }
+
+        function importContacts(customerName) {
+            showNotification('📥 Importing contacts for: ' + customerName, 'info');
+        }
+
+        function exportContactList(customerName) {
+            showNotification('📊 Exporting contact list for: ' + customerName, 'success');
+        }
+
+        function callContact(contactId, phone) {
+            showNotification('📞 Calling contact: ' + contactId + ' at ' + phone, 'info');
+        }
+
+        function emailContact(contactId, email) {
+            showNotification('📧 Emailing contact: ' + contactId + ' at ' + email, 'info');
+        }
+
+        function scheduleWithContact(contactId) {
+            showNotification('📅 Scheduling meeting with contact: ' + contactId, 'info');
+        }
+
+        function viewContactHistory(contactId) {
+            showContactHistoryModal(contactId);
+        }
+
+        function showContactHistoryModal(contactId) {
             const modal = document.createElement('div');
             modal.className = 'modal';
             modal.innerHTML = 
-                '<div class="modal-content">' +
+                '<div class="modal-content" style="width: 800px; max-height: 90vh; overflow-y: auto;">' +
                 '<div class="modal-header">' +
-                '<h2 class="modal-title">Contact History</h2>' +
+                '<h2 class="modal-title">📊 Contact Interaction History</h2>' +
                 '<button class="close-btn" onclick="this.closest(&quot;.modal&quot;).remove()">&times;</button>' +
                 '</div>' +
                 '<div class="modal-body">' +
-                '<div class="contact-timeline">' +
-                '<div style="border-left: 3px solid #2563eb; padding-left: 16px; margin-bottom: 20px;">' +
-                '<h4>📧 Email - Today 2:30 PM</h4>' +
-                '<p>Follow-up on billing inquiry</p>' +
+                generateContactHistoryContent(contactId) +
                 '</div>' +
-                '<div style="border-left: 3px solid #16a34a; padding-left: 16px; margin-bottom: 20px;">' +
-                '<h4>📞 Phone Call - Yesterday 4:15 PM</h4>' +
-                '<p>Technical support session - Issue resolved</p>' +
+                '</div>';
+            document.body.appendChild(modal);
+        }
+
+        function generateContactHistoryContent(contactId) {
+            return '<div>' +
+                '<!-- Contact Overview -->' +
+                '<div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 24px;">' +
+                '<div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">' +
+                '<div style="width: 48px; height: 48px; background: #6366f1; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600;">JD</div>' +
+                '<div>' +
+                '<h3 style="margin: 0; color: #1f2937;">John Doe</h3>' +
+                '<p style="margin: 2px 0 0 0; color: #6b7280;">Senior Account Manager</p>' +
                 '</div>' +
-                '<div style="border-left: 3px solid #d97706; padding-left: 16px;">' +
-                '<h4>💬 Live Chat - 2 days ago</h4>' +
-                '<p>Initial contact about login problems</p>' +
+                '</div>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; font-size: 14px;">' +
+                '<div style="text-align: center;"><div style="font-weight: 600; color: #059669;">47</div><div style="color: #6b7280;">Total Interactions</div></div>' +
+                '<div style="text-align: center;"><div style="font-weight: 600; color: #3b82f6;">12</div><div style="color: #6b7280;">Emails</div></div>' +
+                '<div style="text-align: center;"><div style="font-weight: 600; color: #f59e0b;">8</div><div style="color: #6b7280;">Calls</div></div>' +
+                '<div style="text-align: center;"><div style="font-weight: 600; color: #8b5cf6;">5</div><div style="color: #6b7280;">Meetings</div></div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Interaction Timeline -->' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">Recent Interactions</h3>' +
+                '<div class="contact-timeline" style="position: relative;">' +
+                
+                '<!-- Timeline Item 1 -->' +
+                '<div style="display: flex; margin-bottom: 24px; position: relative;">' +
+                '<div style="width: 32px; height: 32px; background: #3b82f6; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; position: relative; z-index: 1;">' +
+                '<span style="color: white; font-size: 14px;">📧</span>' +
+                '</div>' +
+                '<div style="flex: 1; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">' +
+                '<h4 style="margin: 0; color: #1f2937; font-size: 16px;">Email Discussion</h4>' +
+                '<span style="color: #6b7280; font-size: 12px;">Today, 2:30 PM</span>' +
+                '</div>' +
+                '<p style="color: #4b5563; margin-bottom: 8px;">Follow-up discussion about Q4 pricing structure and contract renewal terms.</p>' +
+                '<div style="display: flex; gap: 8px;">' +
+                '<span style="background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Contract</span>' +
+                '<span style="background: #f3e8ff; color: #7c3aed; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Pricing</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Timeline Item 2 -->' +
+                '<div style="display: flex; margin-bottom: 24px; position: relative;">' +
+                '<div style="width: 32px; height: 32px; background: #10b981; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; position: relative; z-index: 1;">' +
+                '<span style="color: white; font-size: 14px;">📞</span>' +
+                '</div>' +
+                '<div style="flex: 1; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">' +
+                '<h4 style="margin: 0; color: #1f2937; font-size: 16px;">Phone Call - Issue Resolution</h4>' +
+                '<span style="color: #6b7280; font-size: 12px;">Yesterday, 4:15 PM</span>' +
+                '</div>' +
+                '<p style="color: #4b5563; margin-bottom: 8px;">Technical support session regarding API integration issues. Problem resolved successfully.</p>' +
+                '<div style="display: flex; gap: 8px;">' +
+                '<span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Resolved</span>' +
+                '<span style="background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Technical</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Timeline Item 3 -->' +
+                '<div style="display: flex; margin-bottom: 24px; position: relative;">' +
+                '<div style="width: 32px; height: 32px; background: #f59e0b; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; position: relative; z-index: 1;">' +
+                '<span style="color: white; font-size: 14px;">📅</span>' +
+                '</div>' +
+                '<div style="flex: 1; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">' +
+                '<h4 style="margin: 0; color: #1f2937; font-size: 16px;">Strategy Planning Meeting</h4>' +
+                '<span style="color: #6b7280; font-size: 12px;">3 days ago, 10:00 AM</span>' +
+                '</div>' +
+                '<p style="color: #4b5563; margin-bottom: 8px;">Quarterly business review and strategic planning session for 2024 objectives.</p>' +
+                '<div style="display: flex; gap: 8px;">' +
+                '<span style="background: #fef2f2; color: #b91c1c; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Strategic</span>' +
+                '<span style="background: #ede9fe; color: #7c2d12; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Planning</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Timeline Item 4 -->' +
+                '<div style="display: flex; margin-bottom: 24px; position: relative;">' +
+                '<div style="width: 32px; height: 32px; background: #8b5cf6; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; position: relative; z-index: 1;">' +
+                '<span style="color: white; font-size: 14px;">📝</span>' +
+                '</div>' +
+                '<div style="flex: 1; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">' +
+                '<h4 style="margin: 0; color: #1f2937; font-size: 16px;">Proposal Submission</h4>' +
+                '<span style="color: #6b7280; font-size: 12px;">1 week ago</span>' +
+                '</div>' +
+                '<p style="color: #4b5563; margin-bottom: 8px;">Submitted comprehensive proposal for enterprise platform upgrade and customization services.</p>' +
+                '<div style="display: flex; gap: 8px;">' +
+                '<span style="background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Proposal</span>' +
+                '<span style="background: #ecfccb; color: #365314; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Enterprise</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '</div>' +
+
+                '<!-- Action Buttons -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb;">' +
+                '<div style="color: #6b7280; font-size: 14px;">Showing recent 4 of 47 interactions</div>' +
+                '<div style="display: flex; gap: 8px;">' +
+                '<button onclick="exportContactHistory(&quot;' + contactId + '&quot;)" style="background: #059669; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer;">📊 Export History</button>' +
+                '<button onclick="scheduleWithContact(&quot;' + contactId + '&quot;)" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer;">📅 Schedule Follow-up</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function exportContactHistory(contactId) {
+            showNotification('📊 Exporting interaction history for contact: ' + contactId, 'success');
+        }
+
+        function openContactDetail(contactId) {
+            showContactDetailModal(contactId);
+        }
+
+        function showContactDetailModal(contactId) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = 
+                '<div class="modal-content" style="width: 900px; max-height: 95vh; overflow-y: auto;">' +
+                '<div class="modal-header">' +
+                '<h2 class="modal-title">👤 Contact Profile Details</h2>' +
+                '<button class="close-btn" onclick="this.closest(&quot;.modal&quot;).remove()">&times;</button>' +
+                '</div>' +
+                '<div class="modal-body">' +
+                generateContactDetailContent(contactId) +
+                '</div>' +
+                '</div>';
+            document.body.appendChild(modal);
+        }
+
+        function generateContactDetailContent(contactId) {
+            return '<div>' +
+                '<!-- Contact Profile Header -->' +
+                '<div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 32px; margin: -20px -20px 24px -20px; border-radius: 0;">' +
+                '<div style="display: flex; align-items: center; gap: 24px;">' +
+                '<div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px;">JD</div>' +
+                '<div>' +
+                '<h1 style="margin: 0 0 8px 0; font-size: 28px;">John Doe</h1>' +
+                '<p style="margin: 0 0 8px 0; font-size: 18px; opacity: 0.9;">Senior Account Manager</p>' +
+                '<div style="display: flex; gap: 12px; align-items: center;">' +
+                '<span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px;">Primary Contact</span>' +
+                '<span style="display: flex; align-items: center; gap: 4px; font-size: 14px;"><span style="width: 8px; height: 8px; background: #10b981; border-radius: 4px;"></span>Active</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Contact Details Grid -->' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 32px;">' +
+                
+                '<!-- Left Column - Contact Information -->' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">📋 Contact Information</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">' +
+                
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 6px; font-weight: 500; text-transform: uppercase;">Email</div>' +
+                '<div style="color: #1f2937; font-weight: 500; margin-bottom: 4px;">john.doe@microsoft.com</div>' +
+                '<button onclick="emailContact(&quot;john-doe&quot;, &quot;john.doe@microsoft.com&quot;)" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">📧 Send Email</button>' +
+                '</div>' +
+                
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 6px; font-weight: 500; text-transform: uppercase;">Phone</div>' +
+                '<div style="color: #1f2937; font-weight: 500; margin-bottom: 4px;">+1 (425) 882-8080</div>' +
+                '<button onclick="callContact(&quot;john-doe&quot;, &quot;+1 (425) 882-8080&quot;)" style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">📞 Call Now</button>' +
+                '</div>' +
+                
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 6px; font-weight: 500; text-transform: uppercase;">Department</div>' +
+                '<div style="color: #1f2937; font-weight: 500;">Executive</div>' +
+                '</div>' +
+                
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 6px; font-weight: 500; text-transform: uppercase;">Role</div>' +
+                '<div style="color: #1f2937; font-weight: 500;">Decision Maker</div>' +
+                '</div>' +
+                
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 6px; font-weight: 500; text-transform: uppercase;">Preferred Contact</div>' +
+                '<div style="color: #1f2937; font-weight: 500;">Email</div>' +
+                '</div>' +
+                
+                '<div>' +
+                '<div style="font-size: 12px; color: #6b7280; margin-bottom: 6px; font-weight: 500; text-transform: uppercase;">Timezone</div>' +
+                '<div style="color: #1f2937; font-weight: 500;">PST (UTC-8)</div>' +
+                '</div>' +
+                
+                '</div>' +
+                '</div>' +
+
+                '<!-- Expertise & Skills -->' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">💡 Areas of Expertise</h4>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 24px;">' +
+                '<div style="display: flex; flex-wrap: wrap; gap: 8px;">' +
+                '<span style="background: #dbeafe; color: #1d4ed8; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;">Strategic Planning</span>' +
+                '<span style="background: #dcfce7; color: #166534; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;">Cloud Computing</span>' +
+                '<span style="background: #fef3c7; color: #92400e; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;">AI & Machine Learning</span>' +
+                '<span style="background: #f3e8ff; color: #7c3aed; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;">Product Management</span>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Social Links -->' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">🔗 Social & Professional</h4>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<a href="https://linkedin.com/in/johndoe" target="_blank" style="display: flex; align-items: center; gap: 8px; color: #0077b5; text-decoration: none; background: #f0f9ff; padding: 8px 16px; border-radius: 8px; border: 1px solid #0077b5;">💼 LinkedIn Profile</a>' +
+                '<a href="https://twitter.com/johndoe" target="_blank" style="display: flex; align-items: center; gap: 8px; color: #1da1f2; text-decoration: none; background: #f0f9ff; padding: 8px 16px; border-radius: 8px; border: 1px solid #1da1f2;">🐦 Twitter</a>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Right Column - Quick Actions & Stats -->' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">⚡ Quick Actions</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">' +
+                '<div style="display: grid; gap: 12px;">' +
+                '<button onclick="scheduleWithContact(&quot;john-doe&quot;)" style="width: 100%; background: #6366f1; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer;">📅 Schedule Meeting</button>' +
+                '<button onclick="createTaskForContact(&quot;john-doe&quot;)" style="width: 100%; background: #f59e0b; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer;">📝 Create Task</button>' +
+                '<button onclick="addContactNote(&quot;john-doe&quot;)" style="width: 100%; background: #059669; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer;">📄 Add Note</button>' +
+                '<button onclick="viewContactHistory(&quot;john-doe&quot;)" style="width: 100%; background: #8b5cf6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer;">📊 View History</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Contact Statistics -->' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📈 Interaction Stats</h4>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 24px;">' +
+                '<div style="display: grid; gap: 16px;">' +
+                
+                '<div style="text-align: center; padding: 12px; background: #f8fafc; border-radius: 8px;">' +
+                '<div style="font-size: 24px; font-weight: 700; color: #3b82f6;">47</div>' +
+                '<div style="font-size: 12px; color: #6b7280; font-weight: 500;">TOTAL INTERACTIONS</div>' +
+                '</div>' +
+                
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">' +
+                '<div style="text-align: center; padding: 8px; background: #f0f9ff; border-radius: 6px;">' +
+                '<div style="font-weight: 600; color: #3b82f6;">12</div><div style="color: #6b7280; font-size: 11px;">Emails</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 8px; background: #f0fdf4; border-radius: 6px;">' +
+                '<div style="font-weight: 600; color: #10b981;">8</div><div style="color: #6b7280; font-size: 11px;">Calls</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 8px; background: #fef3c7; border-radius: 6px;">' +
+                '<div style="font-weight: 600; color: #f59e0b;">5</div><div style="color: #6b7280; font-size: 11px;">Meetings</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 8px; background: #faf5ff; border-radius: 6px;">' +
+                '<div style="font-weight: 600; color: #8b5cf6;">22</div><div style="color: #6b7280; font-size: 11px;">Other</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<div style="padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 14px; color: #6b7280; text-align: center;">' +
+                'Last Contact: 2 hours ago' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Recent Activity Preview -->' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">🕒 Recent Activity</h4>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">' +
+                '<div style="display: grid; gap: 12px; font-size: 13px;">' +
+                '<div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: #f8fafc; border-radius: 6px;">' +
+                '<span>📧</span><span style="color: #6b7280;">Email - Today 2:30 PM</span>' +
+                '</div>' +
+                '<div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: #f8fafc; border-radius: 6px;">' +
+                '<span>📞</span><span style="color: #6b7280;">Call - Yesterday 4:15 PM</span>' +
+                '</div>' +
+                '<div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: #f8fafc; border-radius: 6px;">' +
+                '<span>📅</span><span style="color: #6b7280;">Meeting - 3 days ago</span>' +
+                '</div>' +
+                '</div>' +
                 '</div>' +
                 '</div>' +
                 '</div>' +
                 '</div>';
-            document.body.appendChild(modal);
+        }
+
+        function createTaskForContact(contactId) {
+            showNotification('📝 Creating task for contact: ' + contactId, 'info');
+        }
+
+        function addContactNote(contactId) {
+            showNotification('📄 Adding note for contact: ' + contactId, 'info');
+        }
+
+        // Navigation Functions
+        function goBackToCustomers() {
+            // Return to customers page
+            showCustomersPage();
+        }
+
+        // Case Management Functions
+        function createNewCase(customerName) {
+            showNotification('📝 Creating new case for: ' + customerName, 'info');
+        }
+
+        function exportCases(customerName) {
+            showNotification('📊 Exporting cases for: ' + customerName, 'success');
+        }
+
+        function openCaseDetail(caseId) {
+            showNotification('📋 Opening case details for: ' + caseId, 'info');
+        }
+
+        function updateCaseStatus(caseId) {
+            showNotification('📝 Updating status for case: ' + caseId, 'info');
+        }
+
+        function addCaseComment(caseId) {
+            showNotification('💬 Adding comment to case: ' + caseId, 'info');
         }
 
         function showFeedbackModal() {
