@@ -380,6 +380,61 @@ const htmlTemplate = `
             justify-content: center;
         }
         
+        /* Customer Management Tabs */
+        .customer-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+        
+        .customer-tab:hover {
+            color: #334155;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .customer-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Customer Cards */
+        .customer-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .customer-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .customer-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .customer-status.active { background: #dcfce7; color: #166534; }
+        .customer-status.inactive { background: #fef2f2; color: #991b1b; }
+        .customer-status.prospect { background: #fef3c7; color: #92400e; }
+        .customer-status.churned { background: #f3f4f6; color: #374151; }
+        
         /* Main Content */
         .main-content {
             flex: 1;
@@ -2677,30 +2732,645 @@ const htmlTemplate = `
         function showCustomersModal() {
             const modal = document.createElement('div');
             modal.className = 'modal';
-            modal.innerHTML = 
-                '<div class="modal-content">' +
-                '<div class="modal-header">' +
-                '<h2 class="modal-title">Customer Management</h2>' +
-                '<button class="close-btn" onclick="this.closest(&quot;.modal&quot;).remove()">&times;</button>' +
+            modal.style.cssText = 'z-index: 10000;';
+            modal.innerHTML = generateAdvancedCustomerManagementHTML();
+            document.body.appendChild(modal);
+            initializeCustomerManagement();
+        }
+
+        function generateAdvancedCustomerManagementHTML() {
+            return '<div class="modal-content" style="width: 95vw; max-width: 1400px; height: 90vh; max-height: none;">' +
+                '<div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px 12px 0 0;">' +
+                '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                '<div>' +
+                '<h2 class="modal-title" style="color: white; margin: 0; font-size: 24px;">🏢 Advanced Customer Management</h2>' +
+                '<p style="color: rgba(255,255,255,0.8); margin: 4px 0 0 0; font-size: 14px;">Enterprise CRM • Customer 360° • Sales Intelligence</p>' +
                 '</div>' +
-                '<div class="modal-body">' +
-                '<div style="display: flex; gap: 10px; margin-bottom: 20px;">' +
-                '<input type="text" placeholder="Search customers..." style="flex: 1; padding: 8px; border: 1px solid #e2e8f0; border-radius: 4px;">' +
-                '<button class="btn btn-primary">Add Customer</button>' +
+                '<button class="close-btn" onclick="this.closest(&quot;.modal&quot;).remove()" style="color: white; font-size: 24px;">&times;</button>' +
                 '</div>' +
-                '<div class="customer-list">' +
-                '<div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 12px;">' +
-                '<h4>Acme Corporation</h4>' +
-                '<p style="color: #64748b;">contact@acme.com • 5 active cases</p>' +
                 '</div>' +
-                '<div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 12px;">' +
-                '<h4>TechStart Inc.</h4>' +
-                '<p style="color: #64748b;">support@techstart.io • 2 active cases</p>' +
+
+                '<!-- Customer Management Tabs -->' +
+                '<div style="display: flex; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">' +
+                '<button class="customer-tab active" onclick="showCustomerTab(&quot;directory&quot;)" data-tab="directory">📁 Master Directory</button>' +
+                '<button class="customer-tab" onclick="showCustomerTab(&quot;profiles&quot;)" data-tab="profiles">👤 Customer Profiles</button>' +
+                '<button class="customer-tab" onclick="showCustomerTab(&quot;segments&quot;)" data-tab="segments">📊 Segments & Analytics</button>' +
+                '<button class="customer-tab" onclick="showCustomerTab(&quot;enterprise&quot;)" data-tab="enterprise">🏆 Major Customers</button>' +
+                '<button class="customer-tab" onclick="showCustomerTab(&quot;pipeline&quot;)" data-tab="pipeline">⚡ Sales Pipeline</button>' +
+                '<button class="customer-tab" onclick="showCustomerTab(&quot;insights&quot;)" data-tab="insights">🧠 AI Insights</button>' +
                 '</div>' +
+
+                '<!-- Tab Content Area -->' +
+                '<div class="modal-body" style="flex: 1; overflow: hidden; padding: 0;">' +
+                '<div id="customerTabContent" style="height: 100%; overflow-y: auto; padding: 20px;">' +
+                generateCustomerDirectoryHTML() +
                 '</div>' +
                 '</div>' +
                 '</div>';
-            document.body.appendChild(modal);
+        }
+
+        function generateCustomerDirectoryHTML() {
+            return '<div class="customer-directory">' +
+                '<!-- Header with Search and Actions -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 20px;">📁 Master Customer Directory</h3>' +
+                '<p style="color: #64748b; margin: 4px 0 0 0; font-size: 14px;">Complete customer database with 360° view</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="importCustomers()" class="btn" style="background: #f59e0b; color: white; padding: 8px 16px; border-radius: 8px; border: none;">📥 Import</button>' +
+                '<button onclick="addNewCustomer()" class="btn btn-primary">➕ Add Customer</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Search and Filters -->' +
+                '<div style="display: grid; grid-template-columns: 1fr auto auto auto; gap: 16px; margin-bottom: 24px; padding: 20px; background: #f8fafc; border-radius: 12px;">' +
+                '<div style="position: relative;">' +
+                '<input type="text" placeholder="🔍 Search customers, companies, contacts..." style="width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;" onkeyup="filterCustomers(this.value)">' +
+                '</div>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;" onchange="filterBySegment(this.value)">' +
+                '<option value="">All Segments</option>' +
+                '<option value="Enterprise">Enterprise</option>' +
+                '<option value="Mid-Market">Mid-Market</option>' +
+                '<option value="SMB">SMB</option>' +
+                '</select>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;" onchange="filterByStatus(this.value)">' +
+                '<option value="">All Status</option>' +
+                '<option value="active">Active</option>' +
+                '<option value="prospect">Prospect</option>' +
+                '<option value="inactive">Inactive</option>' +
+                '</select>' +
+                '<button onclick="exportCustomers()" class="btn" style="background: #059669; color: white; padding: 12px 16px; border-radius: 8px; border: none;">📊 Export</button>' +
+                '</div>' +
+
+                '<!-- Customer Stats Overview -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">' +
+                '<div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 32px; font-weight: bold;">2,847</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Total Customers</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 32px; font-weight: bold;">847</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Enterprise Accounts</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 32px; font-weight: bold;">$12.4M</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Total ARR</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 32px; font-weight: bold;">94.7%</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Health Score</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Customer List -->' +
+                '<div id="customerList">' +
+                generateCustomerList() +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateCustomerList() {
+            const customers = [
+                {
+                    id: 'microsoft',
+                    company: 'Microsoft Corporation',
+                    contact: 'Satya Nadella',
+                    email: 'satya.nadella@microsoft.com',
+                    phone: '+1 (425) 882-8080',
+                    segment: 'Enterprise',
+                    status: 'active',
+                    arr: '$2,400,000',
+                    health: '98.2%',
+                    cases: 12,
+                    lastActivity: '2 hours ago',
+                    industry: 'Technology',
+                    employees: '221,000+',
+                    logo: '🏢',
+                    color: '#0078d4'
+                },
+                {
+                    id: 'salesforce',
+                    company: 'Salesforce Inc',
+                    contact: 'Marc Benioff',
+                    email: 'marc.benioff@salesforce.com',
+                    phone: '+1 (415) 901-7000',
+                    segment: 'Enterprise',
+                    status: 'active',
+                    arr: '$1,850,000',
+                    health: '96.7%',
+                    cases: 8,
+                    lastActivity: '1 day ago',
+                    industry: 'Software',
+                    employees: '73,000+',
+                    logo: '⚡',
+                    color: '#00a1e0'
+                },
+                {
+                    id: 'adobe',
+                    company: 'Adobe Systems',
+                    contact: 'Shantanu Narayen',
+                    email: 'shantanu.narayen@adobe.com',
+                    phone: '+1 (408) 536-6000',
+                    segment: 'Enterprise',
+                    status: 'active',
+                    arr: '$1,240,000',
+                    health: '94.1%',
+                    cases: 6,
+                    lastActivity: '3 hours ago',
+                    industry: 'Creative Software',
+                    employees: '26,000+',
+                    logo: '🎨',
+                    color: '#ff0000'
+                },
+                {
+                    id: 'techstart',
+                    company: 'TechStart Solutions',
+                    contact: 'Sarah Wilson',
+                    email: 'sarah.wilson@techstart.io',
+                    phone: '+1 (555) 123-4567',
+                    segment: 'Mid-Market',
+                    status: 'active',
+                    arr: '$285,000',
+                    health: '87.3%',
+                    cases: 4,
+                    lastActivity: '5 hours ago',
+                    industry: 'SaaS',
+                    employees: '150-500',
+                    logo: '🚀',
+                    color: '#10b981'
+                },
+                {
+                    id: 'acme',
+                    company: 'Acme Corporation',
+                    contact: 'John Anderson',
+                    email: 'john.anderson@acme.com',
+                    phone: '+1 (555) 987-6543',
+                    segment: 'SMB',
+                    status: 'prospect',
+                    arr: '$85,000',
+                    health: '72.1%',
+                    cases: 2,
+                    lastActivity: '1 week ago',
+                    industry: 'Manufacturing',
+                    employees: '50-150',
+                    logo: '🏭',
+                    color: '#f59e0b'
+                }
+            ];
+
+            let html = '';
+            customers.forEach(customer => {
+                html += '<div class="customer-card" onclick="viewCustomerDetail(&quot;' + customer.id + '&quot;)">' +
+                    '<div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px;">' +
+                    '<div style="display: flex; align-items: center;">' +
+                    '<div style="width: 48px; height: 48px; background: ' + customer.color + '; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 16px;">' + customer.logo + '</div>' +
+                    '<div>' +
+                    '<h4 style="color: #1f2937; margin: 0 0 4px 0; font-size: 18px; font-weight: 600;">' + customer.company + '</h4>' +
+                    '<p style="color: #64748b; margin: 0; font-size: 14px;">👤 ' + customer.contact + ' • 📧 ' + customer.email + '</p>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<span class="customer-status ' + customer.status + '">' + customer.status + '</span>' +
+                    '</div>' +
+                    '</div>' +
+
+                    '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; margin-bottom: 16px;">' +
+                    '<div>' +
+                    '<div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Segment</div>' +
+                    '<div style="font-size: 14px; font-weight: 500; color: #1f2937;">' + customer.segment + '</div>' +
+                    '</div>' +
+                    '<div>' +
+                    '<div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">ARR</div>' +
+                    '<div style="font-size: 14px; font-weight: 600; color: #059669;">' + customer.arr + '</div>' +
+                    '</div>' +
+                    '<div>' +
+                    '<div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Health Score</div>' +
+                    '<div style="font-size: 14px; font-weight: 500; color: ' + (parseFloat(customer.health) > 90 ? '#059669' : parseFloat(customer.health) > 80 ? '#f59e0b' : '#dc2626') + ';">' + customer.health + '</div>' +
+                    '</div>' +
+                    '<div>' +
+                    '<div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Active Cases</div>' +
+                    '<div style="font-size: 14px; font-weight: 500; color: #1f2937;">' + customer.cases + '</div>' +
+                    '</div>' +
+                    '<div>' +
+                    '<div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Last Activity</div>' +
+                    '<div style="font-size: 14px; color: #64748b;">' + customer.lastActivity + '</div>' +
+                    '</div>' +
+                    '</div>' +
+
+                    '<div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #f3f4f6;">' +
+                    '<div style="display: flex; gap: 8px;">' +
+                    '<span style="background: #f3f4f6; color: #64748b; padding: 4px 8px; border-radius: 6px; font-size: 12px;">' + customer.industry + '</span>' +
+                    '<span style="background: #f3f4f6; color: #64748b; padding: 4px 8px; border-radius: 6px; font-size: 12px;">👥 ' + customer.employees + '</span>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 8px;">' +
+                    '<button onclick="event.stopPropagation(); createCase(&quot;' + customer.email + '&quot;)" style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">📝 Case</button>' +
+                    '<button onclick="event.stopPropagation(); callCustomer(&quot;' + customer.phone + '&quot;)" style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">📞 Call</button>' +
+                    '<button onclick="event.stopPropagation(); emailCustomer(&quot;' + customer.email + '&quot;)" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">📧 Email</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+
+            return html;
+        }
+
+        function initializeCustomerManagement() {
+            // Initialize default tab
+            showCustomerTab('directory');
+        }
+
+        function showCustomerTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.customer-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            document.querySelector('.customer-tab[data-tab="' + tabName + '"]').classList.add('active');
+            
+            // Show corresponding content
+            const content = document.getElementById('customerTabContent');
+            
+            switch(tabName) {
+                case 'directory':
+                    content.innerHTML = generateCustomerDirectoryHTML();
+                    break;
+                case 'profiles':
+                    content.innerHTML = generateCustomerProfilesHTML();
+                    break;
+                case 'segments':
+                    content.innerHTML = generateSegmentsAnalyticsHTML();
+                    break;
+                case 'enterprise':
+                    content.innerHTML = generateMajorCustomersHTML();
+                    break;
+                case 'pipeline':
+                    content.innerHTML = generateSalesPipelineHTML();
+                    break;
+                case 'insights':
+                    content.innerHTML = generateAIInsightsHTML();
+                    break;
+            }
+        }
+
+        // Customer Management Action Functions
+        function addNewCustomer() {
+            showNotification('📝 Opening new customer form...', 'info');
+        }
+
+        function importCustomers() {
+            showNotification('📥 Opening customer import wizard...', 'info');
+        }
+
+        function exportCustomers() {
+            showNotification('📊 Exporting customer data...', 'success');
+        }
+
+        function filterCustomers(searchTerm) {
+            // Customer search functionality
+            console.log('Searching for: ' + searchTerm);
+        }
+
+        function filterBySegment(segment) {
+            showNotification('Filtering by segment: ' + (segment || 'All'), 'info');
+        }
+
+        function filterByStatus(status) {
+            showNotification('Filtering by status: ' + (status || 'All'), 'info');
+        }
+
+        function viewCustomerDetail(customerId) {
+            showNotification('👤 Opening detailed profile for customer ID: ' + customerId, 'info');
+        }
+
+        function createCase(email) {
+            showNotification('📝 Creating new case for: ' + email, 'info');
+        }
+
+        function callCustomer(phone) {
+            showNotification('📞 Initiating call to: ' + phone, 'info');
+        }
+
+        function emailCustomer(email) {
+            showNotification('📧 Opening email composer for: ' + email, 'info');
+        }
+
+        // Advanced Customer Module Tab Content Functions
+        function generateCustomerProfilesHTML() {
+            return '<div style="padding: 20px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">👤 Customer 360° Profiles</h3>' +
+                '<div style="text-align: center; padding: 60px 20px; color: #64748b;">' +
+                '<div style="font-size: 48px; margin-bottom: 16px;">👥</div>' +
+                '<h4 style="color: #1f2937;">Advanced Customer Profiles</h4>' +
+                '<p>Comprehensive customer profiles with custom fields, relationship mapping, and interaction history coming soon.</p>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateSegmentsAnalyticsHTML() {
+            return '<div style="padding: 20px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">📊 Customer Segments & Analytics</h3>' +
+                
+                '<!-- Segment Performance Overview -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">' +
+                '<div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 24px; border-radius: 16px;">' +
+                '<h4 style="margin: 0 0 12px 0; font-size: 18px;">🏆 Enterprise Segment</h4>' +
+                '<div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">847</div>' +
+                '<div style="opacity: 0.9;">$8.2M ARR • 97.3% Health</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 24px; border-radius: 16px;">' +
+                '<h4 style="margin: 0 0 12px 0; font-size: 18px;">🚀 Mid-Market</h4>' +
+                '<div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">1,425</div>' +
+                '<div style="opacity: 0.9;">$3.1M ARR • 89.7% Health</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 24px; border-radius: 16px;">' +
+                '<h4 style="margin: 0 0 12px 0; font-size: 18px;">🏢 SMB Segment</h4>' +
+                '<div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">575</div>' +
+                '<div style="opacity: 0.9;">$1.1M ARR • 78.2% Health</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Detailed Analytics Table -->' +
+                '<div style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden;">' +
+                '<div style="background: #f8fafc; padding: 16px; border-bottom: 1px solid #e2e8f0;">' +
+                '<h4 style="margin: 0; color: #1f2937;">Segment Performance Matrix</h4>' +
+                '</div>' +
+                '<div style="overflow-x: auto;">' +
+                '<table style="width: 100%; border-collapse: collapse;">' +
+                '<thead>' +
+                '<tr style="background: #f9fafb;">' +
+                '<th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Segment</th>' +
+                '<th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Customers</th>' +
+                '<th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Total ARR</th>' +
+                '<th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Avg ARR</th>' +
+                '<th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Health Score</th>' +
+                '<th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Churn Risk</th>' +
+                '<th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Growth Rate</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>' +
+                '<tr>' +
+                '<td style="padding: 12px; font-weight: 600; color: #1f2937; border-bottom: 1px solid #f3f4f6;">🏆 Enterprise</td>' +
+                '<td style="padding: 12px; text-align: right; color: #1f2937; border-bottom: 1px solid #f3f4f6;">847</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #059669; border-bottom: 1px solid #f3f4f6;">$8.2M</td>' +
+                '<td style="padding: 12px; text-align: right; color: #1f2937; border-bottom: 1px solid #f3f4f6;">$9,682</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #059669; border-bottom: 1px solid #f3f4f6;">97.3%</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #059669; border-bottom: 1px solid #f3f4f6;">2.1%</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #059669; border-bottom: 1px solid #f3f4f6;">+24%</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td style="padding: 12px; font-weight: 600; color: #1f2937; border-bottom: 1px solid #f3f4f6;">🚀 Mid-Market</td>' +
+                '<td style="padding: 12px; text-align: right; color: #1f2937; border-bottom: 1px solid #f3f4f6;">1,425</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #059669; border-bottom: 1px solid #f3f4f6;">$3.1M</td>' +
+                '<td style="padding: 12px; text-align: right; color: #1f2937; border-bottom: 1px solid #f3f4f6;">$2,175</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #f59e0b; border-bottom: 1px solid #f3f4f6;">89.7%</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #f59e0b; border-bottom: 1px solid #f3f4f6;">5.4%</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #059669; border-bottom: 1px solid #f3f4f6;">+18%</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td style="padding: 12px; font-weight: 600; color: #1f2937;">🏢 SMB</td>' +
+                '<td style="padding: 12px; text-align: right; color: #1f2937;">575</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #059669;">$1.1M</td>' +
+                '<td style="padding: 12px; text-align: right; color: #1f2937;">$1,913</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #f59e0b;">78.2%</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #dc2626;">12.3%</td>' +
+                '<td style="padding: 12px; text-align: right; font-weight: 600; color: #059669;">+12%</td>' +
+                '</tr>' +
+                '</tbody>' +
+                '</table>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateMajorCustomersHTML() {
+            return '<div style="padding: 20px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🏆 Major Enterprise Customers</h3>' +
+                
+                '<!-- Enterprise Dashboard -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;">' +
+                '<div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold;">$8.2M</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Enterprise ARR</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold;">847</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Enterprise Accounts</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold;">97.3%</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Avg Health Score</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold;">2.1%</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Churn Rate</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Top Enterprise Customers -->' +
+                '<div style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">' +
+                '<h4 style="margin: 0; color: #1f2937;">Top Enterprise Accounts</h4>' +
+                '<button onclick="manageEnterpriseAccounts()" class="btn btn-primary" style="padding: 8px 16px;">Manage All</button>' +
+                '</div>' +
+
+                '<div style="display: grid; gap: 16px;">' +
+                generateTopEnterpriseCustomers() +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateTopEnterpriseCustomers() {
+            const topCustomers = [
+                { company: 'Microsoft Corporation', logo: '🏢', arr: '$2,400,000', health: '98.2%', contact: 'Satya Nadella', industry: 'Technology', color: '#0078d4' },
+                { company: 'Salesforce Inc', logo: '⚡', arr: '$1,850,000', health: '96.7%', contact: 'Marc Benioff', industry: 'Software', color: '#00a1e0' },
+                { company: 'Adobe Systems', logo: '🎨', arr: '$1,240,000', health: '94.1%', contact: 'Shantanu Narayen', industry: 'Creative Software', color: '#ff0000' },
+                { company: 'Oracle Corporation', logo: '🔺', arr: '$950,000', health: '91.8%', contact: 'Larry Ellison', industry: 'Database', color: '#f80000' },
+                { company: 'IBM Corporation', logo: '💼', arr: '$875,000', health: '89.4%', contact: 'Arvind Krishna', industry: 'Enterprise Tech', color: '#1f70c1' }
+            ];
+
+            let html = '';
+            topCustomers.forEach(customer => {
+                html += '<div style="display: flex; align-items: center; justify-content: space-between; padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; transition: all 0.3s ease;" onmouseover="this.style.boxShadow=&quot;0 4px 20px rgba(0,0,0,0.1)&quot;" onmouseout="this.style.boxShadow=&quot;&quot;">' +
+                    '<div style="display: flex; align-items: center;">' +
+                    '<div style="width: 48px; height: 48px; background: ' + customer.color + '; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 16px;">' + customer.logo + '</div>' +
+                    '<div>' +
+                    '<h5 style="margin: 0 0 4px 0; color: #1f2937; font-size: 16px; font-weight: 600;">' + customer.company + '</h5>' +
+                    '<p style="margin: 0; color: #64748b; font-size: 14px;">👤 ' + customer.contact + ' • ' + customer.industry + '</p>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="display: flex; align-items: center; gap: 24px;">' +
+                    '<div style="text-align: right;">' +
+                    '<div style="font-size: 18px; font-weight: 700; color: #059669; margin-bottom: 2px;">' + customer.arr + '</div>' +
+                    '<div style="font-size: 12px; color: #64748b;">Annual Revenue</div>' +
+                    '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<div style="font-size: 16px; font-weight: 600; color: ' + (parseFloat(customer.health) > 95 ? '#059669' : parseFloat(customer.health) > 90 ? '#f59e0b' : '#dc2626') + '; margin-bottom: 2px;">' + customer.health + '</div>' +
+                    '<div style="font-size: 12px; color: #64748b;">Health Score</div>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 8px;">' +
+                    '<button onclick="viewEnterpriseProfile(&quot;' + customer.company + '&quot;)" style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">👤 Profile</button>' +
+                    '<button onclick="createEnterpriseReport(&quot;' + customer.company + '&quot;)" style="background: #10b981; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">📊 Report</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+
+            return html;
+        }
+
+        function generateSalesPipelineHTML() {
+            return '<div style="padding: 20px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">⚡ Sales Pipeline & Opportunities</h3>' +
+                
+                '<!-- Pipeline Overview -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;">' +
+                '<div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold;">$4.2M</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Pipeline Value</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold;">127</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Active Deals</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold;">73%</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Win Rate</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold;">45</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Days Avg Cycle</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Pipeline Stages -->' +
+                '<div style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;">' +
+                '<h4 style="margin: 0 0 20px 0; color: #1f2937;">Pipeline by Stage</h4>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">' +
+                
+                '<div style="text-align: center; padding: 20px; border: 2px solid #e5e7eb; border-radius: 12px;">' +
+                '<div style="font-size: 32px; margin-bottom: 8px;">🎯</div>' +
+                '<div style="font-size: 18px; font-weight: 600; color: #1f2937;">Qualified</div>' +
+                '<div style="font-size: 24px; font-weight: bold; color: #667eea; margin: 8px 0;">$980K</div>' +
+                '<div style="font-size: 14px; color: #64748b;">23 deals</div>' +
+                '</div>' +
+                
+                '<div style="text-align: center; padding: 20px; border: 2px solid #e5e7eb; border-radius: 12px;">' +
+                '<div style="font-size: 32px; margin-bottom: 8px;">💼</div>' +
+                '<div style="font-size: 18px; font-weight: 600; color: #1f2937;">Proposal</div>' +
+                '<div style="font-size: 24px; font-weight: bold; color: #f59e0b; margin: 8px 0;">$1.4M</div>' +
+                '<div style="font-size: 14px; color: #64748b;">18 deals</div>' +
+                '</div>' +
+                
+                '<div style="text-align: center; padding: 20px; border: 2px solid #e5e7eb; border-radius: 12px;">' +
+                '<div style="font-size: 32px; margin-bottom: 8px;">🤝</div>' +
+                '<div style="font-size: 18px; font-weight: 600; color: #1f2937;">Negotiation</div>' +
+                '<div style="font-size: 24px; font-weight: bold; color: #10b981; margin: 8px 0;">$1.8M</div>' +
+                '<div style="font-size: 14px; color: #64748b;">12 deals</div>' +
+                '</div>' +
+                
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateAIInsightsHTML() {
+            return '<div style="padding: 20px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🧠 AI-Powered Customer Insights</h3>' +
+                
+                '<!-- AI Insights Dashboard -->' +
+                '<div style="display: grid; gap: 24px;">' +
+                
+                '<!-- Health Score Predictions -->' +
+                '<div style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;">' +
+                '<div style="display: flex; align-items: center; margin-bottom: 16px;">' +
+                '<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">🎯</div>' +
+                '<h4 style="margin: 0; color: #1f2937;">Health Score Predictions</h4>' +
+                '</div>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">' +
+                '<div style="padding: 16px; background: #fef2f2; border-radius: 8px; border-left: 4px solid #dc2626;">' +
+                '<div style="font-weight: 600; color: #dc2626; margin-bottom: 4px;">⚠️ At Risk Customers</div>' +
+                '<div style="font-size: 14px; color: #64748b;">3 customers predicted to churn within 30 days</div>' +
+                '<div style="font-size: 12px; color: #dc2626; margin-top: 8px;">Acme Corp, TechVision, StartupX</div>' +
+                '</div>' +
+                '<div style="padding: 16px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #10b981;">' +
+                '<div style="font-weight: 600; color: #10b981; margin-bottom: 4px;">✅ Growth Opportunities</div>' +
+                '<div style="font-size: 14px; color: #64748b;">8 customers ready for upsell/expansion</div>' +
+                '<div style="font-size: 12px; color: #10b981; margin-top: 8px;">Microsoft, Salesforce, Adobe +5 more</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Behavioral Insights -->' +
+                '<div style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;">' +
+                '<div style="display: flex; align-items: center; margin-bottom: 16px;">' +
+                '<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">📊</div>' +
+                '<h4 style="margin: 0; color: #1f2937;">Customer Behavior Analysis</h4>' +
+                '</div>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">' +
+                '<div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 12px;">' +
+                '<div style="font-size: 24px; font-weight: bold; color: #667eea;">47%</div>' +
+                '<div style="font-size: 14px; color: #64748b; margin-top: 4px;">Feature Adoption Rate</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 12px;">' +
+                '<div style="font-size: 24px; font-weight: bold; color: #10b981;">8.4</div>' +
+                '<div style="font-size: 14px; color: #64748b; margin-top: 4px;">Avg Support Interactions</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 12px;">' +
+                '<div style="font-size: 24px; font-weight: bold; color: #f59e0b;">23 days</div>' +
+                '<div style="font-size: 14px; color: #64748b; margin-top: 4px;">Time to Value</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- AI Recommendations -->' +
+                '<div style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;">' +
+                '<div style="display: flex; align-items: center; margin-bottom: 16px;">' +
+                '<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">💡</div>' +
+                '<h4 style="margin: 0; color: #1f2937;">Smart Recommendations</h4>' +
+                '</div>' +
+                '<div style="display: grid; gap: 12px;">' +
+                '<div style="display: flex; align-items: center; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #667eea;">' +
+                '<div style="margin-right: 12px;">🎯</div>' +
+                '<div style="flex: 1;">' +
+                '<div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Schedule Check-in with Adobe Systems</div>' +
+                '<div style="font-size: 14px; color: #64748b;">Health score dropped 5% - recommend proactive outreach</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="display: flex; align-items: center; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #10b981;">' +
+                '<div style="margin-right: 12px;">📈</div>' +
+                '<div style="flex: 1;">' +
+                '<div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Upsell Opportunity: Microsoft Corp</div>' +
+                '<div style="font-size: 14px; color: #64748b;">High feature usage indicates readiness for premium tier</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="display: flex; align-items: center; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #f59e0b;">' +
+                '<div style="margin-right: 12px;">⏰</div>' +
+                '<div style="flex: 1;">' +
+                '<div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Contract Renewal: Salesforce Inc</div>' +
+                '<div style="font-size: 14px; color: #64748b;">Contract expires in 45 days - initiate renewal conversation</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '</div>' +
+                '</div>';
+        }
+
+        // Enterprise Customer Management Functions
+        function manageEnterpriseAccounts() {
+            showNotification('🏆 Opening enterprise account management...', 'info');
+        }
+
+        function viewEnterpriseProfile(company) {
+            showNotification('👤 Opening enterprise profile for: ' + company, 'info');
+        }
+
+        function createEnterpriseReport(company) {
+            showNotification('📊 Generating enterprise report for: ' + company, 'info');
         }
 
         function showContactHistoryModal() {

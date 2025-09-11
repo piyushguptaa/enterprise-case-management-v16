@@ -1,6 +1,6 @@
 {
   "name": "case-management-system",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Enterprise Case Management System",
   "main": "simple-demo.js",
   "scripts": {
