@@ -4217,11 +4217,243 @@ const htmlTemplate = `
 
         // Additional Tab Content Functions (Placeholder implementations)
         function generateCustomerInteractionsTab(customerData) {
-            return '<div style="text-align: center; padding: 60px 20px; color: #6b7280;">' +
-                '<div style="font-size: 48px; margin-bottom: 16px;">💬</div>' +
-                '<h3 style="color: #1f2937; margin-bottom: 8px;">Customer Interactions</h3>' +
-                '<p>Interaction history and communication timeline for ' + customerData.company + '</p>' +
+            const interactions = getCustomerInteractions(customerData.company);
+            
+            return '<div>' +
+                '<!-- Interactions Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin: 0;">💬 Interaction Timeline</h2>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0;">Complete communication history with ' + customerData.company + '</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="logNewInteraction(&quot;' + customerData.company + '&quot;)" class="btn btn-primary">➕ Log Interaction</button>' +
+                '<button onclick="exportInteractions(&quot;' + customerData.company + '&quot;)" class="btn" style="background: #059669; color: white;">📊 Export</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Interaction Filters -->' +
+                '<div style="display: grid; grid-template-columns: 1fr auto auto auto; gap: 16px; margin-bottom: 24px; padding: 20px; background: white; border: 1px solid #e5e7eb; border-radius: 12px;">' +
+                '<input type="text" placeholder="🔍 Search interactions by content, participants..." style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Types</option>' +
+                '<option value="email">📧 Emails</option>' +
+                '<option value="call">📞 Calls</option>' +
+                '<option value="meeting">📅 Meetings</option>' +
+                '<option value="note">📝 Notes</option>' +
+                '<option value="chat">💬 Chats</option>' +
+                '</select>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Time</option>' +
+                '<option value="today">Today</option>' +
+                '<option value="week">This Week</option>' +
+                '<option value="month">This Month</option>' +
+                '<option value="quarter">This Quarter</option>' +
+                '</select>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Participants</option>' +
+                '<option value="john">John Doe</option>' +
+                '<option value="sarah">Sarah Johnson</option>' +
+                '<option value="michael">Michael Chen</option>' +
+                '</select>' +
+                '</div>' +
+
+                '<!-- Interaction Stats -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; text-align: center;">' +
+                '<div style="font-size: 32px; margin-bottom: 8px;">📧</div>' +
+                '<div style="font-size: 24px; font-weight: 700; color: #3b82f6;">127</div>' +
+                '<div style="color: #6b7280; font-size: 14px;">Email Exchanges</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; text-align: center;">' +
+                '<div style="font-size: 32px; margin-bottom: 8px;">📞</div>' +
+                '<div style="font-size: 24px; font-weight: 700; color: #10b981;">48</div>' +
+                '<div style="color: #6b7280; font-size: 14px;">Phone Calls</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; text-align: center;">' +
+                '<div style="font-size: 32px; margin-bottom: 8px;">📅</div>' +
+                '<div style="font-size: 24px; font-weight: 700; color: #f59e0b;">23</div>' +
+                '<div style="color: #6b7280; font-size: 14px;">Meetings</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; text-align: center;">' +
+                '<div style="font-size: 32px; margin-bottom: 8px;">📝</div>' +
+                '<div style="font-size: 24px; font-weight: 700; color: #8b5cf6;">89</div>' +
+                '<div style="color: #6b7280; font-size: 14px;">Internal Notes</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; text-align: center;">' +
+                '<div style="font-size: 32px; margin-bottom: 8px;">💬</div>' +
+                '<div style="font-size: 24px; font-weight: 700; color: #ec4899;">156</div>' +
+                '<div style="color: #6b7280; font-size: 14px;">Chat Messages</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Interaction Timeline -->' +
+                '<div style="position: relative;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">Recent Interactions</h3>' +
+                generateInteractionTimeline(interactions) +
+                '</div>' +
                 '</div>';
+        }
+
+        function getCustomerInteractions(companyName) {
+            // Generate comprehensive interaction history
+            return [
+                {
+                    id: 'INT-001',
+                    type: 'email',
+                    icon: '📧',
+                    color: '#3b82f6',
+                    subject: 'Q1 2024 Business Review Meeting Follow-up',
+                    content: 'Thank you for the productive meeting today. As discussed, we will proceed with the enterprise upgrade plan. I have attached the updated proposal with the custom pricing we agreed upon.',
+                    participants: ['John Doe', 'Sarah Johnson'],
+                    datetime: 'Today, 2:30 PM',
+                    attachments: ['Q1_2024_Proposal.pdf', 'Pricing_Structure.xlsx'],
+                    direction: 'outbound',
+                    status: 'sent'
+                },
+                {
+                    id: 'INT-002',
+                    type: 'call',
+                    icon: '📞',
+                    color: '#10b981',
+                    subject: 'Technical Support Call - API Integration',
+                    content: 'Discussed API integration issues. Customer was experiencing timeout errors with batch processing. Provided workaround using pagination and increased rate limits temporarily.',
+                    participants: ['Michael Chen', 'Tech Support Team'],
+                    datetime: 'Today, 11:15 AM',
+                    duration: '45 minutes',
+                    direction: 'inbound',
+                    outcome: 'Resolved'
+                },
+                {
+                    id: 'INT-003',
+                    type: 'meeting',
+                    icon: '📅',
+                    color: '#f59e0b',
+                    subject: 'Quarterly Business Review - Q4 2023',
+                    content: 'Reviewed Q4 performance metrics, discussed 2024 roadmap, and identified opportunities for expansion. Customer expressed interest in AI features and advanced analytics.',
+                    participants: ['John Doe', 'Sarah Johnson', 'Lisa Anderson', 'Product Team'],
+                    datetime: 'Yesterday, 3:00 PM',
+                    duration: '90 minutes',
+                    location: 'Conference Room A / Zoom',
+                    followUp: 'Send updated roadmap by EOW'
+                },
+                {
+                    id: 'INT-004',
+                    type: 'note',
+                    icon: '📝',
+                    color: '#8b5cf6',
+                    subject: 'Internal Note - Account Strategy',
+                    content: 'Customer is evaluating competitor solutions. Need to schedule executive briefing to showcase our unique value proposition. Focus on integration capabilities and total cost of ownership.',
+                    participants: ['Account Manager'],
+                    datetime: '2 days ago, 9:00 AM',
+                    priority: 'high',
+                    private: true
+                },
+                {
+                    id: 'INT-005',
+                    type: 'chat',
+                    icon: '💬',
+                    color: '#ec4899',
+                    subject: 'Live Chat Support Session',
+                    content: 'Customer requested help with report generation. Walked through custom report builder and shared video tutorial. Customer satisfied with resolution.',
+                    participants: ['Support Agent', 'Customer User'],
+                    datetime: '3 days ago, 4:45 PM',
+                    duration: '15 minutes',
+                    satisfaction: '5/5'
+                },
+                {
+                    id: 'INT-006',
+                    type: 'email',
+                    icon: '📧',
+                    color: '#3b82f6',
+                    subject: 'Contract Renewal Discussion',
+                    content: 'Following up on our contract renewal for 2024. We are pleased to offer a 15% discount for early renewal along with additional user licenses at no extra cost.',
+                    participants: ['Sales Team', 'Procurement Team'],
+                    datetime: '1 week ago',
+                    attachments: ['Renewal_Contract_2024.pdf'],
+                    direction: 'outbound',
+                    status: 'opened'
+                }
+            ];
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateInteractionTimeline(interactions) {
+            let html = '<div style="position: relative; padding-left: 40px;">';
+            
+            // Timeline line
+            html += '<div style="position: absolute; left: 16px; top: 0; bottom: 0; width: 2px; background: #e5e7eb;"></div>';
+            
+            interactions.forEach((interaction, index) => {
+                html += '<div style="position: relative; margin-bottom: 32px;">' +
+                    '<!-- Timeline Dot -->' +
+                    '<div style="position: absolute; left: -28px; top: 8px; width: 12px; height: 12px; background: ' + interaction.color + '; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 1px #e5e7eb;"></div>' +
+                    
+                    '<!-- Interaction Card -->' +
+                    '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; transition: all 0.3s ease; cursor: pointer;" onclick="viewInteractionDetail(&quot;' + interaction.id + '&quot;)" onmouseover="this.style.boxShadow=&quot;0 4px 12px rgba(0,0,0,0.1)&quot;" onmouseout="this.style.boxShadow=&quot;&quot;">' +
+                    
+                    '<!-- Header -->' +
+                    '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">' +
+                    '<div style="display: flex; align-items: center; gap: 12px;">' +
+                    '<span style="font-size: 24px;">' + interaction.icon + '</span>' +
+                    '<div>' +
+                    '<h4 style="margin: 0; color: #1f2937; font-size: 16px; font-weight: 600;">' + escapeHtml(interaction.subject) + '</h4>' +
+                    '<div style="display: flex; align-items: center; gap: 12px; margin-top: 4px;">' +
+                    '<span style="color: #6b7280; font-size: 13px;">👥 ' + escapeHtml(interaction.participants.join(', ')) + '</span>' +
+                    (interaction.duration ? '<span style="color: #6b7280; font-size: 13px;">⏱️ ' + interaction.duration + '</span>' : '') +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<div style="color: #6b7280; font-size: 13px; margin-bottom: 4px;">' + interaction.datetime + '</div>' +
+                    (interaction.direction ? '<span style="background: ' + (interaction.direction === 'inbound' ? '#dbeafe' : '#dcfce7') + '; color: ' + (interaction.direction === 'inbound' ? '#1d4ed8' : '#166534') + '; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">' + interaction.direction.toUpperCase() + '</span>' : '') +
+                    '</div>' +
+                    '</div>' +
+                    
+                    '<!-- Content -->' +
+                    '<div style="color: #4b5563; line-height: 1.6; margin-bottom: 12px; font-size: 14px;">' + escapeHtml(interaction.content) + '</div>' +
+                    
+                    '<!-- Footer -->' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                    '<div style="display: flex; gap: 12px; flex-wrap: wrap;">';
+                
+                // Add attachments if present
+                if (interaction.attachments) {
+                    interaction.attachments.forEach(attachment => {
+                        html += '<span style="background: #f3f4f6; color: #6b7280; padding: 4px 8px; border-radius: 6px; font-size: 12px;">📎 ' + attachment + '</span>';
+                    });
+                }
+                
+                // Add other metadata
+                if (interaction.outcome) {
+                    html += '<span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 12px;">✅ ' + interaction.outcome + '</span>';
+                }
+                
+                if (interaction.followUp) {
+                    html += '<span style="background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 6px; font-size: 12px;">📌 ' + interaction.followUp + '</span>';
+                }
+                
+                if (interaction.satisfaction) {
+                    html += '<span style="background: #ede9fe; color: #6d28d9; padding: 4px 8px; border-radius: 6px; font-size: 12px;">⭐ ' + interaction.satisfaction + '</span>';
+                }
+                
+                html += '</div>' +
+                    '<div style="display: flex; gap: 8px;">' +
+                    '<button onclick="event.stopPropagation(); replyToInteraction(&quot;' + interaction.id + '&quot;)" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">↩️ Reply</button>' +
+                    '<button onclick="event.stopPropagation(); addInteractionNote(&quot;' + interaction.id + '&quot;)" style="background: #6b7280; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">📝 Note</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            html += '</div>';
+            return html;
         }
 
         function generateCustomerCasesTab(customerData) {
@@ -4404,11 +4636,317 @@ const htmlTemplate = `
         }
 
         function generateCustomerDocumentsTab(customerData) {
-            return '<div style="text-align: center; padding: 60px 20px; color: #6b7280;">' +
-                '<div style="font-size: 48px; margin-bottom: 16px;">📁</div>' +
-                '<h3 style="color: #1f2937; margin-bottom: 8px;">Customer Documents</h3>' +
-                '<p>Contracts, proposals, and documents for ' + customerData.company + '</p>' +
+            const documents = getCustomerDocuments(customerData.company);
+            
+            return '<div>' +
+                '<!-- Documents Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin: 0;">📁 Document Repository</h2>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0;">Contracts, proposals, and files for ' + customerData.company + '</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="uploadDocument(&quot;' + customerData.company + '&quot;)" class="btn btn-primary">⬆️ Upload Document</button>' +
+                '<button onclick="createFolder(&quot;' + customerData.company + '&quot;)" class="btn" style="background: #6366f1; color: white;">📁 New Folder</button>' +
+                '<button onclick="exportDocuments(&quot;' + customerData.company + '&quot;)" class="btn" style="background: #059669; color: white;">📥 Download All</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Document Search and Filters -->' +
+                '<div style="display: grid; grid-template-columns: 1fr auto auto auto; gap: 16px; margin-bottom: 24px; padding: 20px; background: white; border: 1px solid #e5e7eb; border-radius: 12px;">' +
+                '<input type="text" placeholder="🔍 Search documents by name, type, content..." style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Categories</option>' +
+                '<option value="contracts">📜 Contracts</option>' +
+                '<option value="proposals">📋 Proposals</option>' +
+                '<option value="invoices">💰 Invoices</option>' +
+                '<option value="reports">📊 Reports</option>' +
+                '<option value="presentations">🎯 Presentations</option>' +
+                '<option value="technical">🔧 Technical Docs</option>' +
+                '</select>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Time</option>' +
+                '<option value="today">Today</option>' +
+                '<option value="week">This Week</option>' +
+                '<option value="month">This Month</option>' +
+                '<option value="year">This Year</option>' +
+                '</select>' +
+                '<select style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;">' +
+                '<option value="">All Types</option>' +
+                '<option value="pdf">PDF</option>' +
+                '<option value="docx">Word</option>' +
+                '<option value="xlsx">Excel</option>' +
+                '<option value="pptx">PowerPoint</option>' +
+                '</select>' +
+                '</div>' +
+
+                '<!-- Document Stats -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px;">' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; text-align: center;">' +
+                '<div style="font-size: 24px; margin-bottom: 4px;">📄</div>' +
+                '<div style="font-size: 20px; font-weight: 700; color: #1f2937;">47</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Total Documents</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; text-align: center;">' +
+                '<div style="font-size: 24px; margin-bottom: 4px;">💾</div>' +
+                '<div style="font-size: 20px; font-weight: 700; color: #1f2937;">284 MB</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Storage Used</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; text-align: center;">' +
+                '<div style="font-size: 24px; margin-bottom: 4px;">📁</div>' +
+                '<div style="font-size: 20px; font-weight: 700; color: #1f2937;">8</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Folders</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; text-align: center;">' +
+                '<div style="font-size: 24px; margin-bottom: 4px;">👥</div>' +
+                '<div style="font-size: 20px; font-weight: 700; color: #1f2937;">5</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Shared Users</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; text-align: center;">' +
+                '<div style="font-size: 24px; margin-bottom: 4px;">🕐</div>' +
+                '<div style="font-size: 20px; font-weight: 700; color: #1f2937;">2h ago</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Last Updated</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Folder Structure -->' +
+                '<div style="display: grid; grid-template-columns: 250px 1fr; gap: 24px;">' +
+                
+                '<!-- Folder Tree -->' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; height: fit-content;">' +
+                '<h4 style="color: #1f2937; margin: 0 0 16px 0; font-size: 14px; font-weight: 600;">📂 FOLDERS</h4>' +
+                generateFolderTree(customerData.company) +
+                '</div>' +
+                
+                '<!-- Document Grid -->' +
+                '<div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">' +
+                '<h3 style="color: #1f2937; margin: 0;">📄 Documents</h3>' +
+                '<div style="display: flex; gap: 8px;">' +
+                '<button onclick="toggleDocumentView()" style="background: #f3f4f6; border: none; padding: 8px; border-radius: 6px; cursor: pointer;">⚏</button>' +
+                '<button onclick="sortDocuments(&quot;name&quot;)" style="background: #f3f4f6; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;">↕ Sort</button>' +
+                '</div>' +
+                '</div>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">' +
+                generateDocumentCards(documents) +
+                '</div>' +
+                '</div>' +
+                '</div>' +
                 '</div>';
+        }
+
+        function getCustomerDocuments(companyName) {
+            return [
+                {
+                    id: 'DOC-001',
+                    name: 'Master Service Agreement 2024',
+                    type: 'contract',
+                    icon: '📜',
+                    category: 'Contracts',
+                    size: '2.4 MB',
+                    format: 'PDF',
+                    uploadedBy: 'Legal Team',
+                    uploadedDate: 'Jan 15, 2024',
+                    lastModified: '2 days ago',
+                    version: 'v3.2',
+                    status: 'active',
+                    tags: ['Legal', 'Active', '2024'],
+                    shared: ['John Doe', 'Sarah Johnson']
+                },
+                {
+                    id: 'DOC-002',
+                    name: 'Q1 2024 Business Proposal',
+                    type: 'proposal',
+                    icon: '📋',
+                    category: 'Proposals',
+                    size: '5.8 MB',
+                    format: 'PPTX',
+                    uploadedBy: 'Sales Team',
+                    uploadedDate: 'Jan 10, 2024',
+                    lastModified: '1 week ago',
+                    version: 'v2.0',
+                    status: 'pending',
+                    tags: ['Sales', 'Q1', 'Pending'],
+                    shared: ['Sales Team']
+                },
+                {
+                    id: 'DOC-003',
+                    name: 'December 2023 Invoice',
+                    type: 'invoice',
+                    icon: '💰',
+                    category: 'Invoices',
+                    size: '156 KB',
+                    format: 'PDF',
+                    uploadedBy: 'Finance',
+                    uploadedDate: 'Dec 31, 2023',
+                    lastModified: '2 weeks ago',
+                    version: 'Final',
+                    status: 'paid',
+                    tags: ['Finance', 'Paid', 'December'],
+                    shared: ['Finance Team']
+                },
+                {
+                    id: 'DOC-004',
+                    name: 'Technical Implementation Guide',
+                    type: 'technical',
+                    icon: '🔧',
+                    category: 'Technical Docs',
+                    size: '8.2 MB',
+                    format: 'DOCX',
+                    uploadedBy: 'Tech Team',
+                    uploadedDate: 'Jan 8, 2024',
+                    lastModified: '3 days ago',
+                    version: 'v4.1',
+                    status: 'current',
+                    tags: ['Technical', 'API', 'Integration'],
+                    shared: ['Tech Support', 'Customer']
+                },
+                {
+                    id: 'DOC-005',
+                    name: 'Annual Performance Report 2023',
+                    type: 'report',
+                    icon: '📊',
+                    category: 'Reports',
+                    size: '12.5 MB',
+                    format: 'XLSX',
+                    uploadedBy: 'Analytics',
+                    uploadedDate: 'Jan 5, 2024',
+                    lastModified: '1 week ago',
+                    version: 'Final',
+                    status: 'approved',
+                    tags: ['Annual', 'Performance', '2023'],
+                    shared: ['Executive Team']
+                },
+                {
+                    id: 'DOC-006',
+                    name: 'Product Roadmap Presentation',
+                    type: 'presentation',
+                    icon: '🎯',
+                    category: 'Presentations',
+                    size: '15.3 MB',
+                    format: 'PPTX',
+                    uploadedBy: 'Product Team',
+                    uploadedDate: 'Jan 12, 2024',
+                    lastModified: 'Yesterday',
+                    version: 'v1.5',
+                    status: 'draft',
+                    tags: ['Product', 'Roadmap', '2024'],
+                    shared: ['Product Team', 'Sales']
+                }
+            ];
+        }
+
+        function generateFolderTree(companyName) {
+            return '<div style="font-size: 14px;">' +
+                '<div style="padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=&quot;#f3f4f6&quot;" onmouseout="this.style.background=&quot;&quot;" onclick="openFolder(&quot;all&quot;)">' +
+                '<span style="margin-right: 8px;">📁</span> All Documents (47)' +
+                '</div>' +
+                '<div style="padding: 8px 12px 8px 24px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=&quot;#f3f4f6&quot;" onmouseout="this.style.background=&quot;&quot;" onclick="openFolder(&quot;contracts&quot;)">' +
+                '<span style="margin-right: 8px;">📜</span> Contracts (8)' +
+                '</div>' +
+                '<div style="padding: 8px 12px 8px 24px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=&quot;#f3f4f6&quot;" onmouseout="this.style.background=&quot;&quot;" onclick="openFolder(&quot;proposals&quot;)">' +
+                '<span style="margin-right: 8px;">📋</span> Proposals (12)' +
+                '</div>' +
+                '<div style="padding: 8px 12px 8px 24px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=&quot;#f3f4f6&quot;" onmouseout="this.style.background=&quot;&quot;" onclick="openFolder(&quot;invoices&quot;)">' +
+                '<span style="margin-right: 8px;">💰</span> Invoices (15)' +
+                '</div>' +
+                '<div style="padding: 8px 12px 8px 24px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=&quot;#f3f4f6&quot;" onmouseout="this.style.background=&quot;&quot;" onclick="openFolder(&quot;reports&quot;)">' +
+                '<span style="margin-right: 8px;">📊</span> Reports (6)' +
+                '</div>' +
+                '<div style="padding: 8px 12px 8px 24px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=&quot;#f3f4f6&quot;" onmouseout="this.style.background=&quot;&quot;" onclick="openFolder(&quot;presentations&quot;)">' +
+                '<span style="margin-right: 8px;">🎯</span> Presentations (4)' +
+                '</div>' +
+                '<div style="padding: 8px 12px 8px 24px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=&quot;#f3f4f6&quot;" onmouseout="this.style.background=&quot;&quot;" onclick="openFolder(&quot;technical&quot;)">' +
+                '<span style="margin-right: 8px;">🔧</span> Technical (2)' +
+                '</div>' +
+                '<div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">' +
+                '<div style="padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=&quot;#fee2e2&quot;" onmouseout="this.style.background=&quot;&quot;" onclick="openFolder(&quot;trash&quot;)">' +
+                '<span style="margin-right: 8px;">🗑️</span> Trash (3)' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateDocumentCards(documents) {
+            let html = '';
+            
+            documents.forEach(doc => {
+                const statusColor = {
+                    'active': '#10b981',
+                    'pending': '#f59e0b',
+                    'paid': '#3b82f6',
+                    'current': '#10b981',
+                    'approved': '#10b981',
+                    'draft': '#6b7280'
+                }[doc.status] || '#6b7280';
+                
+                html += '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; transition: all 0.3s ease; cursor: pointer;" onclick="openDocument(&quot;' + doc.id + '&quot;)" onmouseover="this.style.boxShadow=&quot;0 4px 12px rgba(0,0,0,0.1)&quot;; this.style.transform=&quot;translateY(-2px)&quot;" onmouseout="this.style.boxShadow=&quot;&quot;; this.style.transform=&quot;&quot;">' +
+                    
+                    '<!-- Document Header -->' +
+                    '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">' +
+                    '<div style="display: flex; align-items: center; gap: 12px;">' +
+                    '<div style="width: 48px; height: 48px; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;">' + doc.icon + '</div>' +
+                    '<div style="flex: 1;">' +
+                    '<h4 style="margin: 0 0 4px 0; color: #1f2937; font-size: 14px; font-weight: 600; line-height: 1.3;">' + escapeHtml(doc.name) + '</h4>' +
+                    '<div style="display: flex; align-items: center; gap: 8px;">' +
+                    '<span style="color: #6b7280; font-size: 12px;">' + doc.format + '</span>' +
+                    '<span style="color: #9ca3af;">•</span>' +
+                    '<span style="color: #6b7280; font-size: 12px;">' + doc.size + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="position: relative;">' +
+                    '<button onclick="event.stopPropagation(); showDocumentMenu(&quot;' + doc.id + '&quot;)" style="background: none; border: none; padding: 4px; cursor: pointer; color: #6b7280;">⋮</button>' +
+                    '</div>' +
+                    '</div>' +
+                    
+                    '<!-- Document Info -->' +
+                    '<div style="margin-bottom: 12px;">' +
+                    '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">' +
+                    '<span style="background: ' + statusColor + '; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; text-transform: uppercase;">' + doc.status + '</span>' +
+                    '<span style="background: #f3f4f6; color: #6b7280; padding: 2px 8px; border-radius: 6px; font-size: 11px;">' + doc.version + '</span>' +
+                    '</div>' +
+                    '<div style="color: #6b7280; font-size: 12px; margin-bottom: 4px;">📤 ' + doc.uploadedBy + ' • ' + doc.uploadedDate + '</div>' +
+                    '<div style="color: #6b7280; font-size: 12px;">✏️ Modified ' + doc.lastModified + '</div>' +
+                    '</div>' +
+                    
+                    '<!-- Document Tags -->' +
+                    '<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">';
+                
+                doc.tags.forEach(tag => {
+                    html += '<span style="background: #eff6ff; color: #3b82f6; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 500;">' + tag + '</span>';
+                });
+                
+                html += '</div>' +
+                    
+                    '<!-- Document Actions -->' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #f3f4f6;">' +
+                    '<div style="display: flex; align-items: center; gap: 8px;">' +
+                    '<div style="display: flex; align-items: center;">';
+                
+                // Show shared user avatars
+                if (doc.shared && doc.shared.length > 0) {
+                    doc.shared.slice(0, 3).forEach((user, index) => {
+                        const initials = user.split(' ').map(n => n[0]).join('');
+                        html += '<div style="width: 24px; height: 24px; background: #6366f1; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; margin-left: ' + (index > 0 ? '-8px' : '0') + '; border: 2px solid white; position: relative; z-index: ' + (3 - index) + ';" title="' + user + '">' + initials + '</div>';
+                    });
+                    if (doc.shared.length > 3) {
+                        html += '<div style="width: 24px; height: 24px; background: #e5e7eb; color: #6b7280; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; margin-left: -8px; border: 2px solid white;">+' + (doc.shared.length - 3) + '</div>';
+                    }
+                }
+                
+                html += '</div>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 4px;">' +
+                    '<button onclick="event.stopPropagation(); downloadDocument(&quot;' + doc.id + '&quot;)" style="background: none; border: none; padding: 4px 8px; cursor: pointer; color: #6b7280; font-size: 18px;" title="Download">⬇</button>' +
+                    '<button onclick="event.stopPropagation(); shareDocument(&quot;' + doc.id + '&quot;)" style="background: none; border: none; padding: 4px 8px; cursor: pointer; color: #6b7280; font-size: 18px;" title="Share">↗</button>' +
+                    '<button onclick="event.stopPropagation(); editDocument(&quot;' + doc.id + '&quot;)" style="background: none; border: none; padding: 4px 8px; cursor: pointer; color: #6b7280; font-size: 18px;" title="Edit">✏</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            return html || '<div style="text-align: center; padding: 60px; color: #6b7280;">No documents found</div>';
         }
 
         function generateCustomerAnalyticsTab(customerData) {
@@ -4828,6 +5366,72 @@ const htmlTemplate = `
 
         function addCaseComment(caseId) {
             showNotification('💬 Adding comment to case: ' + caseId, 'info');
+        }
+
+        // Interaction Management Functions
+        function logNewInteraction(customerName) {
+            showNotification('📝 Opening interaction log form for: ' + customerName, 'info');
+        }
+
+        function exportInteractions(customerName) {
+            showNotification('📊 Exporting interaction history for: ' + customerName, 'success');
+        }
+
+        function viewInteractionDetail(interactionId) {
+            showNotification('👁️ Opening interaction details: ' + interactionId, 'info');
+        }
+
+        function replyToInteraction(interactionId) {
+            showNotification('↩️ Opening reply form for interaction: ' + interactionId, 'info');
+        }
+
+        function addInteractionNote(interactionId) {
+            showNotification('📝 Adding note to interaction: ' + interactionId, 'info');
+        }
+
+        // Document Management Functions  
+        function uploadDocument(customerName) {
+            showNotification('⬆️ Opening document upload for: ' + customerName, 'info');
+        }
+
+        function createFolder(customerName) {
+            showNotification('📁 Creating new folder for: ' + customerName, 'info');
+        }
+
+        function exportDocuments(customerName) {
+            showNotification('📥 Downloading all documents for: ' + customerName, 'info');
+        }
+
+        function openFolder(folderType) {
+            showNotification('📂 Opening folder: ' + folderType, 'info');
+        }
+
+        function toggleDocumentView() {
+            showNotification('⚏ Toggling document view mode', 'info');
+        }
+
+        function sortDocuments(criteria) {
+            showNotification('↕ Sorting documents by: ' + criteria, 'info');
+        }
+
+        function openDocument(documentId) {
+            showNotification('📄 Opening document: ' + documentId, 'info');
+        }
+
+        function showDocumentMenu(documentId) {
+            showNotification('⋮ Opening document menu for: ' + documentId, 'info');
+        }
+
+        function downloadDocument(documentId) {
+            showNotification('⬇ Downloading document: ' + documentId, 'success');
+        }
+
+        function shareDocument(documentId) {
+            showNotification('↗ Opening share dialog for document: ' + documentId, 'info');
+        }
+
+        function editDocument(documentId) {
+            showNotification('✏ Opening document editor for: ' + documentId, 'info');
         }
 
         function showFeedbackModal() {
