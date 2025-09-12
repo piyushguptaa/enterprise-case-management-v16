@@ -408,6 +408,30 @@ const htmlTemplate = `
             background: rgba(102, 126, 234, 0.1);
         }
         
+        /* Rule Engine Tabs */
+        .rule-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+        
+        .rule-tab:hover {
+            color: #334155;
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .rule-tab.active {
+            color: #6366f1;
+            border-bottom-color: #6366f1;
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
         /* Customer Cards */
         .customer-card {
             background: white;
@@ -1095,6 +1119,26 @@ const htmlTemplate = `
                         <button class="nav-item" onclick="showTemplatesModal()">
                             <span class="nav-icon">📝</span>
                             Templates
+                        </button>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Rule Engine & Automation</div>
+                        <button class="nav-item" onclick="showRuleEngineModal()">
+                            <span class="nav-icon">🔧</span>
+                            Rule Engine
+                        </button>
+                        <button class="nav-item" onclick="showRulesLibraryModal()">
+                            <span class="nav-icon">📋</span>
+                            Rules Library
+                        </button>
+                        <button class="nav-item" onclick="showRuleExecutionModal()">
+                            <span class="nav-icon">⚡</span>
+                            Execution Monitor
+                        </button>
+                        <button class="nav-item" onclick="showAutomationModal()">
+                            <span class="nav-icon">🤖</span>
+                            Automation Hub
                         </button>
                     </div>
                     
@@ -2837,9 +2881,10 @@ const htmlTemplate = `
 
                 '<!-- Customer Management Tabs -->' +
                 '<div style="display: flex; background: white; border-bottom: 1px solid #e2e8f0; padding: 0 32px;">' +
-                '<button class="customer-tab active" onclick="showCustomerTab(&quot;directory&quot;)" data-tab="directory">📁 Master Directory</button>' +
+                '<button class="customer-tab active" onclick="showCustomerTab(&quot;dashboard&quot;)" data-tab="dashboard">📊 Analytics Dashboard</button>' +
+                '<button class="customer-tab" onclick="showCustomerTab(&quot;directory&quot;)" data-tab="directory">📁 Master Directory</button>' +
                 '<button class="customer-tab" onclick="showCustomerTab(&quot;profiles&quot;)" data-tab="profiles">👤 Customer Profiles</button>' +
-                '<button class="customer-tab" onclick="showCustomerTab(&quot;segments&quot;)" data-tab="segments">📊 Segments & Analytics</button>' +
+                '<button class="customer-tab" onclick="showCustomerTab(&quot;segments&quot;)" data-tab="segments">📈 Segments & Analytics</button>' +
                 '<button class="customer-tab" onclick="showCustomerTab(&quot;enterprise&quot;)" data-tab="enterprise">🏆 Major Customers</button>' +
                 '<button class="customer-tab" onclick="showCustomerTab(&quot;pipeline&quot;)" data-tab="pipeline">⚡ Sales Pipeline</button>' +
                 '<button class="customer-tab" onclick="showCustomerTab(&quot;insights&quot;)" data-tab="insights">🧠 AI Insights</button>' +
@@ -2848,7 +2893,7 @@ const htmlTemplate = `
                 '<!-- Tab Content Area -->' +
                 '<div style="background: white; margin: 0 32px 32px 32px; padding: 32px; border-radius: 0 0 12px 12px; min-height: 500px;">' +
                 '<div id="customerTabContent">' +
-                generateCustomerDirectoryHTML() +
+                generateCustomerDashboardHTML() +
                 '</div>' +
                 '</div>' +
                 '</div>';
@@ -2911,6 +2956,116 @@ const htmlTemplate = `
                 '<!-- Customer List -->' +
                 '<div id="customerList">' +
                 generateCustomerList() +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateCustomerDashboardHTML() {
+            return '<div class="customer-dashboard">' +
+                '<!-- Dashboard Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin: 0; font-size: 28px; font-weight: 700;">📊 Customer Analytics Dashboard</h2>' +
+                '<p style="color: #6b7280; margin: 8px 0 0 0; font-size: 16px;">Real-time insights and performance metrics across your customer portfolio</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="refreshDashboard()" class="btn" style="background: #10b981; color: white;">🔄 Refresh</button>' +
+                '<button onclick="exportDashboard()" class="btn" style="background: #3b82f6; color: white;">📥 Export</button>' +
+                '<button onclick="scheduleDashboard()" class="btn" style="background: #8b5cf6; color: white;">📅 Schedule</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Key Performance Indicators -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🎯 Key Performance Indicators</h3>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">' +
+                generateCustomerKPICards() +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Charts and Analytics -->' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">💰 Revenue Trends</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateCustomerRevenueChart() +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">📈 Customer Growth</h3>' +
+                '<div style="display: grid; gap: 16px;">' +
+                generateGrowthMetrics() +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Customer Segmentation -->' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🎯 Customer Segmentation</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateSegmentationChart() +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">📊 Geographic Distribution</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateGeographicChart() +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Customer Health & Satisfaction -->' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">❤️ Customer Health Score</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateHealthScoreChart() +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">⭐ Satisfaction Trends</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateSatisfactionChart() +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🔮 Churn Risk Analysis</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateChurnRiskChart() +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Activity and Engagement -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🔥 Customer Activity & Engagement</h3>' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<h4 style="margin: 0 0 16px 0; color: #1f2937;">Weekly Activity Trends</h4>' +
+                generateActivityTrendsChart() +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<h4 style="margin: 0 0 16px 0; color: #1f2937;">Top Engaged Customers</h4>' +
+                generateTopEngagedCustomers() +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Predictive Analytics -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🔮 Predictive Analytics & Insights</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generatePredictiveInsightsSection() +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Recent Activity Feed -->' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">📅 Recent Customer Activity</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateRecentActivityFeed() +
+                '</div>' +
                 '</div>' +
                 '</div>';
         }
@@ -3078,6 +3233,9 @@ const htmlTemplate = `
             const content = document.getElementById('customerTabContent');
             
             switch(tabName) {
+                case 'dashboard':
+                    content.innerHTML = generateCustomerDashboardHTML();
+                    break;
                 case 'directory':
                     content.innerHTML = generateCustomerDirectoryHTML();
                     break;
@@ -4950,10 +5108,497 @@ const htmlTemplate = `
         }
 
         function generateCustomerAnalyticsTab(customerData) {
-            return '<div style="text-align: center; padding: 60px 20px; color: #6b7280;">' +
-                '<div style="font-size: 48px; margin-bottom: 16px;">📈</div>' +
-                '<h3 style="color: #1f2937; margin-bottom: 8px;">Customer Analytics</h3>' +
-                '<p>Performance metrics and analytics for ' + customerData.company + '</p>' +
+            const analytics = getCustomerAnalyticsData(customerData.company);
+            
+            return '<div>' +
+                '<!-- Analytics Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin: 0;">📈 Customer Analytics & Insights</h2>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0;">Advanced performance metrics and predictive insights for ' + customerData.company + '</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="generateAnalyticsReport(&quot;' + customerData.company + '&quot;)" class="btn btn-primary">📊 Generate Report</button>' +
+                '<button onclick="exportAnalytics(&quot;' + customerData.company + '&quot;)" class="btn" style="background: #059669; color: white;">📥 Export Data</button>' +
+                '<button onclick="scheduleAnalyticsReview(&quot;' + customerData.company + '&quot;)" class="btn" style="background: #8b5cf6; color: white;">📅 Schedule Review</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Key Performance Indicators -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🎯 Key Performance Indicators</h3>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">' +
+                generateKPICards(analytics.kpis) +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Revenue Analytics -->' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">💰 Revenue Performance</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateRevenueChart(analytics.revenue) +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">📊 Revenue Breakdown</h3>' +
+                '<div style="display: grid; gap: 16px;">' +
+                generateRevenueMetrics(analytics.revenue) +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Engagement Analytics -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🔥 Customer Engagement Trends</h3>' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<h4 style="margin: 0 0 16px 0; color: #1f2937;">Interaction Frequency</h4>' +
+                generateInteractionChart(analytics.engagement) +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<h4 style="margin: 0 0 16px 0; color: #1f2937;">Support Activity</h4>' +
+                generateSupportChart(analytics.support) +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Health Score Analysis -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">❤️ Customer Health Analysis</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateHealthScoreAnalysis(analytics.health) +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Predictive Insights -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🔮 Predictive Insights & Recommendations</h3>' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">' +
+                generatePredictiveInsights(analytics.predictions) +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Risk Assessment -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">⚠️ Risk Assessment</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateRiskAssessment(analytics.risks) +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Benchmarking -->' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">📏 Industry Benchmarking</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateBenchmarkingAnalysis(analytics.benchmarks) +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function getCustomerAnalyticsData(companyName) {
+            return {
+                kpis: {
+                    totalRevenue: { value: '$2.4M', trend: '+18%', status: 'up', period: 'YoY' },
+                    monthlyRecurring: { value: '$195K', trend: '+12%', status: 'up', period: 'MoM' },
+                    customerLifetime: { value: '$8.7M', trend: '+25%', status: 'up', period: 'Projected' },
+                    churnRisk: { value: '12%', trend: '-5%', status: 'down', period: 'vs Industry' },
+                    netPromoterScore: { value: '73', trend: '+8', status: 'up', period: 'Last Quarter' },
+                    engagementScore: { value: '8.4/10', trend: '+0.6', status: 'up', period: 'This Month' }
+                },
+                revenue: {
+                    monthly: [
+                        { month: 'Jan', amount: 180000, growth: 15 },
+                        { month: 'Feb', amount: 185000, growth: 18 },
+                        { month: 'Mar', amount: 192000, growth: 22 },
+                        { month: 'Apr', amount: 195000, growth: 12 },
+                        { month: 'May', amount: 198000, growth: 8 },
+                        { month: 'Jun', amount: 205000, growth: 14 }
+                    ],
+                    breakdown: {
+                        subscription: { amount: 1950000, percentage: 81 },
+                        professional: { amount: 320000, percentage: 13 },
+                        addon: { amount: 130000, percentage: 6 }
+                    },
+                    forecast: { next_quarter: 625000, confidence: 87 }
+                },
+                engagement: {
+                    weekly: [
+                        { week: 'W1', interactions: 28, satisfaction: 8.5 },
+                        { week: 'W2', interactions: 32, satisfaction: 8.8 },
+                        { week: 'W3', interactions: 25, satisfaction: 8.2 },
+                        { week: 'W4', interactions: 35, satisfaction: 9.1 }
+                    ],
+                    channels: {
+                        email: { count: 127, satisfaction: 8.6 },
+                        phone: { count: 48, satisfaction: 9.2 },
+                        chat: { count: 156, satisfaction: 8.9 },
+                        meetings: { count: 23, satisfaction: 9.4 }
+                    }
+                },
+                support: {
+                    tickets: { total: 45, resolved: 42, avg_time: '4.2 hours' },
+                    severity: { critical: 2, high: 8, medium: 15, low: 20 },
+                    satisfaction: { rating: 4.6, responses: 38 }
+                },
+                health: {
+                    current: 94.2,
+                    factors: [
+                        { name: 'Product Usage', score: 96, weight: 30, status: 'excellent' },
+                        { name: 'Payment History', score: 98, weight: 25, status: 'excellent' },
+                        { name: 'Support Interactions', score: 89, weight: 20, status: 'good' },
+                        { name: 'Feature Adoption', score: 92, weight: 15, status: 'good' },
+                        { name: 'Engagement Level', score: 95, weight: 10, status: 'excellent' }
+                    ],
+                    trend: 'improving'
+                },
+                predictions: {
+                    renewal_probability: { score: 94, confidence: 'high', factors: ['Strong usage', 'Timely payments', 'Positive feedback'] },
+                    expansion_opportunity: { score: 78, value: '$450K', timeline: 'Q2 2024' },
+                    churn_risk: { score: 6, factors: ['Declining usage in analytics module'], action: 'Schedule product review' }
+                },
+                risks: [
+                    { type: 'payment', severity: 'low', description: 'Invoice payment delayed by 3 days', action: 'Monitor' },
+                    { type: 'usage', severity: 'medium', description: 'Analytics module usage down 15%', action: 'Engage customer success' },
+                    { type: 'competition', severity: 'low', description: 'Competitor mentioned in recent meeting', action: 'Value reinforcement call' }
+                ],
+                benchmarks: {
+                    industry_avg: {
+                        revenue_growth: 12,
+                        nps: 45,
+                        churn_rate: 18,
+                        engagement: 6.2
+                    },
+                    customer_vs_avg: {
+                        revenue_growth: '+6%',
+                        nps: '+28',
+                        churn_rate: '-6%',
+                        engagement: '+2.2'
+                    }
+                }
+            };
+        }
+
+        function generateKPICards(kpis) {
+            let html = '';
+            const kpiList = [
+                { key: 'totalRevenue', title: 'Total Revenue', icon: '💰', color: '#10b981' },
+                { key: 'monthlyRecurring', title: 'Monthly Recurring Revenue', icon: '🔄', color: '#3b82f6' },
+                { key: 'customerLifetime', title: 'Customer Lifetime Value', icon: '💎', color: '#8b5cf6' },
+                { key: 'churnRisk', title: 'Churn Risk', icon: '⚠️', color: '#f59e0b' },
+                { key: 'netPromoterScore', title: 'Net Promoter Score', icon: '⭐', color: '#ec4899' },
+                { key: 'engagementScore', title: 'Engagement Score', icon: '🔥', color: '#06b6d4' }
+            ];
+
+            kpiList.forEach(kpi => {
+                const data = kpis[kpi.key];
+                const trendColor = data.status === 'up' ? '#10b981' : data.status === 'down' ? '#dc2626' : '#6b7280';
+                const trendIcon = data.status === 'up' ? '↗' : data.status === 'down' ? '↘' : '→';
+
+                html += '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; transition: all 0.3s ease;" onmouseover="this.style.boxShadow=&quot;0 4px 12px rgba(0,0,0,0.1)&quot;" onmouseout="this.style.boxShadow=&quot;&quot;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">' +
+                    '<div style="width: 48px; height: 48px; background: ' + kpi.color + '15; color: ' + kpi.color + '; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">' + kpi.icon + '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<div style="color: ' + trendColor + '; font-size: 14px; font-weight: 600; margin-bottom: 2px;">' + trendIcon + ' ' + data.trend + '</div>' +
+                    '<div style="color: #6b7280; font-size: 12px;">' + data.period + '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<h4 style="color: #1f2937; margin: 0 0 8px 0; font-size: 14px; font-weight: 500;">' + kpi.title + '</h4>' +
+                    '<div style="font-size: 28px; font-weight: 800; color: #1f2937; margin-bottom: 4px;">' + data.value + '</div>' +
+                    '</div>';
+            });
+
+            return html;
+        }
+
+        function generateRevenueChart(revenue) {
+            let html = '<div style="margin-bottom: 20px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">' +
+                '<h4 style="margin: 0; color: #1f2937;">Monthly Revenue Trend</h4>' +
+                '<div style="display: flex; gap: 16px; align-items: center;">' +
+                '<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 12px; height: 3px; background: #3b82f6; border-radius: 2px;"></div><span style="font-size: 12px; color: #6b7280;">Revenue</span></div>' +
+                '<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 12px; height: 3px; background: #10b981; border-radius: 2px;"></div><span style="font-size: 12px; color: #6b7280;">Growth</span></div>' +
+                '</div>' +
+                '</div>';
+
+            // Simple chart visualization
+            html += '<div style="display: flex; align-items: end; gap: 8px; height: 200px; padding: 20px 0; border-bottom: 1px solid #e5e7eb;">';
+            
+            const maxRevenue = Math.max(...revenue.monthly.map(m => m.amount));
+            revenue.monthly.forEach((month, index) => {
+                const heightPercent = (month.amount / maxRevenue) * 100;
+                html += '<div style="flex: 1; display: flex; flex-direction: column; align-items: center;">' +
+                    '<div style="width: 100%; background: linear-gradient(to top, #3b82f6, #60a5fa); height: ' + heightPercent + '%; border-radius: 4px 4px 0 0; position: relative; margin-bottom: 8px;">' +
+                    '<div style="position: absolute; top: -24px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #6b7280; font-weight: 500;">$' + (month.amount/1000).toFixed(0) + 'K</div>' +
+                    '</div>' +
+                    '<div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">' + month.month + '</div>' +
+                    '<div style="font-size: 11px; color: #10b981; font-weight: 600;">+' + month.growth + '%</div>' +
+                    '</div>';
+            });
+            
+            html += '</div></div>';
+            return html;
+        }
+
+        function generateRevenueMetrics(revenue) {
+            let html = '';
+            
+            // Revenue breakdown
+            html += '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">' +
+                '<h5 style="margin: 0 0 12px 0; color: #1f2937; font-size: 14px;">Revenue Sources</h5>';
+            
+            Object.entries(revenue.breakdown).forEach(([source, data]) => {
+                const sourceNames = { subscription: 'Subscriptions', professional: 'Professional Services', addon: 'Add-ons' };
+                html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">' +
+                    '<div style="display: flex; align-items: center; gap: 8px;">' +
+                    '<div style="width: 8px; height: 8px; background: #3b82f6; border-radius: 4px;"></div>' +
+                    '<span style="font-size: 13px; color: #1f2937;">' + sourceNames[source] + '</span>' +
+                    '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<div style="font-size: 13px; font-weight: 600; color: #1f2937;">$' + (data.amount/1000).toFixed(0) + 'K</div>' +
+                    '<div style="font-size: 11px; color: #6b7280;">' + data.percentage + '%</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            html += '</div>';
+
+            // Forecast
+            html += '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">' +
+                '<h5 style="margin: 0 0 12px 0; color: #1f2937; font-size: 14px;">Next Quarter Forecast</h5>' +
+                '<div style="font-size: 24px; font-weight: 700; color: #10b981; margin-bottom: 4px;">$' + (revenue.forecast.next_quarter/1000).toFixed(0) + 'K</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Confidence: ' + revenue.forecast.confidence + '%</div>' +
+                '</div>';
+
+            return html;
+        }
+
+        function generateInteractionChart(engagement) {
+            let html = '<div style="margin-bottom: 16px;">';
+            
+            // Weekly interaction bars
+            html += '<div style="display: flex; align-items: end; gap: 12px; height: 120px; margin-bottom: 16px;">';
+            const maxInteractions = Math.max(...engagement.weekly.map(w => w.interactions));
+            
+            engagement.weekly.forEach(week => {
+                const heightPercent = (week.interactions / maxInteractions) * 100;
+                html += '<div style="flex: 1; display: flex; flex-direction: column; align-items: center;">' +
+                    '<div style="font-size: 10px; color: #6b7280; margin-bottom: 4px;">' + week.interactions + '</div>' +
+                    '<div style="width: 100%; background: #3b82f6; height: ' + heightPercent + '%; border-radius: 4px; margin-bottom: 4px;"></div>' +
+                    '<div style="font-size: 12px; color: #6b7280;">' + week.week + '</div>' +
+                    '</div>';
+            });
+            
+            html += '</div>';
+            
+            // Channel breakdown
+            html += '<div style="font-size: 13px;">';
+            Object.entries(engagement.channels).forEach(([channel, data]) => {
+                const channelIcons = { email: '📧', phone: '📞', chat: '💬', meetings: '🤝' };
+                html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
+                    '<span>' + channelIcons[channel] + ' ' + channel.charAt(0).toUpperCase() + channel.slice(1) + '</span>' +
+                    '<span style="color: #6b7280;">' + data.count + ' (' + data.satisfaction + '/10)</span>' +
+                    '</div>';
+            });
+            html += '</div>';
+            
+            return html;
+        }
+
+        function generateSupportChart(support) {
+            return '<div>' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">' +
+                '<div style="text-align: center;">' +
+                '<div style="font-size: 24px; font-weight: 700; color: #10b981;">' + support.tickets.resolved + '/' + support.tickets.total + '</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Tickets Resolved</div>' +
+                '</div>' +
+                '<div style="text-align: center;">' +
+                '<div style="font-size: 24px; font-weight: 700; color: #3b82f6;">' + support.tickets.avg_time + '</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Avg Response Time</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 16px;">' +
+                '<div style="font-size: 13px; font-weight: 500; color: #1f2937; margin-bottom: 8px;">Ticket Severity</div>' +
+                '<div style="display: flex; gap: 4px; height: 8px; border-radius: 4px; overflow: hidden;">' +
+                '<div style="flex: ' + support.severity.critical + '; background: #dc2626;" title="Critical: ' + support.severity.critical + '"></div>' +
+                '<div style="flex: ' + support.severity.high + '; background: #f59e0b;" title="High: ' + support.severity.high + '"></div>' +
+                '<div style="flex: ' + support.severity.medium + '; background: #3b82f6;" title="Medium: ' + support.severity.medium + '"></div>' +
+                '<div style="flex: ' + support.severity.low + '; background: #10b981;" title="Low: ' + support.severity.low + '"></div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<div style="text-align: center;">' +
+                '<div style="font-size: 20px; font-weight: 700; color: #f59e0b;">⭐ ' + support.satisfaction.rating + '/5</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Satisfaction (' + support.satisfaction.responses + ' responses)</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateHealthScoreAnalysis(health) {
+            let html = '<div style="display: grid; grid-template-columns: 200px 1fr; gap: 32px; align-items: center;">';
+            
+            // Health score circle
+            const scorePercent = health.current;
+            const scoreColor = scorePercent >= 90 ? '#10b981' : scorePercent >= 70 ? '#f59e0b' : '#dc2626';
+            
+            html += '<div style="position: relative; width: 160px; height: 160px; margin: 0 auto;">' +
+                '<svg width="160" height="160" style="transform: rotate(-90deg);">' +
+                '<circle cx="80" cy="80" r="70" fill="none" stroke="#e5e7eb" stroke-width="12"/>' +
+                '<circle cx="80" cy="80" r="70" fill="none" stroke="' + scoreColor + '" stroke-width="12" stroke-dasharray="' + (scorePercent * 4.4) + ' 440" stroke-linecap="round"/>' +
+                '</svg>' +
+                '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">' +
+                '<div style="font-size: 32px; font-weight: 800; color: ' + scoreColor + ';">' + scorePercent.toFixed(1) + '</div>' +
+                '<div style="font-size: 14px; color: #6b7280;">Health Score</div>' +
+                '</div>' +
+                '</div>';
+            
+            // Health factors
+            html += '<div>' +
+                '<h4 style="margin: 0 0 16px 0; color: #1f2937;">Health Factors</h4>' +
+                '<div style="display: grid; gap: 12px;">';
+            
+            health.factors.forEach(factor => {
+                const statusColor = factor.status === 'excellent' ? '#10b981' : factor.status === 'good' ? '#3b82f6' : '#f59e0b';
+                html += '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                    '<div style="flex: 1;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">' +
+                    '<span style="font-size: 14px; color: #1f2937;">' + factor.name + '</span>' +
+                    '<span style="font-size: 14px; font-weight: 600; color: ' + statusColor + ';">' + factor.score + '/100</span>' +
+                    '</div>' +
+                    '<div style="display: flex; align-items: center; gap: 8px;">' +
+                    '<div style="flex: 1; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">' +
+                    '<div style="width: ' + factor.score + '%; height: 100%; background: ' + statusColor + ';"></div>' +
+                    '</div>' +
+                    '<span style="font-size: 11px; color: #6b7280;">' + factor.weight + '%</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            html += '</div></div></div>';
+            return html;
+        }
+
+        function generatePredictiveInsights(predictions) {
+            let html = '';
+            
+            // Renewal probability
+            html += '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">' +
+                '<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">' +
+                '<div style="width: 40px; height: 40px; background: #10b98115; color: #10b981; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🔄</div>' +
+                '<div>' +
+                '<h4 style="margin: 0; color: #1f2937;">Renewal Probability</h4>' +
+                '<div style="font-size: 12px; color: #6b7280;">Confidence: ' + predictions.renewal_probability.confidence + '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="font-size: 32px; font-weight: 800; color: #10b981; margin-bottom: 12px;">' + predictions.renewal_probability.score + '%</div>' +
+                '<div style="margin-bottom: 12px;">' +
+                '<div style="font-size: 13px; font-weight: 500; color: #1f2937; margin-bottom: 6px;">Key Factors:</div>';
+            
+            predictions.renewal_probability.factors.forEach(factor => {
+                html += '<div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">• ' + factor + '</div>';
+            });
+            
+            html += '</div></div>';
+            
+            // Expansion opportunity
+            html += '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">' +
+                '<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">' +
+                '<div style="width: 40px; height: 40px; background: #8b5cf615; color: #8b5cf6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">📈</div>' +
+                '<div>' +
+                '<h4 style="margin: 0; color: #1f2937;">Expansion Opportunity</h4>' +
+                '<div style="font-size: 12px; color: #6b7280;">Timeline: ' + predictions.expansion_opportunity.timeline + '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="font-size: 32px; font-weight: 800; color: #8b5cf6; margin-bottom: 8px;">' + predictions.expansion_opportunity.value + '</div>' +
+                '<div style="font-size: 14px; color: #6b7280; margin-bottom: 12px;">Potential Value</div>' +
+                '<div style="font-size: 16px; font-weight: 600; color: #8b5cf6;">' + predictions.expansion_opportunity.score + '% likelihood</div>' +
+                '</div>';
+            
+            return html;
+        }
+
+        function generateRiskAssessment(risks) {
+            let html = '<div style="display: grid; gap: 16px;">';
+            
+            risks.forEach(risk => {
+                const severityColor = {
+                    'low': '#10b981',
+                    'medium': '#f59e0b',
+                    'high': '#dc2626',
+                    'critical': '#7c2d12'
+                }[risk.severity] || '#6b7280';
+                
+                const riskIcons = {
+                    'payment': '💳',
+                    'usage': '📊',
+                    'competition': '🏆',
+                    'support': '🛠️'
+                };
+                
+                html += '<div style="display: flex; align-items: flex-start; gap: 16px; padding: 16px; border-left: 4px solid ' + severityColor + '; background: #f8fafc; border-radius: 0 8px 8px 0;">' +
+                    '<div style="font-size: 24px;">' + (riskIcons[risk.type] || '⚠️') + '</div>' +
+                    '<div style="flex: 1;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">' +
+                    '<h5 style="margin: 0; color: #1f2937; text-transform: capitalize;">' + risk.type + ' Risk</h5>' +
+                    '<span style="background: ' + severityColor + '; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; text-transform: uppercase;">' + risk.severity + '</span>' +
+                    '</div>' +
+                    '<p style="margin: 0 0 8px 0; color: #4b5563; font-size: 14px;">' + risk.description + '</p>' +
+                    '<div style="color: ' + severityColor + '; font-size: 13px; font-weight: 500;">Recommended Action: ' + risk.action + '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        function generateBenchmarkingAnalysis(benchmarks) {
+            return '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">' +
+                '<div>' +
+                '<h4 style="margin: 0 0 16px 0; color: #1f2937;">Industry Averages</h4>' +
+                '<div style="display: grid; gap: 12px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8fafc; border-radius: 8px;">' +
+                '<span style="color: #1f2937;">Revenue Growth</span>' +
+                '<span style="font-weight: 600; color: #6b7280;">' + benchmarks.industry_avg.revenue_growth + '%</span>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8fafc; border-radius: 8px;">' +
+                '<span style="color: #1f2937;">Net Promoter Score</span>' +
+                '<span style="font-weight: 600; color: #6b7280;">' + benchmarks.industry_avg.nps + '</span>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8fafc; border-radius: 8px;">' +
+                '<span style="color: #1f2937;">Churn Rate</span>' +
+                '<span style="font-weight: 600; color: #6b7280;">' + benchmarks.industry_avg.churn_rate + '%</span>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8fafc; border-radius: 8px;">' +
+                '<span style="color: #1f2937;">Engagement Score</span>' +
+                '<span style="font-weight: 600; color: #6b7280;">' + benchmarks.industry_avg.engagement + '/10</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h4 style="margin: 0 0 16px 0; color: #1f2937;">Customer Performance</h4>' +
+                '<div style="display: grid; gap: 12px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #10b981;">' +
+                '<span style="color: #1f2937;">Revenue Growth</span>' +
+                '<span style="font-weight: 600; color: #10b981;">↗ ' + benchmarks.customer_vs_avg.revenue_growth + '</span>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #10b981;">' +
+                '<span style="color: #1f2937;">Net Promoter Score</span>' +
+                '<span style="font-weight: 600; color: #10b981;">↗ ' + benchmarks.customer_vs_avg.nps + '</span>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #10b981;">' +
+                '<span style="color: #1f2937;">Churn Rate</span>' +
+                '<span style="font-weight: 600; color: #10b981;">↘ ' + benchmarks.customer_vs_avg.churn_rate + '</span>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #10b981;">' +
+                '<span style="color: #1f2937;">Engagement Score</span>' +
+                '<span style="font-weight: 600; color: #10b981;">↗ ' + benchmarks.customer_vs_avg.engagement + '</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
                 '</div>';
         }
 
@@ -5026,6 +5671,381 @@ const htmlTemplate = `
 
         function callContact(contactId, phone) {
             showNotification('📞 Calling contact: ' + contactId + ' at ' + phone, 'info');
+        }
+
+        // Customer Dashboard Functions
+        function generateCustomerKPICards() {
+            const kpis = [
+                { title: 'Total Revenue', value: '$47.2M', trend: '+18%', status: 'up', icon: '💰', color: '#10b981' },
+                { title: 'Active Customers', value: '2,847', trend: '+12%', status: 'up', icon: '👥', color: '#3b82f6' },
+                { title: 'Customer Lifetime Value', value: '$16.8K', trend: '+25%', status: 'up', icon: '💎', color: '#8b5cf6' },
+                { title: 'Monthly Churn Rate', value: '3.2%', trend: '-1.5%', status: 'down', icon: '📉', color: '#f59e0b' },
+                { title: 'Net Promoter Score', value: '68', trend: '+12', status: 'up', icon: '⭐', color: '#ec4899' },
+                { title: 'Customer Satisfaction', value: '4.7/5', trend: '+0.3', status: 'up', icon: '😊', color: '#06b6d4' }
+            ];
+            
+            let html = '';
+            kpis.forEach(kpi => {
+                const trendColor = kpi.status === 'up' ? '#10b981' : kpi.status === 'down' ? '#dc2626' : '#6b7280';
+                const trendIcon = kpi.status === 'up' ? '↗' : kpi.status === 'down' ? '↘' : '→';
+                
+                html += '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; transition: all 0.3s ease;" onmouseover="this.style.boxShadow=&quot;0 4px 12px rgba(0,0,0,0.1)&quot;" onmouseout="this.style.boxShadow=&quot;&quot;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">' +
+                    '<div style="font-size: 32px;">' + kpi.icon + '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<div style="font-size: 28px; font-weight: 700; color: ' + kpi.color + '; margin-bottom: 4px;">' + kpi.value + '</div>' +
+                    '<div style="display: flex; align-items: center; gap: 4px; justify-content: flex-end;">' +
+                    '<span style="color: ' + trendColor + '; font-weight: 600; font-size: 14px;">' + trendIcon + ' ' + kpi.trend + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="color: #1f2937; font-weight: 600; font-size: 16px;">' + kpi.title + '</div>' +
+                    '</div>';
+            });
+            
+            return html;
+        }
+
+        function generateCustomerRevenueChart() {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const revenue = [3200, 3800, 4200, 4100, 4500, 4800, 5200, 4900, 5100, 5400, 5800, 6200];
+            
+            let html = '<div style="margin-bottom: 20px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">' +
+                '<h4 style="margin: 0; color: #1f2937;">Monthly Revenue Growth ($K)</h4>' +
+                '<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 12px; height: 3px; background: #10b981; border-radius: 2px;"></div><span style="font-size: 12px; color: #6b7280;">Revenue</span></div>' +
+                '</div>';
+            
+            // Chart visualization
+            html += '<div style="display: flex; align-items: end; gap: 8px; height: 200px; margin-bottom: 16px; padding: 0 8px;">';
+            const maxRevenue = Math.max(...revenue);
+            
+            revenue.forEach((amount, index) => {
+                const heightPercent = (amount / maxRevenue) * 100;
+                html += '<div style="flex: 1; display: flex; flex-direction: column; align-items: center;">' +
+                    '<div style="font-size: 10px; color: #6b7280; margin-bottom: 4px;">$' + amount + 'K</div>' +
+                    '<div style="width: 100%; height: ' + heightPercent + '%; background: linear-gradient(to top, #10b981, #34d399); border-radius: 2px 2px 0 0; transition: all 0.3s ease;" onmouseover="this.style.transform=&quot;scaleY(1.1)&quot;" onmouseout="this.style.transform=&quot;scaleY(1)&quot;"></div>' +
+                    '<div style="font-size: 11px; color: #6b7280; margin-top: 8px; font-weight: 500;">' + months[index] + '</div>' +
+                '</div>';
+            });
+            
+            html += '</div>';
+            
+            // Summary stats
+            html += '<div style="display: flex; justify-content: space-around; padding: 16px; background: #f8fafc; border-radius: 8px;">' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #10b981;">$47.2M</div><div style="font-size: 12px; color: #6b7280;">Total Revenue</div></div>' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #3b82f6;">+23%</div><div style="font-size: 12px; color: #6b7280;">Growth Rate</div></div>' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #8b5cf6;">$3.9M</div><div style="font-size: 12px; color: #6b7280;">Average Monthly</div></div>' +
+                '</div>';
+            
+            return html + '</div>';
+        }
+
+        function generateGrowthMetrics() {
+            const metrics = [
+                { label: 'New Customers', value: '+284', trend: '+18%', color: '#10b981' },
+                { label: 'Customer Retention', value: '94.2%', trend: '+2.3%', color: '#3b82f6' },
+                { label: 'Expansion Revenue', value: '$2.1M', trend: '+45%', color: '#8b5cf6' },
+                { label: 'Average Deal Size', value: '$12.8K', trend: '+8%', color: '#f59e0b' }
+            ];
+            
+            let html = '';
+            metrics.forEach(metric => {
+                html += '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">' +
+                    '<span style="color: #6b7280; font-size: 14px;">' + metric.label + '</span>' +
+                    '<span style="color: ' + metric.color + '; font-size: 12px; font-weight: 600;">' + metric.trend + '</span>' +
+                    '</div>' +
+                    '<div style="font-size: 24px; font-weight: 700; color: ' + metric.color + ';">' + metric.value + '</div>' +
+                    '</div>';
+            });
+            
+            return html;
+        }
+
+        function generateSegmentationChart() {
+            const segments = [
+                { name: 'Enterprise', count: 847, percentage: 30, color: '#10b981' },
+                { name: 'Mid-Market', count: 1278, percentage: 45, color: '#3b82f6' },
+                { name: 'SMB', count: 722, percentage: 25, color: '#f59e0b' }
+            ];
+            
+            let html = '<div style="margin-bottom: 24px;">';
+            
+            // Segment bars
+            segments.forEach(segment => {
+                html += '<div style="margin-bottom: 16px;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
+                    '<span style="color: #1f2937; font-weight: 500;">' + segment.name + '</span>' +
+                    '<span style="color: #6b7280; font-size: 12px;">' + segment.count + ' customers</span>' +
+                    '</div>' +
+                    '<div style="width: 100%; height: 12px; background: #f3f4f6; border-radius: 6px; overflow: hidden;">' +
+                    '<div style="width: ' + segment.percentage + '%; height: 100%; background: ' + segment.color + '; border-radius: 6px; transition: all 0.3s ease;"></div>' +
+                    '</div>' +
+                    '<div style="text-align: right; margin-top: 4px; color: ' + segment.color + '; font-weight: 600; font-size: 14px;">' + segment.percentage + '%</div>' +
+                    '</div>';
+            });
+            
+            // Summary stats
+            html += '<div style="display: flex; justify-content: space-around; margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px;">' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #10b981;">2,847</div><div style="font-size: 12px; color: #6b7280;">Total Customers</div></div>' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #3b82f6;">$47.2M</div><div style="font-size: 12px; color: #6b7280;">Total Revenue</div></div>' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #8b5cf6;">$16.8K</div><div style="font-size: 12px; color: #6b7280;">Avg Customer Value</div></div>' +
+                '</div>';
+            
+            html += '</div>';
+            
+            return html;
+        }
+
+        function generateGeographicChart() {
+            const regions = [
+                { name: 'North America', customers: 1285, revenue: '$18.4M', color: '#10b981' },
+                { name: 'Europe', customers: 892, revenue: '$12.8M', color: '#3b82f6' },
+                { name: 'Asia Pacific', customers: 567, revenue: '$11.2M', color: '#f59e0b' },
+                { name: 'Other', customers: 103, revenue: '$4.8M', color: '#6b7280' }
+            ];
+            
+            let html = '';
+            regions.forEach((region, index) => {
+                const widthPercent = (region.customers / 1285) * 100;
+                html += '<div style="margin-bottom: 16px;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
+                    '<span style="color: #1f2937; font-weight: 500;">' + region.name + '</span>' +
+                    '<span style="color: #6b7280; font-size: 12px;">' + region.customers + ' customers</span>' +
+                    '</div>' +
+                    '<div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 4px; overflow: hidden;">' +
+                    '<div style="width: ' + widthPercent + '%; height: 100%; background: ' + region.color + '; border-radius: 4px; transition: all 0.3s ease;"></div>' +
+                    '</div>' +
+                    '<div style="text-align: right; margin-top: 4px; color: ' + region.color + '; font-weight: 600; font-size: 14px;">' + region.revenue + '</div>' +
+                    '</div>';
+            });
+            
+            return html;
+        }
+
+        function generateHealthScoreChart() {
+            const healthScore = 87.3;
+            const circumference = 2 * Math.PI * 45;
+            const strokeDasharray = circumference;
+            const strokeDashoffset = circumference - (healthScore / 100) * circumference;
+            
+            return '<div style="text-align: center;">' +
+                '<div style="position: relative; width: 120px; height: 120px; margin: 0 auto 20px;">' +
+                '<svg width="120" height="120" style="transform: rotate(-90deg);">' +
+                '<circle cx="60" cy="60" r="45" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>' +
+                '<circle cx="60" cy="60" r="45" fill="none" stroke="#10b981" stroke-width="8" stroke-dasharray="' + strokeDasharray + '" stroke-dashoffset="' + strokeDashoffset + '" stroke-linecap="round"></circle>' +
+                '</svg>' +
+                '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">' +
+                '<div style="font-size: 24px; font-weight: 700; color: #10b981;">' + healthScore + '</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Health Score</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="display: grid; gap: 8px; font-size: 12px;">' +
+                '<div style="display: flex; justify-content: space-between;"><span style="color: #6b7280;">Excellent</span><span style="color: #10b981; font-weight: 600;">65%</span></div>' +
+                '<div style="display: flex; justify-content: space-between;"><span style="color: #6b7280;">Good</span><span style="color: #3b82f6; font-weight: 600;">28%</span></div>' +
+                '<div style="display: flex; justify-content: space-between;"><span style="color: #6b7280;">At Risk</span><span style="color: #f59e0b; font-weight: 600;">7%</span></div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateSatisfactionChart() {
+            const satisfaction = [4.2, 4.3, 4.5, 4.4, 4.6, 4.7, 4.8, 4.7, 4.6, 4.8, 4.9, 4.7];
+            const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+            
+            let html = '<div style="display: flex; align-items: end; gap: 4px; height: 100px; margin-bottom: 16px;">';
+            const maxSat = Math.max(...satisfaction);
+            
+            satisfaction.forEach((rating, index) => {
+                const heightPercent = (rating / 5) * 100;
+                html += '<div style="flex: 1; display: flex; flex-direction: column; align-items: center;">' +
+                    '<div style="width: 100%; height: ' + heightPercent + '%; background: linear-gradient(to top, #ec4899, #f472b6); border-radius: 2px;" title="' + rating + '/5"></div>' +
+                    '<div style="font-size: 10px; color: #6b7280; margin-top: 4px;">' + months[index] + '</div>' +
+                '</div>';
+            });
+            
+            html += '</div>' +
+                '<div style="text-align: center;">' +
+                '<div style="font-size: 32px; font-weight: 700; color: #ec4899; margin-bottom: 4px;">4.7</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Average Rating</div>' +
+                '<div style="color: #10b981; font-size: 12px; margin-top: 4px;">↗ +0.3 this quarter</div>' +
+                '</div>';
+            
+            return html;
+        }
+
+        function generateChurnRiskChart() {
+            const riskLevels = [
+                { label: 'Low Risk', count: 2456, percentage: 86, color: '#10b981' },
+                { label: 'Medium Risk', count: 284, percentage: 10, color: '#f59e0b' },
+                { label: 'High Risk', count: 107, percentage: 4, color: '#dc2626' }
+            ];
+            
+            let html = '';
+            riskLevels.forEach(level => {
+                html += '<div style="margin-bottom: 12px;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">' +
+                    '<span style="color: #1f2937; font-size: 12px; font-weight: 500;">' + level.label + '</span>' +
+                    '<span style="color: #6b7280; font-size: 12px;">' + level.count + '</span>' +
+                    '</div>' +
+                    '<div style="width: 100%; height: 6px; background: #f3f4f6; border-radius: 3px;">' +
+                    '<div style="width: ' + level.percentage + '%; height: 100%; background: ' + level.color + '; border-radius: 3px;"></div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            html += '<div style="margin-top: 16px; text-align: center;">' +
+                '<div style="color: #10b981; font-size: 18px; font-weight: 600;">96%</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Retention Rate</div>' +
+                '</div>';
+            
+            return html;
+        }
+
+        function generateActivityTrendsChart() {
+            const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'];
+            const activities = [
+                { name: 'Emails', data: [245, 287, 312, 298, 334, 356], color: '#3b82f6' },
+                { name: 'Calls', data: [89, 94, 102, 87, 115, 123], color: '#10b981' },
+                { name: 'Meetings', data: [34, 42, 38, 45, 52, 48], color: '#f59e0b' }
+            ];
+            
+            let html = '<div style="display: flex; align-items: end; gap: 12px; height: 150px; margin-bottom: 16px;">';
+            
+            weeks.forEach((week, weekIndex) => {
+                html += '<div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; height: 100%;">';
+                
+                const totalWeekActivity = activities.reduce((sum, activity) => sum + activity.data[weekIndex], 0);
+                const maxTotal = Math.max(...weeks.map((_, i) => activities.reduce((sum, activity) => sum + activity.data[i], 0)));
+                
+                activities.forEach(activity => {
+                    const heightPercent = (activity.data[weekIndex] / maxTotal) * 100;
+                    html += '<div style="width: 100%; height: ' + heightPercent + '%; background: ' + activity.color + '; border-radius: 2px;" title="' + activity.name + ': ' + activity.data[weekIndex] + '"></div>';
+                });
+                
+                html += '<div style="font-size: 10px; color: #6b7280; margin-top: 8px; text-align: center;">W' + (weekIndex + 1) + '</div>';
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            
+            // Legend
+            html += '<div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 12px;">';
+            activities.forEach(activity => {
+                html += '<div style="display: flex; align-items: center; gap: 6px;">' +
+                    '<div style="width: 12px; height: 3px; background: ' + activity.color + '; border-radius: 2px;"></div>' +
+                    '<span style="font-size: 12px; color: #6b7280;">' + activity.name + '</span>' +
+                    '</div>';
+            });
+            html += '</div>';
+            
+            return html;
+        }
+
+        function generateTopEngagedCustomers() {
+            const customers = [
+                { name: 'Microsoft Corp', score: 9.8, revenue: '$2.4M', color: '#10b981' },
+                { name: 'Amazon Web Services', score: 9.6, revenue: '$1.8M', color: '#3b82f6' },
+                { name: 'Google Cloud', score: 9.4, revenue: '$1.6M', color: '#8b5cf6' },
+                { name: 'Salesforce Inc', score: 9.2, revenue: '$1.2M', color: '#f59e0b' },
+                { name: 'Apple Inc', score: 9.0, revenue: '$980K', color: '#ec4899' }
+            ];
+            
+            let html = '';
+            customers.forEach((customer, index) => {
+                html += '<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: ' + (index % 2 === 0 ? '#f8fafc' : 'white') + '; border-radius: 8px; margin-bottom: 8px;">' +
+                    '<div style="flex: 1;">' +
+                    '<div style="color: #1f2937; font-weight: 600; font-size: 14px; margin-bottom: 2px;">' + customer.name + '</div>' +
+                    '<div style="color: #6b7280; font-size: 12px;">' + customer.revenue + ' revenue</div>' +
+                    '</div>' +
+                    '<div style="text-align: center;">' +
+                    '<div style="background: ' + customer.color + '; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">' + customer.score + '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            return html;
+        }
+
+        function generatePredictiveInsightsSection() {
+            return '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">' +
+                '<div>' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">🔮 Renewal Predictions</h4>' +
+                '<div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 12px;">' +
+                '<div style="font-size: 18px; font-weight: 600; color: #059669; margin-bottom: 4px;">92.3%</div>' +
+                '<div style="color: #065f46; font-size: 12px;">Likely to renew in Q1</div>' +
+                '</div>' +
+                '<div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 16px;">' +
+                '<div style="font-size: 18px; font-weight: 600; color: #d97706; margin-bottom: 4px;">7.7%</div>' +
+                '<div style="color: #92400e; font-size: 12px;">At risk of churn</div>' +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📈 Expansion Opportunities</h4>' +
+                '<div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin-bottom: 12px;">' +
+                '<div style="font-size: 18px; font-weight: 600; color: #2563eb; margin-bottom: 4px;">$12.8M</div>' +
+                '<div style="color: #1e40af; font-size: 12px;">Potential upsell revenue</div>' +
+                '</div>' +
+                '<div style="background: #f3e8ff; border: 1px solid #c4b5fd; border-radius: 8px; padding: 16px;">' +
+                '<div style="font-size: 18px; font-weight: 600; color: #7c3aed; margin-bottom: 4px;">847</div>' +
+                '<div style="color: #5b21b6; font-size: 12px;">Cross-sell candidates</div>' +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">🎯 Recommended Actions</h4>' +
+                '<div style="display: grid; gap: 8px;">' +
+                '<div style="background: #f8fafc; border-left: 3px solid #10b981; padding: 12px; font-size: 12px;">' +
+                '<strong>Schedule Reviews:</strong> 47 customers due for QBRs' +
+                '</div>' +
+                '<div style="background: #f8fafc; border-left: 3px solid #3b82f6; padding: 12px; font-size: 12px;">' +
+                '<strong>Upsell Focus:</strong> 23 high-value expansion targets' +
+                '</div>' +
+                '<div style="background: #f8fafc; border-left: 3px solid #f59e0b; padding: 12px; font-size: 12px;">' +
+                '<strong>Risk Mitigation:</strong> 12 accounts need attention' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateRecentActivityFeed() {
+            const activities = [
+                { type: 'new', customer: 'Tesla Inc', action: 'New enterprise account created', time: '2 hours ago', icon: '🎉', color: '#10b981' },
+                { type: 'expansion', customer: 'Microsoft Corp', action: 'Expanded to Premium plan (+$50K ARR)', time: '4 hours ago', icon: '📈', color: '#3b82f6' },
+                { type: 'meeting', customer: 'Amazon AWS', action: 'Quarterly business review completed', time: '6 hours ago', icon: '📅', color: '#8b5cf6' },
+                { type: 'risk', customer: 'Shopify Inc', action: 'Health score dropped to 67 (was 82)', time: '8 hours ago', icon: '⚠️', color: '#f59e0b' },
+                { type: 'support', customer: 'Google Cloud', action: '3 support tickets resolved', time: '12 hours ago', icon: '🎫', color: '#06b6d4' },
+                { type: 'feedback', customer: 'Apple Inc', action: 'NPS survey completed (Score: 9)', time: '1 day ago', icon: '⭐', color: '#ec4899' }
+            ];
+            
+            let html = '<div style="max-height: 300px; overflow-y: auto;">';
+            activities.forEach((activity, index) => {
+                html += '<div style="display: flex; align-items: center; gap: 16px; padding: 12px; border-bottom: 1px solid #f3f4f6;">' +
+                    '<div style="font-size: 24px;">' + activity.icon + '</div>' +
+                    '<div style="flex: 1;">' +
+                    '<div style="color: #1f2937; font-weight: 600; margin-bottom: 2px;">' + activity.customer + '</div>' +
+                    '<div style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">' + activity.action + '</div>' +
+                    '<div style="color: #9ca3af; font-size: 12px;">' + activity.time + '</div>' +
+                    '</div>' +
+                    '<div style="width: 4px; height: 40px; background: ' + activity.color + '; border-radius: 2px;"></div>' +
+                    '</div>';
+            });
+            html += '</div>';
+            
+            return html;
+        }
+
+        // Dashboard Action Functions
+        function refreshDashboard() {
+            showNotification('🔄 Refreshing customer dashboard...', 'info');
+        }
+
+        function exportDashboard() {
+            showNotification('📥 Exporting dashboard data...', 'success');
+        }
+
+        function scheduleDashboard() {
+            showNotification('📅 Opening dashboard schedule settings...', 'info');
         }
 
         function emailContact(contactId, email) {
@@ -8563,6 +9583,1290 @@ const htmlTemplate = `
             setTimeout(() => {
                 showNotification('✅ ' + templateName.charAt(0).toUpperCase() + templateName.slice(1) + ' template loaded!', 'success');
             }, 500);
+        }
+
+        // Enterprise Rule Engine System
+        function showRuleEngineModal() {
+            // Show rule engine as a page instead of modal
+            showRuleEnginePage();
+        }
+
+        function showRuleEnginePage() {
+            // Update page title
+            const pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) {
+                pageTitle.textContent = '🔧 Rule Engine';
+            }
+            
+            // Replace dashboard content with rule engine page
+            const dashboardContent = document.getElementById('dashboardContent');
+            if (dashboardContent) {
+                dashboardContent.innerHTML = generateRuleEngineHTML();
+                initializeRuleEngine();
+            }
+            
+            currentView = 'ruleengine';
+        }
+
+        function generateRuleEngineHTML() {
+            return '<div style="background: #f8fafc; margin: -20px; min-height: calc(100vh - 100px);">' +
+                '<!-- Breadcrumbs -->' +
+                '<div style="background: white; padding: 16px 32px; border-bottom: 1px solid #e5e7eb;">' +
+                '<nav style="display: flex; align-items: center; gap: 8px; font-size: 14px;">' +
+                '<a href="#" onclick="showDashboard(); return false;" style="color: #6b7280; text-decoration: none;">Dashboard</a>' +
+                '<span style="color: #9ca3af;">›</span>' +
+                '<span style="color: #1f2937; font-weight: 500;">Rule Engine</span>' +
+                '</nav>' +
+                '</div>' +
+                
+                '<!-- Page Header -->' +
+                '<div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 32px;">' +
+                '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                '<div>' +
+                '<h2 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">🔧 Enterprise Rule Engine</h2>' +
+                '<p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">Intelligent automation • Business logic • Customer & SLA integration</p>' +
+                '</div>' +
+                '<button onclick="showDashboard()" style="color: white; font-size: 14px; background: rgba(255,255,255,0.2); border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">← Back to Dashboard</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Rule Engine Tabs -->' +
+                '<div style="display: flex; background: white; border-bottom: 1px solid #e2e8f0; padding: 0 32px;">' +
+                '<button class="rule-tab active" onclick="showRuleTab(&quot;dashboard&quot;)" data-tab="dashboard">📊 Rule Dashboard</button>' +
+                '<button class="rule-tab" onclick="showRuleTab(&quot;builder&quot;)" data-tab="builder">🔧 Rule Builder</button>' +
+                '<button class="rule-tab" onclick="showRuleTab(&quot;library&quot;)" data-tab="library">📋 Rules Library</button>' +
+                '<button class="rule-tab" onclick="showRuleTab(&quot;execution&quot;)" data-tab="execution">⚡ Execution Monitor</button>' +
+                '<button class="rule-tab" onclick="showRuleTab(&quot;templates&quot;)" data-tab="templates">📄 Templates</button>' +
+                '<button class="rule-tab" onclick="showRuleTab(&quot;analytics&quot;)" data-tab="analytics">📈 Analytics</button>' +
+                '</div>' +
+
+                '<!-- Tab Content Area -->' +
+                '<div style="background: white; margin: 0 32px 32px 32px; padding: 32px; border-radius: 0 0 12px 12px; min-height: 500px;">' +
+                '<div id="ruleTabContent">' +
+                generateRuleDashboardHTML() +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateRuleDashboardHTML() {
+            return '<div class="rule-dashboard">' +
+                '<!-- Header with Quick Actions -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 24px;">📊 Rule Engine Dashboard</h3>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0; font-size: 16px;">Monitor, manage, and optimize your automated business rules</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="createNewRule()" class="btn btn-primary">➕ Create Rule</button>' +
+                '<button onclick="importRules()" class="btn" style="background: #059669; color: white;">📥 Import</button>' +
+                '<button onclick="exportRules()" class="btn" style="background: #3b82f6; color: white;">📤 Export</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Key Metrics -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 32px;">' +
+                '<div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 24px; border-radius: 12px;">' +
+                '<div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">147</div>' +
+                '<div style="font-size: 16px; opacity: 0.9;">Active Rules</div>' +
+                '<div style="font-size: 12px; opacity: 0.7; margin-top: 4px;">↗ +12 this month</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 24px; border-radius: 12px;">' +
+                '<div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">2,847</div>' +
+                '<div style="font-size: 16px; opacity: 0.9;">Executions Today</div>' +
+                '<div style="font-size: 12px; opacity: 0.7; margin-top: 4px;">↗ +18% vs yesterday</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 24px; border-radius: 12px;">' +
+                '<div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">98.7%</div>' +
+                '<div style="font-size: 16px; opacity: 0.9;">Success Rate</div>' +
+                '<div style="font-size: 12px; opacity: 0.7; margin-top: 4px;">↗ +0.3% improvement</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 24px; border-radius: 12px;">' +
+                '<div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">3.2s</div>' +
+                '<div style="font-size: 16px; opacity: 0.9;">Avg Response Time</div>' +
+                '<div style="font-size: 12px; opacity: 0.7; margin-top: 4px;">↘ -15% faster</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Rule Categories -->' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🎯 Active Rule Categories</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateRuleCategoriesChart() +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">⚡ Recent Executions</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateRecentExecutionsWidget() +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Customer & SLA Integration Overview -->' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">👥 Customer-Triggered Rules</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateCustomerRulesOverview() +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">📋 SLA-Connected Rules</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateSLARulesOverview() +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Rule Performance Analytics -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">📈 Performance Analytics</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateRulePerformanceChart() +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Top Performing Rules -->' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px;">🏆 Top Performing Rules</h3>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                generateTopRulesTable() +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        // Rule Engine Helper Functions
+        function generateRuleCategoriesChart() {
+            const categories = [
+                { name: 'Customer Lifecycle', count: 34, percentage: 23, color: '#10b981', executions: 1247 },
+                { name: 'SLA Management', count: 28, percentage: 19, color: '#3b82f6', executions: 892 },
+                { name: 'Case Routing', count: 25, percentage: 17, color: '#8b5cf6', executions: 1156 },
+                { name: 'Escalation Rules', count: 22, percentage: 15, color: '#f59e0b', executions: 634 },
+                { name: 'Notification Rules', count: 20, percentage: 14, color: '#ec4899', executions: 923 },
+                { name: 'Data Validation', count: 18, percentage: 12, color: '#06b6d4', executions: 445 }
+            ];
+            
+            let html = '';
+            categories.forEach(category => {
+                html += '<div style="margin-bottom: 16px;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
+                    '<span style="color: #1f2937; font-weight: 600;">' + category.name + '</span>' +
+                    '<div style="text-align: right;">' +
+                    '<span style="color: ' + category.color + '; font-size: 14px; font-weight: 600;">' + category.count + ' rules</span>' +
+                    '<div style="color: #6b7280; font-size: 12px;">' + category.executions + ' executions</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 4px; overflow: hidden;">' +
+                    '<div style="width: ' + category.percentage + '%; height: 100%; background: ' + category.color + '; border-radius: 4px; transition: all 0.3s ease;"></div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            return html;
+        }
+
+        function generateRecentExecutionsWidget() {
+            const executions = [
+                { rule: 'Auto-escalate High Priority Cases', status: 'success', time: '2m ago', customer: 'Microsoft Corp' },
+                { rule: 'SLA Breach Notification', status: 'success', time: '5m ago', customer: 'Amazon AWS' },
+                { rule: 'Customer Lifecycle Update', status: 'running', time: '8m ago', customer: 'Google Cloud' },
+                { rule: 'Case Auto-assignment', status: 'success', time: '12m ago', customer: 'Apple Inc' },
+                { rule: 'Priority Escalation', status: 'failed', time: '15m ago', customer: 'Tesla Inc' },
+                { rule: 'SLA Reminder Alert', status: 'success', time: '18m ago', customer: 'Salesforce' }
+            ];
+            
+            let html = '<div style="max-height: 300px; overflow-y: auto;">';
+            executions.forEach(execution => {
+                const statusColor = execution.status === 'success' ? '#10b981' : execution.status === 'failed' ? '#dc2626' : '#f59e0b';
+                const statusIcon = execution.status === 'success' ? '✅' : execution.status === 'failed' ? '❌' : '🔄';
+                
+                html += '<div style="display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid #f3f4f6;">' +
+                    '<div style="font-size: 16px;">' + statusIcon + '</div>' +
+                    '<div style="flex: 1;">' +
+                    '<div style="color: #1f2937; font-weight: 600; font-size: 14px; margin-bottom: 2px;">' + execution.rule + '</div>' +
+                    '<div style="color: #6b7280; font-size: 12px;">' + execution.customer + ' • ' + execution.time + '</div>' +
+                    '</div>' +
+                    '<div style="background: ' + statusColor + '; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; text-transform: uppercase;">' + execution.status + '</div>' +
+                    '</div>';
+            });
+            html += '</div>';
+            
+            return html;
+        }
+
+        function generateCustomerRulesOverview() {
+            return '<div>' +
+                '<div style="display: grid; gap: 16px; margin-bottom: 20px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #10b981;">' +
+                '<div>' +
+                '<div style="color: #065f46; font-weight: 600;">Onboarding Rules</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">New customer automation</div>' +
+                '</div>' +
+                '<div style="text-align: right;">' +
+                '<div style="color: #10b981; font-weight: 700; font-size: 18px;">23</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">active</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #eff6ff; border-radius: 8px; border-left: 4px solid #3b82f6;">' +
+                '<div>' +
+                '<div style="color: #1e40af; font-weight: 600;">Engagement Rules</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Customer interaction triggers</div>' +
+                '</div>' +
+                '<div style="text-align: right;">' +
+                '<div style="color: #3b82f6; font-weight: 700; font-size: 18px;">34</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">active</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">' +
+                '<div>' +
+                '<div style="color: #92400e; font-weight: 600;">Retention Rules</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Churn prevention automation</div>' +
+                '</div>' +
+                '<div style="text-align: right;">' +
+                '<div style="color: #f59e0b; font-weight: 700; font-size: 18px;">18</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">active</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">' +
+                '<div style="color: #1f2937; font-weight: 600; margin-bottom: 4px;">Customer Integration Status</div>' +
+                '<div style="color: #10b981; font-size: 24px; font-weight: 700;">Active</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Real-time customer data sync enabled</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateSLARulesOverview() {
+            return '<div>' +
+                '<div style="display: grid; gap: 16px; margin-bottom: 20px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #fef2f2; border-radius: 8px; border-left: 4px solid #dc2626;">' +
+                '<div>' +
+                '<div style="color: #991b1b; font-weight: 600;">Breach Prevention</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Proactive SLA monitoring</div>' +
+                '</div>' +
+                '<div style="text-align: right;">' +
+                '<div style="color: #dc2626; font-weight: 700; font-size: 18px;">15</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">active</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f3e8ff; border-radius: 8px; border-left: 4px solid #8b5cf6;">' +
+                '<div>' +
+                '<div style="color: #5b21b6; font-weight: 600;">Auto-escalation</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Priority-based routing</div>' +
+                '</div>' +
+                '<div style="text-align: right;">' +
+                '<div style="color: #8b5cf6; font-weight: 700; font-size: 18px;">28</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">active</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #ecfdf5; border-radius: 8px; border-left: 4px solid #059669;">' +
+                '<div>' +
+                '<div style="color: #047857; font-weight: 600;">Performance Tracking</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">SLA compliance monitoring</div>' +
+                '</div>' +
+                '<div style="text-align: right;">' +
+                '<div style="color: #059669; font-weight: 700; font-size: 18px;">42</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">active</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">' +
+                '<div style="color: #1f2937; font-weight: 600; margin-bottom: 4px;">SLA Integration Status</div>' +
+                '<div style="color: #10b981; font-size: 24px; font-weight: 700;">Connected</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Live SLA monitoring and enforcement</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateRulePerformanceChart() {
+            const hours = Array.from({length: 24}, (_, i) => i + 'h');
+            const executions = [45, 52, 38, 61, 74, 89, 125, 156, 189, 234, 267, 298, 312, 289, 245, 198, 165, 134, 112, 89, 67, 56, 48, 41];
+            
+            let html = '<div style="margin-bottom: 20px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">' +
+                '<h4 style="margin: 0; color: #1f2937;">24-Hour Rule Execution Trends</h4>' +
+                '<div style="display: flex; gap: 16px;">' +
+                '<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 12px; height: 3px; background: #6366f1; border-radius: 2px;"></div><span style="font-size: 12px; color: #6b7280;">Executions</span></div>' +
+                '<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 12px; height: 3px; background: #10b981; border-radius: 2px;"></div><span style="font-size: 12px; color: #6b7280;">Success Rate</span></div>' +
+                '</div>' +
+                '</div>';
+            
+            // Chart visualization
+            html += '<div style="display: flex; align-items: end; gap: 4px; height: 150px; margin-bottom: 16px; padding: 0 8px;">';
+            const maxExecutions = Math.max(...executions);
+            
+            executions.forEach((count, index) => {
+                const heightPercent = (count / maxExecutions) * 100;
+                html += '<div style="flex: 1; display: flex; flex-direction: column; align-items: center;">' +
+                    '<div style="font-size: 10px; color: #6b7280; margin-bottom: 4px;">' + count + '</div>' +
+                    '<div style="width: 100%; height: ' + heightPercent + '%; background: linear-gradient(to top, #6366f1, #8b5cf6); border-radius: 2px 2px 0 0; transition: all 0.3s ease;" onmouseover="this.style.transform=&quot;scaleY(1.1)&quot;" onmouseout="this.style.transform=&quot;scaleY(1)&quot;"></div>' +
+                    '<div style="font-size: 10px; color: #6b7280; margin-top: 8px; font-weight: 500;">' + hours[index] + '</div>' +
+                    '</div>';
+            });
+            
+            html += '</div>';
+            
+            // Summary stats
+            html += '<div style="display: flex; justify-content: space-around; padding: 16px; background: #f8fafc; border-radius: 8px;">' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #6366f1;">4,247</div><div style="font-size: 12px; color: #6b7280;">Total Executions</div></div>' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #10b981;">98.7%</div><div style="font-size: 12px; color: #6b7280;">Success Rate</div></div>' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #8b5cf6;">177</div><div style="font-size: 12px; color: #6b7280;">Avg/Hour</div></div>' +
+                '<div style="text-align: center;"><div style="font-size: 18px; font-weight: 600; color: #f59e0b;">3.2s</div><div style="font-size: 12px; color: #6b7280;">Avg Response</div></div>' +
+                '</div>';
+            
+            return html + '</div>';
+        }
+
+        function generateTopRulesTable() {
+            const rules = [
+                { name: 'High Priority Case Auto-Escalation', category: 'SLA Management', executions: 456, success: 99.8, avgTime: '2.1s', impact: 'High' },
+                { name: 'Customer Onboarding Workflow', category: 'Customer Lifecycle', executions: 389, success: 98.5, avgTime: '1.8s', impact: 'High' },
+                { name: 'SLA Breach Prevention Alert', category: 'SLA Management', executions: 234, success: 99.1, avgTime: '1.5s', impact: 'Critical' },
+                { name: 'Case Auto-Assignment by Skills', category: 'Case Routing', executions: 567, success: 97.9, avgTime: '3.4s', impact: 'Medium' },
+                { name: 'Customer Satisfaction Follow-up', category: 'Customer Lifecycle', executions: 123, success: 96.7, avgTime: '2.8s', impact: 'Medium' }
+            ];
+            
+            let html = '<div style="overflow-x: auto;">' +
+                '<table style="width: 100%; border-collapse: collapse;">' +
+                '<thead>' +
+                '<tr style="background: #f8fafc; border-bottom: 2px solid #e5e7eb;">' +
+                '<th style="text-align: left; padding: 12px; color: #374151; font-weight: 600;">Rule Name</th>' +
+                '<th style="text-align: left; padding: 12px; color: #374151; font-weight: 600;">Category</th>' +
+                '<th style="text-align: center; padding: 12px; color: #374151; font-weight: 600;">Executions</th>' +
+                '<th style="text-align: center; padding: 12px; color: #374151; font-weight: 600;">Success Rate</th>' +
+                '<th style="text-align: center; padding: 12px; color: #374151; font-weight: 600;">Avg Time</th>' +
+                '<th style="text-align: center; padding: 12px; color: #374151; font-weight: 600;">Impact</th>' +
+                '<th style="text-align: center; padding: 12px; color: #374151; font-weight: 600;">Actions</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+            
+            rules.forEach((rule, index) => {
+                const impactColor = rule.impact === 'Critical' ? '#dc2626' : rule.impact === 'High' ? '#f59e0b' : '#6b7280';
+                html += '<tr style="border-bottom: 1px solid #f3f4f6; ' + (index % 2 === 0 ? 'background: #fafbfc;' : '') + '">' +
+                    '<td style="padding: 12px; color: #1f2937; font-weight: 500;">' + rule.name + '</td>' +
+                    '<td style="padding: 12px; color: #6b7280;">' + rule.category + '</td>' +
+                    '<td style="padding: 12px; text-align: center; color: #1f2937; font-weight: 600;">' + rule.executions + '</td>' +
+                    '<td style="padding: 12px; text-align: center; color: #10b981; font-weight: 600;">' + rule.success + '%</td>' +
+                    '<td style="padding: 12px; text-align: center; color: #6b7280;">' + rule.avgTime + '</td>' +
+                    '<td style="padding: 12px; text-align: center;"><span style="background: ' + impactColor + '; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">' + rule.impact.toUpperCase() + '</span></td>' +
+                    '<td style="padding: 12px; text-align: center;">' +
+                    '<button onclick="editRule(&quot;' + rule.name + '&quot;)" style="background: none; border: none; color: #6366f1; cursor: pointer; margin-right: 8px;">✏️</button>' +
+                    '<button onclick="viewRuleDetails(&quot;' + rule.name + '&quot;)" style="background: none; border: none; color: #10b981; cursor: pointer;">📊</button>' +
+                    '</td>' +
+                    '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+            
+            return html;
+        }
+
+        // Rule Engine Tab Management
+        function showRuleTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.rule-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            document.querySelector('.rule-tab[data-tab="' + tabName + '"]').classList.add('active');
+            
+            // Show corresponding content
+            const content = document.getElementById('ruleTabContent');
+            
+            switch(tabName) {
+                case 'dashboard':
+                    content.innerHTML = generateRuleDashboardHTML();
+                    break;
+                case 'builder':
+                    content.innerHTML = generateRuleBuilderHTML();
+                    break;
+                case 'library':
+                    content.innerHTML = generateRulesLibraryHTML();
+                    break;
+                case 'execution':
+                    content.innerHTML = generateExecutionMonitorHTML();
+                    break;
+                case 'templates':
+                    content.innerHTML = generateRuleTemplatesHTML();
+                    break;
+                case 'analytics':
+                    content.innerHTML = generateRuleAnalyticsHTML();
+                    break;
+            }
+        }
+
+        // Additional Rule Engine Functions (full implementations)
+        function generateRuleBuilderHTML() {
+            return '<div class="rule-builder">' +
+                '<!-- Builder Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 24px;">🔧 Visual Rule Builder</h3>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0; font-size: 16px;">Create powerful automation rules with our intuitive drag-and-drop interface</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="saveRule()" class="btn btn-primary">💾 Save Rule</button>' +
+                '<button onclick="testRule()" class="btn" style="background: #059669; color: white;">🧪 Test Rule</button>' +
+                '<button onclick="clearBuilder()" class="btn" style="background: #dc2626; color: white;">🗑️ Clear</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Rule Builder Interface -->' +
+                '<div style="display: grid; grid-template-columns: 300px 1fr 300px; gap: 24px;">' +
+                
+                '<!-- Left Panel: Components -->' +
+                '<div>' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">📦 Rule Components</h4>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px;">' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<h5 style="color: #6b7280; margin-bottom: 12px; font-size: 12px; text-transform: uppercase;">Triggers</h5>' +
+                '<div class="draggable-component" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">📅</span> Time-based Trigger' +
+                '</div>' +
+                '<div class="draggable-component" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">👤</span> Customer Event' +
+                '</div>' +
+                '<div class="draggable-component" style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">📋</span> SLA Trigger' +
+                '</div>' +
+                '<div class="draggable-component" style="background: #f3e8ff; border: 1px solid #c4b5fd; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">📧</span> Communication Trigger' +
+                '</div>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<h5 style="color: #6b7280; margin-bottom: 12px; font-size: 12px; text-transform: uppercase;">Conditions</h5>' +
+                '<div class="draggable-component" style="background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">🔍</span> If/Then Condition' +
+                '</div>' +
+                '<div class="draggable-component" style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">🔀</span> Switch/Case' +
+                '</div>' +
+                '<div class="draggable-component" style="background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">🔄</span> Loop/Iteration' +
+                '</div>' +
+                '</div>' +
+                
+                '<div>' +
+                '<h5 style="color: #6b7280; margin-bottom: 12px; font-size: 12px; text-transform: uppercase;">Actions</h5>' +
+                '<div class="draggable-component" style="background: #f0f9ff; border: 1px solid #7dd3fc; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">📤</span> Send Notification' +
+                '</div>' +
+                '<div class="draggable-component" style="background: #fdf4ff; border: 1px solid #e879f9; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">📝</span> Update Record' +
+                '</div>' +
+                '<div class="draggable-component" style="background: #fff7ed; border: 1px solid #fb923c; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: move;">' +
+                '<span style="margin-right: 8px;">⚡</span> Escalate Case' +
+                '</div>' +
+                '<div class="draggable-component" style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 12px; cursor: move;">' +
+                '<span style="margin-right: 8px;">🤖</span> Trigger Workflow' +
+                '</div>' +
+                '</div>' +
+                
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Center Panel: Canvas -->' +
+                '<div>' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">🎨 Rule Canvas</h4>' +
+                '<div style="background: white; border: 2px dashed #d1d5db; border-radius: 12px; min-height: 600px; padding: 24px; position: relative;">' +
+                
+                '<!-- Rule Name Input -->' +
+                '<div style="margin-bottom: 24px;">' +
+                '<input type="text" placeholder="Enter rule name..." style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px; font-weight: 600;" value="Customer Onboarding Automation">' +
+                '</div>' +
+                
+                '<!-- Rule Flow Visualization -->' +
+                '<div style="background: #f8fafc; border-radius: 12px; padding: 20px;">' +
+                
+                '<!-- Start Node -->' +
+                '<div style="text-align: center; margin-bottom: 24px;">' +
+                '<div style="display: inline-block; background: #10b981; color: white; padding: 12px 24px; border-radius: 24px; font-weight: 600;">🚀 START</div>' +
+                '</div>' +
+                
+                '<!-- Trigger Section -->' +
+                '<div style="text-align: center; margin-bottom: 24px;">' +
+                '<div style="width: 2px; height: 30px; background: #d1d5db; margin: 0 auto;"></div>' +
+                '<div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 16px; display: inline-block;">' +
+                '<div style="color: #1e40af; font-weight: 600; margin-bottom: 8px;">📅 Trigger: New Customer Created</div>' +
+                '<div style="color: #6b7280; font-size: 14px;">When a new customer is added to the system</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Condition Section -->' +
+                '<div style="text-align: center; margin-bottom: 24px;">' +
+                '<div style="width: 2px; height: 30px; background: #d1d5db; margin: 0 auto;"></div>' +
+                '<div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px; padding: 16px; display: inline-block;">' +
+                '<div style="color: #065f46; font-weight: 600; margin-bottom: 8px;">🔍 Condition: Check Customer Type</div>' +
+                '<div style="color: #6b7280; font-size: 14px;">IF customer.type = "Enterprise" THEN</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Actions Section -->' +
+                '<div style="text-align: center; margin-bottom: 24px;">' +
+                '<div style="width: 2px; height: 30px; background: #d1d5db; margin: 0 auto;"></div>' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">' +
+                '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 12px;">' +
+                '<div style="color: #92400e; font-weight: 600; margin-bottom: 4px;">📧 Send Email</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Welcome email to customer</div>' +
+                '</div>' +
+                '<div style="background: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 12px; padding: 12px;">' +
+                '<div style="color: #5b21b6; font-weight: 600; margin-bottom: 4px;">📝 Create Task</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Assign onboarding task</div>' +
+                '</div>' +
+                '<div style="background: #fee2e2; border: 2px solid #dc2626; border-radius: 12px; padding: 12px;">' +
+                '<div style="color: #991b1b; font-weight: 600; margin-bottom: 4px;">📅 Schedule Call</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">Setup kickoff meeting</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- End Node -->' +
+                '<div style="text-align: center;">' +
+                '<div style="width: 2px; height: 30px; background: #d1d5db; margin: 0 auto;"></div>' +
+                '<div style="display: inline-block; background: #dc2626; color: white; padding: 12px 24px; border-radius: 24px; font-weight: 600;">🏁 END</div>' +
+                '</div>' +
+                
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Right Panel: Properties -->' +
+                '<div>' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">⚙️ Rule Properties</h4>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px;">' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Rule Category</label>' +
+                '<select style="width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px;">' +
+                '<option>Customer Lifecycle</option>' +
+                '<option>SLA Management</option>' +
+                '<option>Case Routing</option>' +
+                '<option>Escalation Rules</option>' +
+                '</select>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Priority</label>' +
+                '<select style="width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px;">' +
+                '<option>High</option>' +
+                '<option>Medium</option>' +
+                '<option>Low</option>' +
+                '</select>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Status</label>' +
+                '<div style="display: flex; align-items: center; gap: 8px;">' +
+                '<input type="checkbox" checked>' +
+                '<span style="color: #10b981; font-weight: 600;">Active</span>' +
+                '</div>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 20px;">' +
+                '<label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Execution Mode</label>' +
+                '<div style="display: grid; gap: 8px;">' +
+                '<label style="display: flex; align-items: center; gap: 8px;"><input type="radio" name="mode" checked> Automatic</label>' +
+                '<label style="display: flex; align-items: center; gap: 8px;"><input type="radio" name="mode"> Manual Approval</label>' +
+                '<label style="display: flex; align-items: center; gap: 8px;"><input type="radio" name="mode"> Scheduled</label>' +
+                '</div>' +
+                '</div>' +
+                
+                '<div>' +
+                '<label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Description</label>' +
+                '<textarea style="width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; resize: vertical;" rows="4" placeholder="Describe what this rule does...">Automatically triggers onboarding workflow when a new enterprise customer is created in the system.</textarea>' +
+                '</div>' +
+                
+                '</div>' +
+                '</div>' +
+                
+                '</div>' +
+                '</div>';
+        }
+
+        function generateRulesLibraryHTML() {
+            const rules = [
+                { id: 'R001', name: 'High Priority Case Auto-Escalation', category: 'SLA Management', status: 'active', lastModified: '2024-01-15', executions: 456, success: 99.8, author: 'John Smith' },
+                { id: 'R002', name: 'Customer Onboarding Workflow', category: 'Customer Lifecycle', status: 'active', lastModified: '2024-01-14', executions: 389, success: 98.5, author: 'Sarah Johnson' },
+                { id: 'R003', name: 'SLA Breach Prevention Alert', category: 'SLA Management', status: 'active', lastModified: '2024-01-13', executions: 234, success: 99.1, author: 'Mike Chen' },
+                { id: 'R004', name: 'Case Auto-Assignment by Skills', category: 'Case Routing', status: 'active', lastModified: '2024-01-12', executions: 567, success: 97.9, author: 'Emily Davis' },
+                { id: 'R005', name: 'Customer Satisfaction Follow-up', category: 'Customer Lifecycle', status: 'inactive', lastModified: '2024-01-11', executions: 123, success: 96.7, author: 'David Wilson' },
+                { id: 'R006', name: 'Payment Reminder Automation', category: 'Notification Rules', status: 'active', lastModified: '2024-01-10', executions: 789, success: 99.5, author: 'Lisa Anderson' },
+                { id: 'R007', name: 'Churn Risk Detection', category: 'Customer Lifecycle', status: 'testing', lastModified: '2024-01-09', executions: 45, success: 94.2, author: 'Robert Brown' },
+                { id: 'R008', name: 'Emergency Escalation Protocol', category: 'Escalation Rules', status: 'active', lastModified: '2024-01-08', executions: 89, success: 100, author: 'Jennifer Garcia' }
+            ];
+            
+            return '<div class="rules-library">' +
+                '<!-- Library Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 24px;">📋 Rules Library</h3>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0; font-size: 16px;">Manage, organize, and monitor all your automation rules in one place</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="createNewRule()" class="btn btn-primary">➕ Create Rule</button>' +
+                '<button onclick="importRules()" class="btn" style="background: #059669; color: white;">📥 Import</button>' +
+                '<button onclick="exportSelectedRules()" class="btn" style="background: #3b82f6; color: white;">📤 Export</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Search and Filters -->' +
+                '<div style="display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 16px; margin-bottom: 24px; padding: 20px; background: #f8fafc; border-radius: 12px;">' +
+                '<input type="text" placeholder="🔍 Search rules by name, category, or author..." style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">' +
+                '<select style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">' +
+                '<option>All Categories</option>' +
+                '<option>Customer Lifecycle</option>' +
+                '<option>SLA Management</option>' +
+                '<option>Case Routing</option>' +
+                '<option>Escalation Rules</option>' +
+                '<option>Notification Rules</option>' +
+                '</select>' +
+                '<select style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">' +
+                '<option>All Status</option>' +
+                '<option>Active</option>' +
+                '<option>Inactive</option>' +
+                '<option>Testing</option>' +
+                '<option>Draft</option>' +
+                '</select>' +
+                '<select style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">' +
+                '<option>Sort by: Last Modified</option>' +
+                '<option>Sort by: Name</option>' +
+                '<option>Sort by: Executions</option>' +
+                '<option>Sort by: Success Rate</option>' +
+                '</select>' +
+                '<button onclick="applyFilters()" class="btn" style="background: #6366f1; color: white;">Apply Filters</button>' +
+                '</div>' +
+
+                '<!-- Rules Table -->' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">' +
+                '<table style="width: 100%; border-collapse: collapse;">' +
+                '<thead>' +
+                '<tr style="background: #f8fafc; border-bottom: 2px solid #e5e7eb;">' +
+                '<th style="padding: 16px; text-align: left;"><input type="checkbox" onclick="selectAllRules(this)"></th>' +
+                '<th style="padding: 16px; text-align: left; color: #374151; font-weight: 600;">Rule ID</th>' +
+                '<th style="padding: 16px; text-align: left; color: #374151; font-weight: 600;">Rule Name</th>' +
+                '<th style="padding: 16px; text-align: left; color: #374151; font-weight: 600;">Category</th>' +
+                '<th style="padding: 16px; text-align: center; color: #374151; font-weight: 600;">Status</th>' +
+                '<th style="padding: 16px; text-align: center; color: #374151; font-weight: 600;">Executions</th>' +
+                '<th style="padding: 16px; text-align: center; color: #374151; font-weight: 600;">Success Rate</th>' +
+                '<th style="padding: 16px; text-align: left; color: #374151; font-weight: 600;">Author</th>' +
+                '<th style="padding: 16px; text-align: left; color: #374151; font-weight: 600;">Last Modified</th>' +
+                '<th style="padding: 16px; text-align: center; color: #374151; font-weight: 600;">Actions</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>' +
+                rules.map((rule, index) => {
+                    const statusColor = rule.status === 'active' ? '#10b981' : rule.status === 'inactive' ? '#6b7280' : rule.status === 'testing' ? '#f59e0b' : '#3b82f6';
+                    const statusBg = rule.status === 'active' ? '#f0fdf4' : rule.status === 'inactive' ? '#f3f4f6' : rule.status === 'testing' ? '#fef3c7' : '#eff6ff';
+                    
+                    return '<tr style="border-bottom: 1px solid #f3f4f6; ' + (index % 2 === 0 ? 'background: #fafbfc;' : '') + '">' +
+                        '<td style="padding: 16px;"><input type="checkbox" value="' + rule.id + '"></td>' +
+                        '<td style="padding: 16px; color: #6366f1; font-weight: 600;">' + rule.id + '</td>' +
+                        '<td style="padding: 16px; color: #1f2937; font-weight: 500;">' + rule.name + '</td>' +
+                        '<td style="padding: 16px; color: #6b7280;"><span style="background: #f3f4f6; padding: 4px 8px; border-radius: 6px; font-size: 12px;">' + rule.category + '</span></td>' +
+                        '<td style="padding: 16px; text-align: center;">' +
+                        '<span style="background: ' + statusBg + '; color: ' + statusColor + '; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase;">' + rule.status + '</span>' +
+                        '</td>' +
+                        '<td style="padding: 16px; text-align: center; color: #1f2937; font-weight: 600;">' + rule.executions + '</td>' +
+                        '<td style="padding: 16px; text-align: center;">' +
+                        '<span style="color: ' + (rule.success > 98 ? '#10b981' : rule.success > 95 ? '#f59e0b' : '#dc2626') + '; font-weight: 600;">' + rule.success + '%</span>' +
+                        '</td>' +
+                        '<td style="padding: 16px; color: #6b7280;">' + rule.author + '</td>' +
+                        '<td style="padding: 16px; color: #6b7280;">' + rule.lastModified + '</td>' +
+                        '<td style="padding: 16px; text-align: center;">' +
+                        '<button onclick="editRule(&quot;' + rule.id + '&quot;)" style="background: none; border: none; color: #6366f1; cursor: pointer; margin-right: 8px;" title="Edit">✏️</button>' +
+                        '<button onclick="duplicateRule(&quot;' + rule.id + '&quot;)" style="background: none; border: none; color: #8b5cf6; cursor: pointer; margin-right: 8px;" title="Duplicate">📋</button>' +
+                        '<button onclick="toggleRuleStatus(&quot;' + rule.id + '&quot;)" style="background: none; border: none; color: ' + (rule.status === 'active' ? '#f59e0b' : '#10b981') + '; cursor: pointer; margin-right: 8px;" title="Toggle Status">' + (rule.status === 'active' ? '⏸️' : '▶️') + '</button>' +
+                        '<button onclick="deleteRule(&quot;' + rule.id + '&quot;)" style="background: none; border: none; color: #dc2626; cursor: pointer;" title="Delete">🗑️</button>' +
+                        '</td>' +
+                        '</tr>';
+                }).join('') +
+                '</tbody>' +
+                '</table>' +
+                '</div>' +
+
+                '<!-- Pagination -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">' +
+                '<div style="color: #6b7280;">Showing 1-8 of 147 rules</div>' +
+                '<div style="display: flex; gap: 8px;">' +
+                '<button style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white;">Previous</button>' +
+                '<button style="padding: 8px 12px; border: 1px solid #6366f1; border-radius: 6px; background: #6366f1; color: white;">1</button>' +
+                '<button style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white;">2</button>' +
+                '<button style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white;">3</button>' +
+                '<button style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white;">...</button>' +
+                '<button style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white;">19</button>' +
+                '<button style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white;">Next</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateExecutionMonitorHTML() {
+            const liveExecutions = [
+                { id: 'EX001', ruleName: 'Customer Onboarding Workflow', status: 'running', startTime: '2024-01-15 14:23:45', duration: '00:02:15', customer: 'Tesla Inc', progress: 65 },
+                { id: 'EX002', ruleName: 'SLA Breach Prevention Alert', status: 'completed', startTime: '2024-01-15 14:22:30', duration: '00:00:45', customer: 'Microsoft Corp', progress: 100 },
+                { id: 'EX003', ruleName: 'High Priority Case Auto-Escalation', status: 'failed', startTime: '2024-01-15 14:21:12', duration: '00:01:30', customer: 'Amazon AWS', progress: 85 },
+                { id: 'EX004', ruleName: 'Payment Reminder Automation', status: 'queued', startTime: '2024-01-15 14:25:00', duration: '00:00:00', customer: 'Google Cloud', progress: 0 },
+                { id: 'EX005', ruleName: 'Case Auto-Assignment by Skills', status: 'running', startTime: '2024-01-15 14:24:10', duration: '00:01:05', customer: 'Apple Inc', progress: 35 }
+            ];
+
+            return '<div class="execution-monitor">' +
+                '<!-- Monitor Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 24px;">⚡ Real-time Execution Monitor</h3>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0; font-size: 16px;">Monitor live rule executions, debug issues, and track performance in real-time</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px; align-items: center;">' +
+                '<div style="display: flex; align-items: center; gap: 8px;">' +
+                '<div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>' +
+                '<span style="color: #6b7280; font-size: 14px;">Live monitoring active</span>' +
+                '</div>' +
+                '<button onclick="pauseMonitoring()" class="btn" style="background: #f59e0b; color: white;">⏸️ Pause</button>' +
+                '<button onclick="refreshMonitor()" class="btn" style="background: #3b82f6; color: white;">🔄 Refresh</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Execution Statistics -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">' +
+                '<div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold; margin-bottom: 8px;">2</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Currently Running</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold; margin-bottom: 8px;">1</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">In Queue</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #059669, #047857); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold; margin-bottom: 8px;">34</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Completed Today</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold; margin-bottom: 8px;">1</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Failed</div>' +
+                '</div>' +
+                '<div style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 20px; border-radius: 12px; text-align: center;">' +
+                '<div style="font-size: 28px; font-weight: bold; margin-bottom: 8px;">97.2%</div>' +
+                '<div style="font-size: 14px; opacity: 0.9;">Success Rate</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Live Execution Table -->' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 32px;">' +
+                '<div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">' +
+                '<h4 style="color: #1f2937; margin: 0;">🔴 Live Executions</h4>' +
+                '</div>' +
+                '<div style="overflow-x: auto;">' +
+                '<table style="width: 100%; border-collapse: collapse;">' +
+                '<thead>' +
+                '<tr style="background: #f8fafc; border-bottom: 1px solid #e5e7eb;">' +
+                '<th style="padding: 12px; text-align: left; color: #374151; font-weight: 600;">Execution ID</th>' +
+                '<th style="padding: 12px; text-align: left; color: #374151; font-weight: 600;">Rule Name</th>' +
+                '<th style="padding: 12px; text-align: center; color: #374151; font-weight: 600;">Status</th>' +
+                '<th style="padding: 12px; text-align: left; color: #374151; font-weight: 600;">Customer</th>' +
+                '<th style="padding: 12px; text-align: center; color: #374151; font-weight: 600;">Progress</th>' +
+                '<th style="padding: 12px; text-align: left; color: #374151; font-weight: 600;">Start Time</th>' +
+                '<th style="padding: 12px; text-align: left; color: #374151; font-weight: 600;">Duration</th>' +
+                '<th style="padding: 12px; text-align: center; color: #374151; font-weight: 600;">Actions</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>' +
+                liveExecutions.map(execution => {
+                    const statusColor = execution.status === 'completed' ? '#10b981' : execution.status === 'running' ? '#3b82f6' : execution.status === 'failed' ? '#dc2626' : '#6b7280';
+                    const statusBg = execution.status === 'completed' ? '#f0fdf4' : execution.status === 'running' ? '#eff6ff' : execution.status === 'failed' ? '#fef2f2' : '#f3f4f6';
+                    const statusIcon = execution.status === 'completed' ? '✅' : execution.status === 'running' ? '🔄' : execution.status === 'failed' ? '❌' : '⏱️';
+
+                    return '<tr style="border-bottom: 1px solid #f3f4f6;">' +
+                        '<td style="padding: 12px; color: #6366f1; font-weight: 600;">' + execution.id + '</td>' +
+                        '<td style="padding: 12px; color: #1f2937;">' + execution.ruleName + '</td>' +
+                        '<td style="padding: 12px; text-align: center;">' +
+                        '<span style="background: ' + statusBg + '; color: ' + statusColor + '; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">' +
+                        statusIcon + ' ' + execution.status.toUpperCase() +
+                        '</span>' +
+                        '</td>' +
+                        '<td style="padding: 12px; color: #6b7280;">' + execution.customer + '</td>' +
+                        '<td style="padding: 12px; text-align: center;">' +
+                        '<div style="display: flex; align-items: center; gap: 8px; justify-content: center;">' +
+                        '<div style="width: 60px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">' +
+                        '<div style="width: ' + execution.progress + '%; height: 100%; background: ' + statusColor + '; transition: width 0.3s ease;"></div>' +
+                        '</div>' +
+                        '<span style="font-size: 12px; color: #6b7280; font-weight: 600;">' + execution.progress + '%</span>' +
+                        '</div>' +
+                        '</td>' +
+                        '<td style="padding: 12px; color: #6b7280; font-size: 12px;">' + execution.startTime + '</td>' +
+                        '<td style="padding: 12px; color: #6b7280; font-size: 12px;">' + execution.duration + '</td>' +
+                        '<td style="padding: 12px; text-align: center;">' +
+                        '<button onclick="viewExecutionDetails(&quot;' + execution.id + '&quot;)" style="background: none; border: none; color: #6366f1; cursor: pointer; margin-right: 8px;" title="View Details">👁️</button>' +
+                        (execution.status === 'running' ? '<button onclick="stopExecution(&quot;' + execution.id + '&quot;)" style="background: none; border: none; color: #dc2626; cursor: pointer;" title="Stop">⏹️</button>' : '') +
+                        '</td>' +
+                        '</tr>';
+                }).join('') +
+                '</tbody>' +
+                '</table>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Execution Logs -->' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px;">' +
+                '<div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">' +
+                '<h4 style="color: #1f2937; margin: 0;">📋 Execution Logs</h4>' +
+                '</div>' +
+                '<div style="padding: 16px; background: #1f2937; color: #f8fafc; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;">' +
+                '<div style="margin-bottom: 8px;"><span style="color: #10b981;">[14:23:45]</span> <span style="color: #3b82f6;">[INFO]</span> Rule "Customer Onboarding Workflow" started for Tesla Inc</div>' +
+                '<div style="margin-bottom: 8px;"><span style="color: #10b981;">[14:23:46]</span> <span style="color: #3b82f6;">[INFO]</span> Condition check: customer.type = "Enterprise" → TRUE</div>' +
+                '<div style="margin-bottom: 8px;"><span style="color: #10b981;">[14:23:47]</span> <span style="color: #3b82f6;">[INFO]</span> Executing action: Send Welcome Email</div>' +
+                '<div style="margin-bottom: 8px;"><span style="color: #10b981;">[14:23:50]</span> <span style="color: #10b981;">[SUCCESS]</span> Email sent successfully to contact@tesla.com</div>' +
+                '<div style="margin-bottom: 8px;"><span style="color: #10b981;">[14:23:51]</span> <span style="color: #3b82f6;">[INFO]</span> Executing action: Create Onboarding Task</div>' +
+                '<div style="margin-bottom: 8px;"><span style="color: #10b981;">[14:23:52]</span> <span style="color: #10b981;">[SUCCESS]</span> Task "Tesla - Customer Onboarding" created</div>' +
+                '<div style="margin-bottom: 8px;"><span style="color: #10b981;">[14:23:53]</span> <span style="color: #3b82f6;">[INFO]</span> Executing action: Schedule Kickoff Meeting</div>' +
+                '<div style="margin-bottom: 8px;"><span style="color: #10b981;">[14:24:00]</span> <span style="color: #f59e0b;">[WARN]</span> Calendar API rate limit reached, retrying in 30s</div>' +
+                '<div style="margin-bottom: 8px;"><span style="color: #10b981;">[14:24:30]</span> <span style="color: #3b82f6;">[INFO]</span> Retrying calendar operation...</div>' +
+                '<div><span style="color: #10b981;">[14:24:35]</span> <span style="color: #3b82f6;">[INFO]</span> Processing... (65% complete)</div>' +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 16px;">' +
+                '<div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">' +
+                '<h4 style="color: #1f2937; margin: 0;">⚡ Quick Actions</h4>' +
+                '</div>' +
+                '<div style="padding: 16px; display: grid; gap: 12px;">' +
+                '<button onclick="pauseAllExecutions()" class="btn" style="background: #f59e0b; color: white; width: 100%;">⏸️ Pause All</button>' +
+                '<button onclick="retryFailedExecutions()" class="btn" style="background: #dc2626; color: white; width: 100%;">🔄 Retry Failed</button>' +
+                '<button onclick="clearCompletedExecutions()" class="btn" style="background: #6b7280; color: white; width: 100%;">🗑️ Clear Completed</button>' +
+                '<button onclick="exportExecutionLogs()" class="btn" style="background: #059669; color: white; width: 100%;">📥 Export Logs</button>' +
+                '</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px;">' +
+                '<div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">' +
+                '<h4 style="color: #1f2937; margin: 0;">📊 Performance</h4>' +
+                '</div>' +
+                '<div style="padding: 16px;">' +
+                '<div style="margin-bottom: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">' +
+                '<span style="color: #6b7280; font-size: 14px;">CPU Usage</span>' +
+                '<span style="color: #1f2937; font-weight: 600;">23%</span>' +
+                '</div>' +
+                '<div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px;">' +
+                '<div style="width: 23%; height: 100%; background: #10b981; border-radius: 4px;"></div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="margin-bottom: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">' +
+                '<span style="color: #6b7280; font-size: 14px;">Memory</span>' +
+                '<span style="color: #1f2937; font-weight: 600;">67%</span>' +
+                '</div>' +
+                '<div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px;">' +
+                '<div style="width: 67%; height: 100%; background: #f59e0b; border-radius: 4px;"></div>' +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">' +
+                '<span style="color: #6b7280; font-size: 14px;">Queue Load</span>' +
+                '<span style="color: #1f2937; font-weight: 600;">12%</span>' +
+                '</div>' +
+                '<div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px;">' +
+                '<div style="width: 12%; height: 100%; background: #3b82f6; border-radius: 4px;"></div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateExecutionMonitorHTML() {
+            const executions = [
+                { id: 'EXE001', rule: 'Customer Onboarding Automation', status: 'running', started: '14:32:15', duration: '00:02:43', progress: 75 },
+                { id: 'EXE002', rule: 'SLA Breach Alert System', status: 'completed', started: '14:25:08', duration: '00:00:12', progress: 100 },
+                { id: 'EXE003', rule: 'High Priority Escalation', status: 'failed', started: '14:20:33', duration: '00:01:05', progress: 45 },
+                { id: 'EXE004', rule: 'Payment Reminder Workflow', status: 'completed', started: '14:15:20', duration: '00:00:08', progress: 100 },
+                { id: 'EXE005', rule: 'Case Auto-Assignment', status: 'running', started: '14:30:12', duration: '00:04:23', progress: 60 }
+            ];
+
+            return '<div class="execution-monitor">' +
+                '<!-- Monitor Header -->' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 24px;">⚡ Execution Monitor</h3>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0; font-size: 16px;">Real-time monitoring of rule execution and performance metrics</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="pauseMonitoring()" class="btn" style="background: #f59e0b; color: white;">⏸️ Pause Monitor</button>' +
+                '<button onclick="clearLogs()" class="btn" style="background: #ef4444; color: white;">🗑️ Clear Logs</button>' +
+                '<button onclick="exportLogs()" class="btn" style="background: #3b82f6; color: white;">📤 Export</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Status Overview -->' +
+                '<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 32px;">' +
+                '<div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e5e7eb;">' +
+                '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                '<div>' +
+                '<h4 style="color: #6b7280; font-size: 14px; margin: 0; text-transform: uppercase; letter-spacing: 0.05em;">Running</h4>' +
+                '<p style="color: #1f2937; font-size: 32px; font-weight: 700; margin: 8px 0 0 0;">2</p>' +
+                '</div>' +
+                '<div style="background: #3b82f6; color: white; padding: 12px; border-radius: 50%; font-size: 20px;">⚡</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e5e7eb;">' +
+                '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                '<div>' +
+                '<h4 style="color: #6b7280; font-size: 14px; margin: 0; text-transform: uppercase; letter-spacing: 0.05em;">Completed</h4>' +
+                '<p style="color: #1f2937; font-size: 32px; font-weight: 700; margin: 8px 0 0 0;">2</p>' +
+                '</div>' +
+                '<div style="background: #059669; color: white; padding: 12px; border-radius: 50%; font-size: 20px;">✅</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e5e7eb;">' +
+                '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                '<div>' +
+                '<h4 style="color: #6b7280; font-size: 14px; margin: 0; text-transform: uppercase; letter-spacing: 0.05em;">Failed</h4>' +
+                '<p style="color: #1f2937; font-size: 32px; font-weight: 700; margin: 8px 0 0 0;">1</p>' +
+                '</div>' +
+                '<div style="background: #ef4444; color: white; padding: 12px; border-radius: 50%; font-size: 20px;">❌</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e5e7eb;">' +
+                '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                '<div>' +
+                '<h4 style="color: #6b7280; font-size: 14px; margin: 0; text-transform: uppercase; letter-spacing: 0.05em;">Success Rate</h4>' +
+                '<p style="color: #1f2937; font-size: 32px; font-weight: 700; margin: 8px 0 0 0;">95.3%</p>' +
+                '</div>' +
+                '<div style="background: #059669; color: white; padding: 12px; border-radius: 50%; font-size: 20px;">📈</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Live Executions Table -->' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; margin-bottom: 32px;">' +
+                '<div style="padding: 20px; border-bottom: 1px solid #e5e7eb; background: #f8fafc;">' +
+                '<h4 style="color: #1f2937; margin: 0;">🔴 Live Executions</h4>' +
+                '</div>' +
+                '<table style="width: 100%; border-collapse: collapse;">' +
+                '<thead>' +
+                '<tr style="background: #f8fafc;">' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Execution ID</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Rule Name</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Status</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Started</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Duration</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Progress</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Actions</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>' +
+                executions.map(exec => {
+                    const statusColors = {
+                        running: '#3b82f6',
+                        completed: '#059669',
+                        failed: '#ef4444',
+                        paused: '#f59e0b'
+                    };
+                    const statusIcons = {
+                        running: '⚡',
+                        completed: '✅',
+                        failed: '❌',
+                        paused: '⏸️'
+                    };
+                    return '<tr style="border-bottom: 1px solid #f3f4f6;">' +
+                        '<td style="padding: 16px; color: #1f2937; font-weight: 500;">' + exec.id + '</td>' +
+                        '<td style="padding: 16px; color: #1f2937;">' + exec.rule + '</td>' +
+                        '<td style="padding: 16px;">' +
+                        '<span style="background: ' + statusColors[exec.status] + '; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">' +
+                        statusIcons[exec.status] + ' ' + exec.status.toUpperCase() +
+                        '</span></td>' +
+                        '<td style="padding: 16px; color: #6b7280;">' + exec.started + '</td>' +
+                        '<td style="padding: 16px; color: #6b7280;">' + exec.duration + '</td>' +
+                        '<td style="padding: 16px;">' +
+                        '<div style="display: flex; align-items: center; gap: 8px;">' +
+                        '<div style="width: 60px; height: 6px; background: #e5e7eb; border-radius: 3px;">' +
+                        '<div style="width: ' + exec.progress + '%; height: 100%; background: ' + statusColors[exec.status] + '; border-radius: 3px;"></div>' +
+                        '</div>' +
+                        '<span style="color: #6b7280; font-size: 12px;">' + exec.progress + '%</span>' +
+                        '</div>' +
+                        '</td>' +
+                        '<td style="padding: 16px;">' +
+                        '<div style="display: flex; gap: 8px;">' +
+                        '<button onclick="viewExecutionLogs(&quot;' + exec.id + '&quot;)" style="padding: 6px 12px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">📋 Logs</button>' +
+                        (exec.status === 'running' ? 
+                            '<button onclick="stopExecution(&quot;' + exec.id + '&quot;)" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">⏹️ Stop</button>' :
+                            '<button onclick="restartExecution(&quot;' + exec.id + '&quot;)" style="padding: 6px 12px; background: #059669; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">🔄 Restart</button>'
+                        ) +
+                        '</div>' +
+                        '</td>' +
+                        '</tr>';
+                }).join('') +
+                '</tbody>' +
+                '</table>' +
+                '</div>' +
+
+                '<!-- Performance Metrics -->' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<h4 style="color: #1f2937; margin: 0 0 16px 0;">📊 Performance Trends</h4>' +
+                '<div style="text-align: center; padding: 40px; color: #6b7280;">' +
+                '<div style="font-size: 48px; margin-bottom: 16px;">📈</div>' +
+                '<p>Performance analytics visualization coming soon...</p>' +
+                '</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<h4 style="color: #1f2937; margin: 0 0 16px 0;">💻 System Resources</h4>' +
+                '<div style="margin-bottom: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">' +
+                '<span style="color: #6b7280; font-size: 14px;">CPU Usage</span>' +
+                '<span style="color: #1f2937; font-weight: 600;">23%</span>' +
+                '</div>' +
+                '<div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px;">' +
+                '<div style="width: 23%; height: 100%; background: #3b82f6; border-radius: 4px;"></div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="margin-bottom: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">' +
+                '<span style="color: #6b7280; font-size: 14px;">Memory</span>' +
+                '<span style="color: #1f2937; font-weight: 600;">45%</span>' +
+                '</div>' +
+                '<div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px;">' +
+                '<div style="width: 45%; height: 100%; background: #f59e0b; border-radius: 4px;"></div>' +
+                '</div>' +
+                '</div>' +
+                '<div>' +
+                '<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">' +
+                '<span style="color: #6b7280; font-size: 14px;">Queue Load</span>' +
+                '<span style="color: #1f2937; font-weight: 600;">8%</span>' +
+                '</div>' +
+                '<div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px;">' +
+                '<div style="width: 8%; height: 100%; background: #059669; border-radius: 4px;"></div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+
+        // Rule Engine Action Functions
+        function createNewRule() {
+            showNotification('🔧 Opening rule builder...', 'info');
+        }
+
+        function importRules() {
+            showNotification('📥 Rule import functionality coming soon...', 'info');
+        }
+
+        function exportRules() {
+            showNotification('📤 Exporting rule configurations...', 'success');
+        }
+
+        function editRule(ruleName) {
+            showNotification('✏️ Editing rule: ' + ruleName, 'info');
+        }
+
+        function viewRuleDetails(ruleName) {
+            showNotification('📊 Viewing analytics for: ' + ruleName, 'info');
+        }
+
+        function initializeRuleEngine() {
+            // Initialize rule engine specific functionality
+            console.log('Rule Engine initialized');
+        }
+
+        // Additional Rule Engine Modal Functions
+        function showRulesLibraryModal() {
+            showRuleEnginePage();
+            // Switch to Rules Library tab
+            setTimeout(() => {
+                showRuleTab('library');
+            }, 100);
+        }
+
+        function showRuleExecutionModal() {
+            showRuleEnginePage();
+            // Switch to Execution Monitor tab
+            setTimeout(() => {
+                showRuleTab('monitor');
+            }, 100);
+        }
+
+        function showAutomationModal() {
+            showNotification('🤖 Automation Hub - workflow automation center coming soon', 'info');
+        }
+
+        // Complete Template and Analytics implementations
+        function generateRuleTemplatesHTML() {
+            const templates = [
+                { id: 'TPL001', name: 'Customer Onboarding Automation', category: 'Customer Lifecycle', description: 'Automatically welcome new customers and set up their accounts', uses: 45, rating: 4.8 },
+                { id: 'TPL002', name: 'SLA Breach Alert System', category: 'SLA Management', description: 'Monitor SLA compliance and send alerts when thresholds are exceeded', uses: 67, rating: 4.9 },
+                { id: 'TPL003', name: 'High Priority Case Escalation', category: 'Escalation Rules', description: 'Automatically escalate urgent cases to senior team members', uses: 89, rating: 4.7 },
+                { id: 'TPL004', name: 'Payment Reminder Workflow', category: 'Notification Rules', description: 'Send automated payment reminders based on invoice due dates', uses: 23, rating: 4.6 },
+                { id: 'TPL005', name: 'Churn Risk Detection', category: 'Customer Lifecycle', description: 'Identify customers at risk of churning and trigger retention actions', uses: 34, rating: 4.5 },
+                { id: 'TPL006', name: 'Case Auto-Assignment', category: 'Case Routing', description: 'Automatically assign cases to agents based on skills and workload', uses: 78, rating: 4.8 }
+            ];
+
+            return '<div class="rule-templates">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">' +
+                '<div><h3 style="color: #1f2937; margin: 0; font-size: 24px;">📄 Rule Templates</h3>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0;">Pre-built automation templates for common business scenarios</p></div>' +
+                '<button onclick="createCustomTemplate()" class="btn btn-primary">➕ Create Template</button>' +
+                '</div>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px;">' +
+                templates.map(template => 
+                    '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; transition: all 0.3s ease;" onmouseover="this.style.boxShadow=&quot;0 4px 12px rgba(0,0,0,0.1)&quot;" onmouseout="this.style.boxShadow=&quot;&quot;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">' +
+                    '<h4 style="color: #1f2937; margin: 0;">' + template.name + '</h4>' +
+                    '<span style="background: #f0fdf4; color: #059669; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">' + template.category + '</span>' +
+                    '</div>' +
+                    '<p style="color: #6b7280; font-size: 14px; line-height: 1.5; margin-bottom: 16px;">' + template.description + '</p>' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">' +
+                    '<div style="display: flex; align-items: center; gap: 16px;">' +
+                    '<span style="color: #6b7280; font-size: 12px;">' + template.uses + ' uses</span>' +
+                    '<div style="display: flex; align-items: center; gap: 4px;">' +
+                    '<span style="color: #f59e0b;">⭐</span>' +
+                    '<span style="color: #6b7280; font-size: 12px;">' + template.rating + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 8px;">' +
+                    '<button onclick="useTemplate(&quot;' + template.id + '&quot;)" class="btn btn-primary" style="flex: 1;">Use Template</button>' +
+                    '<button onclick="previewTemplate(&quot;' + template.id + '&quot;)" class="btn" style="background: #6b7280; color: white;">👁️ Preview</button>' +
+                    '</div>' +
+                    '</div>'
+                ).join('') +
+                '</div></div>';
+        }
+
+        function generateRuleAnalyticsHTML() {
+            return '<div class="rule-analytics">' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 24px;">📈 Advanced Rule Analytics</h3>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0;">Deep insights into rule performance and business impact</p>' +
+                '</div>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 32px;">' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">Performance Trends</h4>' +
+                '<div style="height: 200px; background: #f8fafc; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6b7280;">Performance chart placeholder</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">Resource Utilization</h4>' +
+                '<div style="height: 200px; background: #f8fafc; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6b7280;">Resource usage chart placeholder</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<h4 style="color: #1f2937; margin-bottom: 16px;">Business Impact Analysis</h4>' +
+                '<p style="color: #6b7280;">Advanced analytics features coming soon...</p>' +
+                '</div>' +
+                '</div>';
+        }
+
+        // Rule Engine Action Functions
+        function saveRule() {
+            showNotification('💾 Rule saved successfully!', 'success');
+        }
+
+        function testRule() {
+            showNotification('🧪 Testing rule execution...', 'info');
+            setTimeout(() => {
+                showNotification('✅ Rule test completed successfully!', 'success');
+            }, 2000);
+        }
+
+        function clearBuilder() {
+            showNotification('🗑️ Rule builder cleared', 'info');
+        }
+
+        function exportSelectedRules() {
+            showNotification('📤 Exporting selected rules...', 'success');
+        }
+
+        function applyFilters() {
+            showNotification('🔍 Applying filters...', 'info');
+        }
+
+        function selectAllRules(checkbox) {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][value^="R"]');
+            checkboxes.forEach(cb => cb.checked = checkbox.checked);
+        }
+
+        function duplicateRule(ruleId) {
+            showNotification('📋 Duplicating rule: ' + ruleId, 'info');
+        }
+
+        function toggleRuleStatus(ruleId) {
+            showNotification('⚡ Toggling rule status: ' + ruleId, 'info');
+        }
+
+        function deleteRule(ruleId) {
+            if(confirm('Are you sure you want to delete rule ' + ruleId + '?')) {
+                showNotification('🗑️ Rule ' + ruleId + ' deleted', 'success');
+            }
+        }
+
+        function pauseMonitoring() {
+            showNotification('⏸️ Monitoring paused', 'info');
+        }
+
+        function refreshMonitor() {
+            showNotification('🔄 Monitor refreshed', 'info');
+        }
+
+        function viewExecutionDetails(executionId) {
+            showNotification('👁️ Viewing details for: ' + executionId, 'info');
+        }
+
+        function stopExecution(executionId) {
+            showNotification('⏹️ Stopping execution: ' + executionId, 'info');
+        }
+
+        function pauseAllExecutions() {
+            showNotification('⏸️ All executions paused', 'info');
+        }
+
+        function retryFailedExecutions() {
+            showNotification('🔄 Retrying failed executions...', 'info');
+        }
+
+        function clearCompletedExecutions() {
+            showNotification('🗑️ Completed executions cleared', 'info');
+        }
+
+        function exportExecutionLogs() {
+            showNotification('📥 Exporting execution logs...', 'success');
+        }
+
+        function createCustomTemplate() {
+            showNotification('➕ Creating custom template...', 'info');
+        }
+
+        function useTemplate(templateId) {
+            showNotification('📄 Using template: ' + templateId, 'success');
+        }
+
+        function previewTemplate(templateId) {
+            showNotification('👁️ Previewing template: ' + templateId, 'info');
+        }
+
+        // Additional execution monitor functions
+        function viewExecutionLogs(executionId) {
+            showNotification('📋 Viewing logs for execution: ' + executionId, 'info');
+        }
+
+        function restartExecution(executionId) {
+            showNotification('🔄 Restarting execution: ' + executionId, 'info');
+        }
+
+        function clearLogs() {
+            showNotification('🗑️ Execution logs cleared', 'info');
+        }
+
+        function exportLogs() {
+            showNotification('📤 Exporting execution logs...', 'success');
         }
 
         // Initialize app
