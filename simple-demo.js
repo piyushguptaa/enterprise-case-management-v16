@@ -458,6 +458,488 @@ const htmlTemplate = `
             text-transform: uppercase;
         }
         
+        /* Team Member Dashboard Styles */
+        #teamMemberApp {
+            min-height: 100vh;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #teamMemberApp .app-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        #teamMemberApp .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            position: relative;
+            z-index: 100;
+        }
+        
+        #teamMemberApp .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        #teamMemberApp .logo h1 {
+            color: white;
+            font-size: 24px;
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        #teamMemberApp .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        #teamMemberApp .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        #teamMemberApp .user-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        #teamMemberApp .user-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        #teamMemberApp .user-role {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+        
+        #teamMemberApp .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        #teamMemberApp .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        #teamMemberApp .sidebar {
+            width: 260px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        
+        #teamMemberApp .sidebar-content {
+            padding: 20px 0;
+        }
+        
+        #teamMemberApp .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        #teamMemberApp .nav-section-title {
+            color: #6b7280;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+        
+        #teamMemberApp .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            color: #4b5563;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        #teamMemberApp .nav-item:hover {
+            background: #f8fafc;
+            color: #1f2937;
+        }
+        
+        #teamMemberApp .nav-item.active {
+            background: #eef2ff;
+            color: #667eea;
+            font-weight: 500;
+        }
+        
+        #teamMemberApp .nav-icon {
+            font-size: 18px;
+        }
+        
+        #teamMemberApp .main-content {
+            flex: 1;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+        
+        #teamMemberApp .page-header {
+            background: white;
+            padding: 20px 32px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #teamMemberApp .page-title {
+            color: #1f2937;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        #teamMemberApp .page-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        #teamMemberApp .content-wrapper {
+            padding: 0;
+        }
+        
+        #teamMemberApp .dashboard-content {
+            min-height: calc(100vh - 144px);
+        }
+        
+        #teamMemberApp .user-specialization {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            margin-top: 2px;
+        }
+        
+        #teamMemberApp .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            gap: 8px;
+        }
+        
+        #teamMemberApp .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        #teamMemberApp .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .team-dashboard {
+            padding: 24px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Team KPI Cards */
+        .team-kpi-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .team-kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .team-kpi-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .team-kpi-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* Team Charts */
+        .team-chart-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .team-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .team-chart-title {
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Team Case Table */
+        .team-case-table {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .team-case-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .team-case-table thead {
+            background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .team-case-table th {
+            text-align: left;
+            padding: 16px;
+            color: #475569;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .team-case-table tbody tr {
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s ease;
+        }
+        
+        .team-case-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .team-case-table td {
+            padding: 16px;
+            color: #1f2937;
+            font-size: 14px;
+        }
+        
+        /* Priority Badges */
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .priority-critical {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .priority-high {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .priority-medium {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .priority-low {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-new {
+            background: #f0f9ff;
+            color: #0369a1;
+        }
+        
+        .status-in-progress {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .status-waiting {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+        
+        .status-waiting-customer {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+        
+        .status-escalated {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        /* Activity Timeline */
+        .activity-timeline {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s ease;
+        }
+        
+        .activity-item:hover {
+            background-color: #f8fafc;
+            margin: 0 -12px;
+            padding: 12px;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-action {
+            color: #1f2937;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .activity-time {
+            color: #6b7280;
+            font-size: 12px;
+        }
+        
+        /* Team Navigation Enhancement */
+        #teamMemberApp .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.2s ease;
+        }
+        
+        #teamMemberApp .nav-item.active::before,
+        #teamMemberApp .nav-item:hover::before {
+            transform: scaleX(1);
+        }
+        
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            .team-dashboard {
+                padding: 16px;
+            }
+            
+            .team-kpi-card {
+                padding: 16px;
+            }
+            
+            .team-case-table {
+                overflow-x: auto;
+            }
+            
+            .team-case-table table {
+                min-width: 600px;
+            }
+        }
+        
         .customer-status.active { background: #dcfce7; color: #166534; }
         .customer-status.inactive { background: #fef2f2; color: #991b1b; }
         .customer-status.prospect { background: #fef3c7; color: #92400e; }
@@ -1367,6 +1849,127 @@ const htmlTemplate = `
         </div>
     </div>
 
+    <!-- Team Member Dashboard Application -->
+    <div id="teamMemberApp" class="app-container hidden">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1 style="color: #6366f1;">⚡ Team Dashboard</h1>
+                </div>
+                
+                <div class="header-profile">
+                    <div class="user-info">
+                        <div class="user-details">
+                            <div class="user-name" id="teamWelcomeText">Team Member</div>
+                            <div class="user-role" id="teamDepartment">Customer Support</div>
+                            <div class="user-specialization" id="teamSpecialization">General</div>
+                        </div>
+                    </div>
+                    <button class="logout-btn" id="teamLogoutBtn">
+                        <span>🚪</span>
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-layout">
+            <nav class="sidebar" id="teamSidebar">
+                <div class="sidebar-content">
+                    <div class="nav-section">
+                        <div class="nav-section-title">My Workspace</div>
+                        <button class="nav-item active" onclick="showTeamDashboard()">
+                            <span class="nav-icon">📊</span>
+                            Dashboard
+                        </button>
+                        <button class="nav-item" onclick="showMyCases()">
+                            <span class="nav-icon">📋</span>
+                            My Cases
+                        </button>
+                        <button class="nav-item" onclick="showMyPerformance()">
+                            <span class="nav-icon">📈</span>
+                            Performance
+                        </button>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Case Management</div>
+                        <button class="nav-item" onclick="showAssignedCases()">
+                            <span class="nav-icon">🎯</span>
+                            Assigned Cases
+                        </button>
+                        <button class="nav-item" onclick="showUrgentCases()">
+                            <span class="nav-icon">🚨</span>
+                            Urgent Cases
+                        </button>
+                        <button class="nav-item" onclick="showOverdueCases()">
+                            <span class="nav-icon">⏰</span>
+                            Overdue Cases
+                        </button>
+                        <button class="nav-item" onclick="showCompletedCases()">
+                            <span class="nav-icon">✅</span>
+                            Completed Cases
+                        </button>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Customer Support</div>
+                        <button class="nav-item" onclick="showCustomerInteractions()">
+                            <span class="nav-icon">👥</span>
+                            Customer Interactions
+                        </button>
+                        <button class="nav-item" onclick="showKnowledgeBase()">
+                            <span class="nav-icon">📚</span>
+                            Knowledge Base
+                        </button>
+                        <button class="nav-item" onclick="showTicketTemplates()">
+                            <span class="nav-icon">📝</span>
+                            Quick Templates
+                        </button>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Tools & Reports</div>
+                        <button class="nav-item" onclick="showTimeTracking()">
+                            <span class="nav-icon">⏱️</span>
+                            Time Tracking
+                        </button>
+                        <button class="nav-item" onclick="showMyReports()">
+                            <span class="nav-icon">📊</span>
+                            My Reports
+                        </button>
+                        <button class="nav-item" onclick="showTeamCollaboration()">
+                            <span class="nav-icon">🤝</span>
+                            Team Collaboration
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <main class="main-content">
+                <div class="page-header">
+                    <h1 class="page-title" id="teamPageTitle">Dashboard Overview</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="createNewCase()">
+                            <span>➕</span>
+                            New Case
+                        </button>
+                        <button class="btn" onclick="refreshTeamDashboard()">
+                            <span>🔄</span>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-wrapper">
+                    <div id="teamDashboardContent" class="dashboard-content">
+                        <!-- Team member dashboard content will be loaded here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
     <script>
         let currentUser = null;
 
@@ -1374,15 +1977,29 @@ const htmlTemplate = `
         document.addEventListener('DOMContentLoaded', function() {
             // Check for existing demo session
             const token = localStorage.getItem('token');
+            const userRole = localStorage.getItem('userRole');
             if (token && token.startsWith('demo-token-')) {
-                currentUser = {
-                    id: 1,
-                    name: 'Admin User',
-                    email: 'admin@example.com',
-                    role: 'admin'
-                };
-                showMainApp();
-                loadStats();
+                if (userRole === 'admin') {
+                    currentUser = {
+                        id: 1,
+                        name: 'Admin User',
+                        email: 'admin@example.com',
+                        role: 'admin'
+                    };
+                    showMainApp();
+                    loadStats();
+                } else if (userRole === 'team_member') {
+                    currentUser = {
+                        id: 2,
+                        name: 'Sarah Johnson',
+                        email: 'team@example.com',
+                        role: 'team_member',
+                        department: 'Customer Support',
+                        specialization: 'Technical Issues'
+                    };
+                    showTeamMemberApp();
+                    loadTeamMemberData();
+                }
             }
 
             // Login form handler
@@ -1400,19 +2017,23 @@ const htmlTemplate = `
                     }
 
                     setTimeout(() => {
-                        if (email === 'admin@example.com' && password === 'admin123') {
-                            currentUser = {
-                                id: 1,
-                                name: 'Admin User',
-                                email: 'admin@example.com',
-                                role: 'admin'
-                            };
+                        const userData = authenticateUser(email, password);
+                        if (userData) {
+                            currentUser = userData;
                             localStorage.setItem('token', 'demo-token-' + Date.now());
-                            showMainApp();
-                            loadStats();
-                            showNotification('Welcome back!', 'success');
+                            localStorage.setItem('userRole', userData.role);
+                            
+                            if (userData.role === 'admin') {
+                                showMainApp();
+                                loadStats();
+                            } else if (userData.role === 'team_member') {
+                                showTeamMemberApp();
+                                loadTeamMemberData();
+                            }
+                            
+                            showNotification('Welcome back, ' + userData.name + '!', 'success');
                         } else {
-                            showNotification('Invalid credentials. Use admin@example.com / admin123', 'error');
+                            showNotification('Invalid credentials. Try: admin@example.com/admin123 or team@example.com/team123', 'error');
                             if (loginBtn) {
                                 loginBtn.textContent = 'Sign In';
                                 loginBtn.disabled = false;
@@ -1422,11 +2043,22 @@ const htmlTemplate = `
                 });
             }
 
-            // Logout handler
+            // Logout handlers
             const logoutBtn = document.getElementById('logoutBtn');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', function() {
                     localStorage.removeItem('token');
+                    localStorage.removeItem('userRole');
+                    currentUser = null;
+                    showLogin();
+                });
+            }
+
+            const teamLogoutBtn = document.getElementById('teamLogoutBtn');
+            if (teamLogoutBtn) {
+                teamLogoutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userRole');
                     currentUser = null;
                     showLogin();
                 });
@@ -1438,13 +2070,50 @@ const htmlTemplate = `
         function showLogin() {
             document.getElementById('loginPage').classList.remove('hidden');
             document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('teamMemberApp').classList.add('hidden');
+        }
+
+        function authenticateUser(email, password) {
+            // Admin credentials
+            if (email === 'admin@example.com' && password === 'admin123') {
+                return {
+                    id: 1,
+                    name: 'Admin User',
+                    email: 'admin@example.com',
+                    role: 'admin',
+                    department: 'Management'
+                };
+            }
+            
+            // Team member credentials
+            const teamMembers = [
+                { email: 'team@example.com', password: 'team123', id: 2, name: 'Sarah Johnson', role: 'team_member', department: 'Customer Support', specialization: 'Technical Issues', level: 'Senior' },
+                { email: 'agent1@example.com', password: 'agent123', id: 3, name: 'Michael Chen', role: 'team_member', department: 'Customer Support', specialization: 'Billing & Account', level: 'Junior' },
+                { email: 'agent2@example.com', password: 'agent123', id: 4, name: 'Emily Rodriguez', role: 'team_member', department: 'Customer Support', specialization: 'General Inquiry', level: 'Senior' },
+                { email: 'agent3@example.com', password: 'agent123', id: 5, name: 'David Kim', role: 'team_member', department: 'Customer Support', specialization: 'Escalations', level: 'Lead' },
+                { email: 'agent4@example.com', password: 'agent123', id: 6, name: 'Lisa Anderson', role: 'team_member', department: 'Customer Support', specialization: 'Enterprise Accounts', level: 'Senior' }
+            ];
+            
+            return teamMembers.find(member => member.email === email && member.password === password) || null;
         }
 
         function showMainApp() {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('teamMemberApp').classList.add('hidden');
             if (currentUser) {
                 document.getElementById('welcomeText').textContent = currentUser.name;
+            }
+        }
+
+        function showTeamMemberApp() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('teamMemberApp').classList.remove('hidden');
+            if (currentUser) {
+                document.getElementById('teamWelcomeText').textContent = currentUser.name;
+                document.getElementById('teamDepartment').textContent = currentUser.department;
+                document.getElementById('teamSpecialization').textContent = currentUser.specialization;
             }
         }
 
@@ -1476,6 +2145,497 @@ const htmlTemplate = `
             } catch (error) {
                 console.error('Failed to load stats:', error);
             }
+        }
+
+        // Team Member Dashboard Functions
+        function loadTeamMemberData() {
+            if (currentUser && currentUser.role === 'team_member') {
+                showTeamDashboard();
+                loadTeamStats();
+            }
+        }
+
+        function loadTeamStats() {
+            // Mock team member statistics based on user
+            const teamStats = generateTeamMemberStats(currentUser);
+            updateTeamDashboardStats(teamStats);
+        }
+
+        function showTeamDashboard() {
+            document.getElementById('teamPageTitle').textContent = 'Dashboard Overview';
+            document.getElementById('teamDashboardContent').innerHTML = generateTeamDashboardHTML();
+            
+            // Update active nav item
+            const navItems = document.querySelectorAll('#teamSidebar .nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            navItems[0].classList.add('active');
+        }
+
+        function generateTeamDashboardHTML() {
+            const teamData = generateTeamMemberStats(currentUser);
+            
+            return '<div class="team-dashboard">' +
+                '<!-- Performance Overview -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin: 0; font-size: 28px; font-weight: 700;">📊 My Performance Dashboard</h2>' +
+                '<p style="color: #6b7280; margin: 8px 0 0 0; font-size: 16px;">Track your productivity, case resolution, and performance metrics</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button onclick="refreshTeamDashboard()" class="btn" style="background: #10b981; color: white;">🔄 Refresh</button>' +
+                '<button onclick="exportTeamReport()" class="btn" style="background: #3b82f6; color: white;">📥 Export Report</button>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Key Metrics Cards -->' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 32px;">' +
+                generateTeamKPICards(teamData.kpis) +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Case Assignment Overview -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px; font-size: 24px;">📋 My Case Portfolio</h3>' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">' +
+                '<div class="team-chart-container">' +
+                '<div class="team-chart-header"><h4 class="team-chart-title">📈 Case Resolution Trends</h4></div>' +
+                generateCaseResolutionChart(teamData.caseStats) +
+                '</div>' +
+                '<div class="team-chart-container">' +
+                '<div class="team-chart-header"><h4 class="team-chart-title">🎯 Priority Distribution</h4></div>' +
+                generatePriorityDistributionChart(teamData.priorities) +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Active Cases Table -->' +
+                '<div style="margin-bottom: 32px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 24px;">🔄 Active Cases</h3>' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<select id="priorityFilter" style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px;" onchange="filterCasesByPriority(this.value)">' +
+                '<option value="">All Priorities</option>' +
+                '<option value="critical">Critical</option>' +
+                '<option value="high">High</option>' +
+                '<option value="medium">Medium</option>' +
+                '<option value="low">Low</option>' +
+                '</select>' +
+                '<button onclick="viewAllCases()" class="btn btn-primary">📋 View All Cases</button>' +
+                '</div>' +
+                '</div>' +
+                generateActiveCasesTable(teamData.activeCases) +
+                '</div>' +
+
+                '<!-- Performance Analytics -->' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px;">' +
+                '<div class="team-chart-container">' +
+                '<div class="team-chart-header"><h4 class="team-chart-title">⏱️ Response Time Analytics</h4></div>' +
+                generateResponseTimeChart(teamData.responseTime) +
+                '</div>' +
+                '<div class="team-chart-container">' +
+                '<div class="team-chart-header"><h4 class="team-chart-title">😊 Customer Satisfaction</h4></div>' +
+                generateSatisfactionChart(teamData.satisfaction) +
+                '</div>' +
+                '</div>' +
+
+                '<!-- Recent Activity Timeline -->' +
+                '<div>' +
+                '<h3 style="color: #1f2937; margin-bottom: 20px; font-size: 24px;">📅 Recent Activity Timeline</h3>' +
+                '<div class="activity-timeline">' +
+                generateActivityTimeline(teamData.recentActivity) +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function generateTeamMemberStats(user) {
+            return {
+                kpis: {
+                    assignedCases: { value: 47, trend: '+12%', status: 'up', description: 'Total assigned cases' },
+                    resolvedToday: { value: 8, trend: '+25%', status: 'up', description: 'Cases resolved today' },
+                    avgResponseTime: { value: '2.3h', trend: '-15%', status: 'down', description: 'Average first response time' },
+                    customerSatisfaction: { value: '4.8/5', trend: '+0.2', status: 'up', description: 'Customer satisfaction rating' },
+                    slaCompliance: { value: '96%', trend: '+3%', status: 'up', description: 'SLA compliance rate' },
+                    hoursWorked: { value: '7.5h', trend: '', status: 'neutral', description: 'Hours worked today' }
+                },
+                caseStats: {
+                    weekly: [
+                        { day: 'Mon', resolved: 12, assigned: 15 },
+                        { day: 'Tue', resolved: 10, assigned: 12 },
+                        { day: 'Wed', resolved: 14, assigned: 16 },
+                        { day: 'Thu', resolved: 11, assigned: 13 },
+                        { day: 'Fri', resolved: 13, assigned: 14 },
+                        { day: 'Sat', resolved: 8, assigned: 9 },
+                        { day: 'Sun', resolved: 6, assigned: 7 }
+                    ]
+                },
+                priorities: {
+                    critical: 3,
+                    high: 12,
+                    medium: 24,
+                    low: 8
+                },
+                activeCases: [
+                    { id: 'CS-2024-1158', customer: 'TechCorp Solutions', subject: 'API Integration Issue', priority: 'high', created: '2 hours ago', due: 'Today 6:00 PM', status: 'in_progress' },
+                    { id: 'CS-2024-1159', customer: 'Global Industries', subject: 'Billing Discrepancy', priority: 'medium', created: '4 hours ago', due: 'Tomorrow 10:00 AM', status: 'waiting_customer' },
+                    { id: 'CS-2024-1160', customer: 'StartupHub', subject: 'Account Access Problem', priority: 'high', created: '1 hour ago', due: 'Today 4:00 PM', status: 'new' },
+                    { id: 'CS-2024-1161', customer: 'Enterprise Co', subject: 'Feature Request', priority: 'low', created: '6 hours ago', due: 'Next Week', status: 'in_progress' },
+                    { id: 'CS-2024-1162', customer: 'MegaCorp Ltd', subject: 'Performance Issues', priority: 'critical', created: '30 minutes ago', due: 'Today 2:00 PM', status: 'escalated' }
+                ],
+                responseTime: {
+                    thisWeek: [2.1, 2.5, 1.8, 2.3, 2.0, 2.7, 2.4],
+                    target: 2.0
+                },
+                satisfaction: {
+                    thisMonth: [4.6, 4.7, 4.8, 4.5, 4.9, 4.8, 4.7, 4.8],
+                    average: 4.8
+                },
+                recentActivity: [
+                    { time: '10 minutes ago', action: 'Resolved case CS-2024-1157 for DataFlow Inc', type: 'resolution', icon: '✅' },
+                    { time: '25 minutes ago', action: 'Updated case CS-2024-1158 with technical solution', type: 'update', icon: '📝' },
+                    { time: '1 hour ago', action: 'Started working on case CS-2024-1160', type: 'assignment', icon: '🎯' },
+                    { time: '2 hours ago', action: 'Customer call completed for CS-2024-1159', type: 'interaction', icon: '📞' },
+                    { time: '3 hours ago', action: 'Escalated case CS-2024-1162 to senior team', type: 'escalation', icon: '🔺' }
+                ]
+            };
+        }
+
+        // Team Member Chart Generation Functions
+        function generateTeamKPICards(kpis) {
+            let html = '';
+            const kpiList = [
+                { key: 'assignedCases', title: 'Assigned Cases', icon: '📋', color: '#3b82f6' },
+                { key: 'resolvedToday', title: 'Resolved Today', icon: '✅', color: '#10b981' },
+                { key: 'avgResponseTime', title: 'Avg Response Time', icon: '⏱️', color: '#f59e0b' },
+                { key: 'customerSatisfaction', title: 'Customer Satisfaction', icon: '😊', color: '#ec4899' },
+                { key: 'slaCompliance', title: 'SLA Compliance', icon: '🎯', color: '#8b5cf6' },
+                { key: 'hoursWorked', title: 'Hours Worked Today', icon: '⏰', color: '#06b6d4' }
+            ];
+
+            kpiList.forEach(kpi => {
+                const data = kpis[kpi.key];
+                const trendColor = data.status === 'up' ? '#10b981' : data.status === 'down' ? '#dc2626' : '#6b7280';
+                const trendIcon = data.status === 'up' ? '↗' : data.status === 'down' ? '↘' : '→';
+
+                html += '<div class="team-kpi-card">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">' +
+                    '<div style="width: 48px; height: 48px; background: ' + kpi.color + '15; color: ' + kpi.color + '; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">' + kpi.icon + '</div>' +
+                    (data.trend ? '<div style="text-align: right;"><div style="color: ' + trendColor + '; font-size: 14px; font-weight: 600; margin-bottom: 2px;">' + trendIcon + ' ' + data.trend + '</div></div>' : '') +
+                    '</div>' +
+                    '<h4 style="color: #1f2937; margin: 0 0 8px 0; font-size: 14px; font-weight: 500;">' + kpi.title + '</h4>' +
+                    '<div style="font-size: 28px; font-weight: 800; color: #1f2937; margin-bottom: 4px;">' + data.value + '</div>' +
+                    '<p style="color: #6b7280; font-size: 12px; margin: 0;">' + data.description + '</p>' +
+                    '</div>';
+            });
+
+            return html;
+        }
+
+        function generateCaseResolutionChart(caseStats) {
+            let html = '<div style="margin-bottom: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">' +
+                '<div style="display: flex; gap: 16px; align-items: center;">' +
+                '<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 12px; height: 3px; background: #10b981; border-radius: 2px;"></div><span style="font-size: 12px; color: #6b7280;">Resolved</span></div>' +
+                '<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 12px; height: 3px; background: #3b82f6; border-radius: 2px;"></div><span style="font-size: 12px; color: #6b7280;">Assigned</span></div>' +
+                '</div>' +
+                '</div>';
+
+            // Simple bar chart for case resolution
+            html += '<div style="display: flex; align-items: end; gap: 8px; height: 200px; padding: 20px 0; border-bottom: 1px solid #e5e7eb;">';
+            
+            const maxCases = Math.max(...caseStats.weekly.map(day => Math.max(day.resolved, day.assigned)));
+            caseStats.weekly.forEach((day, index) => {
+                const resolvedHeight = (day.resolved / maxCases) * 100;
+                const assignedHeight = (day.assigned / maxCases) * 100;
+                html += '<div style="flex: 1; display: flex; flex-direction: column; align-items: center;">' +
+                    '<div style="display: flex; gap: 4px; width: 100%;">' +
+                    '<div style="width: 50%; background: #10b981; height: ' + resolvedHeight + '%; border-radius: 4px 4px 0 0; position: relative; margin-bottom: 8px;">' +
+                    '<div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #10b981; font-weight: 500;">' + day.resolved + '</div>' +
+                    '</div>' +
+                    '<div style="width: 50%; background: #3b82f6; height: ' + assignedHeight + '%; border-radius: 4px 4px 0 0; position: relative; margin-bottom: 8px;">' +
+                    '<div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #3b82f6; font-weight: 500;">' + day.assigned + '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="font-size: 12px; color: #6b7280; margin-top: 8px;">' + day.day + '</div>' +
+                    '</div>';
+            });
+            
+            html += '</div></div>';
+            return html;
+        }
+
+        function generatePriorityDistributionChart(priorities) {
+            const total = Object.values(priorities).reduce((sum, val) => sum + val, 0);
+            const colors = {
+                critical: '#dc2626',
+                high: '#f59e0b',
+                medium: '#3b82f6',
+                low: '#10b981'
+            };
+
+            let html = '<div style="margin-bottom: 16px;">';
+            
+            // Priority distribution bars
+            Object.entries(priorities).forEach(([priority, count]) => {
+                const percentage = (count / total * 100).toFixed(1);
+                html += '<div style="margin-bottom: 12px;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">' +
+                    '<span style="color: #1f2937; font-size: 14px; text-transform: capitalize; font-weight: 500;">' + priority + '</span>' +
+                    '<span style="color: #6b7280; font-size: 12px;">' + count + ' cases (' + percentage + '%)</span>' +
+                    '</div>' +
+                    '<div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px;">' +
+                    '<div style="width: ' + percentage + '%; height: 100%; background: ' + colors[priority] + '; border-radius: 4px;"></div>' +
+                    '</div>' +
+                    '</div>';
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        function generateActiveCasesTable(activeCases) {
+            const priorityIcons = {
+                critical: '🔴',
+                high: '🟡', 
+                medium: '🔵',
+                low: '🟢'
+            };
+
+            const statusIcons = {
+                new: '🆕',
+                in_progress: '⚡',
+                waiting_customer: '⏳',
+                escalated: '🔺'
+            };
+
+            let html = '<div class="team-case-table">' +
+                '<table>' +
+                '<thead>' +
+                '<tr>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase;">Case ID</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase;">Customer</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase;">Subject</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase;">Priority</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase;">Status</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase;">Due</th>' +
+                '<th style="text-align: left; padding: 16px; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase;">Actions</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+
+            activeCases.forEach(caseItem => {
+                const priorityIcon = priorityIcons[caseItem.priority];
+                const statusIcon = statusIcons[caseItem.status];
+                const statusClass = 'status-' + caseItem.status.replace('_', '-');
+                
+                html += '<tr>' +
+                    '<td>' + caseItem.id + '</td>' +
+                    '<td>' + caseItem.customer + '</td>' +
+                    '<td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + caseItem.subject + '">' + caseItem.subject + '</td>' +
+                    '<td><span class="priority-badge priority-' + caseItem.priority + '">' + priorityIcon + ' ' + caseItem.priority.toUpperCase() + '</span></td>' +
+                    '<td><span class="status-badge ' + statusClass + '">' + statusIcon + ' ' + caseItem.status.replace('_', ' ').toUpperCase() + '</span></td>' +
+                    '<td style="color: #6b7280; font-size: 14px;">' + caseItem.due + '</td>' +
+                    '<td><div style="display: flex; gap: 8px;"><button onclick="openCase(&quot;' + caseItem.id + '&quot;)" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Open</button><button onclick="updateCase(&quot;' + caseItem.id + '&quot;)" class="btn" style="background: #10b981; color: white; padding: 6px 12px; font-size: 12px;">Update</button></div></td>' +
+                    '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        function generateResponseTimeChart(responseTime) {
+            let html = '<div style="margin-bottom: 16px;">';
+            
+            // Response time trend
+            html += '<div style="display: flex; align-items: end; gap: 8px; height: 150px; padding: 20px 0; border-bottom: 1px solid #e5e7eb;">';
+            
+            const maxTime = Math.max(...responseTime.thisWeek, responseTime.target + 1);
+            responseTime.thisWeek.forEach((time, index) => {
+                const heightPercent = (time / maxTime) * 100;
+                const color = time <= responseTime.target ? '#10b981' : '#f59e0b';
+                const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                
+                html += '<div style="flex: 1; display: flex; flex-direction: column; align-items: center;">' +
+                    '<div style="width: 80%; background: ' + color + '; height: ' + heightPercent + '%; border-radius: 4px 4px 0 0; position: relative; margin-bottom: 8px;">' +
+                    '<div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: ' + color + '; font-weight: 500;">' + time + 'h</div>' +
+                    '</div>' +
+                    '<div style="font-size: 12px; color: #6b7280; margin-top: 8px;">' + days[index] + '</div>' +
+                    '</div>';
+            });
+            
+            html += '</div>';
+            html += '<div style="margin-top: 12px; padding: 8px; background: #f0fdf4; border-radius: 6px; font-size: 12px; color: #166534;">🎯 Target: ' + responseTime.target + 'h | Current Average: ' + (responseTime.thisWeek.reduce((a, b) => a + b) / responseTime.thisWeek.length).toFixed(1) + 'h</div>';
+            html += '</div>';
+            
+            return html;
+        }
+
+        function generateSatisfactionChart(satisfaction) {
+            let html = '<div style="margin-bottom: 16px;">';
+            
+            // Satisfaction trend
+            html += '<div style="display: flex; align-items: end; gap: 6px; height: 120px; padding: 20px 0; border-bottom: 1px solid #e5e7eb;">';
+            
+            satisfaction.thisMonth.forEach((score, index) => {
+                const heightPercent = (score / 5) * 100;
+                const color = score >= 4.5 ? '#10b981' : score >= 4.0 ? '#3b82f6' : '#f59e0b';
+                
+                html += '<div style="flex: 1; display: flex; flex-direction: column; align-items: center;">' +
+                    '<div style="width: 80%; background: ' + color + '; height: ' + heightPercent + '%; border-radius: 4px 4px 0 0; position: relative; margin-bottom: 8px;">' +
+                    '<div style="position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 9px; color: ' + color + '; font-weight: 500;">' + score + '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            html += '</div>';
+            html += '<div style="margin-top: 12px; padding: 8px; background: #f0f9ff; border-radius: 6px; font-size: 12px; color: #1e40af;">⭐ Average Rating: ' + satisfaction.average + '/5.0 | Target: 4.5+</div>';
+            html += '</div>';
+            
+            return html;
+        }
+
+        function generateActivityTimeline(recentActivity) {
+            let html = '';
+            
+            recentActivity.forEach((activity, index) => {
+                const typeColors = {
+                    resolution: '#10b981',
+                    update: '#3b82f6',
+                    assignment: '#8b5cf6',
+                    interaction: '#f59e0b',
+                    escalation: '#dc2626'
+                };
+                
+                html += '<div class="activity-item">' +
+                    '<div class="activity-icon" style="background: ' + typeColors[activity.type] + '15; color: ' + typeColors[activity.type] + ';">' + activity.icon + '</div>' +
+                    '<div class="activity-content">' +
+                    '<p class="activity-action">' + activity.action + '</p>' +
+                    '<p class="activity-time">' + activity.time + '</p>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            return html;
+        }
+
+        // Team Member Action Functions
+        function refreshTeamDashboard() {
+            showNotification('🔄 Dashboard refreshed successfully!', 'success');
+            loadTeamMemberData();
+        }
+
+        function exportTeamReport() {
+            showNotification('📥 Exporting team performance report...', 'success');
+        }
+
+        function filterCasesByPriority(priority) {
+            showNotification('🔍 Filtering cases by priority: ' + (priority || 'All'), 'info');
+        }
+
+        function viewAllCases() {
+            showNotification('📋 Opening full case management view...', 'info');
+        }
+
+        function openCase(caseId) {
+            showNotification('📂 Opening case: ' + caseId, 'info');
+        }
+
+        function updateCase(caseId) {
+            showNotification('✏️ Updating case: ' + caseId, 'info');
+        }
+
+        function updateTeamDashboardStats(stats) {
+            // Update dashboard with fresh stats
+            console.log('Team stats updated:', stats);
+        }
+
+        // Team Member Navigation Functions
+        function showMyCases() {
+            document.getElementById('teamPageTitle').textContent = 'My Cases';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">📋</div><h3 style="color: #1f2937; margin-bottom: 8px;">My Cases</h3><p>Comprehensive case management view coming soon...</p></div>';
+            updateActiveNav('My Cases');
+        }
+
+        function showMyPerformance() {
+            document.getElementById('teamPageTitle').textContent = 'Performance Analytics';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">📈</div><h3 style="color: #1f2937; margin-bottom: 8px;">Performance Analytics</h3><p>Detailed performance metrics and insights coming soon...</p></div>';
+            updateActiveNav('Performance');
+        }
+
+        function showAssignedCases() {
+            document.getElementById('teamPageTitle').textContent = 'Assigned Cases';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">🎯</div><h3 style="color: #1f2937; margin-bottom: 8px;">Assigned Cases</h3><p>All your assigned cases with advanced filtering coming soon...</p></div>';
+            updateActiveNav('Assigned Cases');
+        }
+
+        function showUrgentCases() {
+            document.getElementById('teamPageTitle').textContent = 'Urgent Cases';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">🚨</div><h3 style="color: #1f2937; margin-bottom: 8px;">Urgent Cases</h3><p>High priority and critical cases requiring immediate attention coming soon...</p></div>';
+            updateActiveNav('Urgent Cases');
+        }
+
+        function showOverdueCases() {
+            document.getElementById('teamPageTitle').textContent = 'Overdue Cases';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">⏰</div><h3 style="color: #1f2937; margin-bottom: 8px;">Overdue Cases</h3><p>Cases past their SLA deadlines coming soon...</p></div>';
+            updateActiveNav('Overdue Cases');
+        }
+
+        function showCompletedCases() {
+            document.getElementById('teamPageTitle').textContent = 'Completed Cases';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">✅</div><h3 style="color: #1f2937; margin-bottom: 8px;">Completed Cases</h3><p>Your successfully resolved cases and achievements coming soon...</p></div>';
+            updateActiveNav('Completed Cases');
+        }
+
+        function showCustomerInteractions() {
+            document.getElementById('teamPageTitle').textContent = 'Customer Interactions';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">👥</div><h3 style="color: #1f2937; margin-bottom: 8px;">Customer Interactions</h3><p>Communication history and customer relationship management coming soon...</p></div>';
+            updateActiveNav('Customer Interactions');
+        }
+
+        function showKnowledgeBase() {
+            document.getElementById('teamPageTitle').textContent = 'Knowledge Base';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">📚</div><h3 style="color: #1f2937; margin-bottom: 8px;">Knowledge Base</h3><p>Searchable knowledge articles and solutions coming soon...</p></div>';
+            updateActiveNav('Knowledge Base');
+        }
+
+        function showTicketTemplates() {
+            document.getElementById('teamPageTitle').textContent = 'Quick Templates';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">📝</div><h3 style="color: #1f2937; margin-bottom: 8px;">Quick Templates</h3><p>Pre-built response templates and shortcuts coming soon...</p></div>';
+            updateActiveNav('Quick Templates');
+        }
+
+        function showTimeTracking() {
+            document.getElementById('teamPageTitle').textContent = 'Time Tracking';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">⏱️</div><h3 style="color: #1f2937; margin-bottom: 8px;">Time Tracking</h3><p>Track time spent on cases and activities coming soon...</p></div>';
+            updateActiveNav('Time Tracking');
+        }
+
+        function showMyReports() {
+            document.getElementById('teamPageTitle').textContent = 'My Reports';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">📊</div><h3 style="color: #1f2937; margin-bottom: 8px;">My Reports</h3><p>Personal performance reports and analytics coming soon...</p></div>';
+            updateActiveNav('My Reports');
+        }
+
+        function showTeamCollaboration() {
+            document.getElementById('teamPageTitle').textContent = 'Team Collaboration';
+            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">🤝</div><h3 style="color: #1f2937; margin-bottom: 8px;">Team Collaboration</h3><p>Team communication and collaboration tools coming soon...</p></div>';
+            updateActiveNav('Team Collaboration');
+        }
+
+        function updateActiveNav(activeSection) {
+            // Update active navigation item
+            const navItems = document.querySelectorAll('#teamSidebar .nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.textContent.trim().includes(activeSection) || (activeSection === 'Dashboard Overview' && item.textContent.trim().includes('Dashboard'))) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        function createNewCase() {
+            showNotification('➕ Opening new case creation form...', 'info');
         }
 
         // Modal functions
@@ -10897,17 +12057,46 @@ const server = http.createServer((req, res) => {
         req.on('data', chunk => { body += chunk.toString(); });
         req.on('end', () => {
             const { email, password } = JSON.parse(body);
+            
+            // Admin authentication
             if (email === 'admin@example.com' && password === 'admin123') {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
                     message: 'Login successful',
-                    user: mockUser,
+                    user: {
+                        id: 1,
+                        name: 'Admin User',
+                        email: 'admin@example.com',
+                        role: 'admin',
+                        department: 'Management'
+                    },
                     token: 'demo-token-12345'
                 }));
-            } else {
-                res.writeHead(401, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Invalid credentials' }));
+                return;
             }
+            
+            // Team member authentication
+            const teamMembers = [
+                { email: 'team@example.com', password: 'team123', id: 2, name: 'Sarah Johnson', role: 'team_member', department: 'Customer Support', specialization: 'Technical Issues', level: 'Senior' },
+                { email: 'agent1@example.com', password: 'agent123', id: 3, name: 'Michael Chen', role: 'team_member', department: 'Customer Support', specialization: 'Billing & Account', level: 'Junior' },
+                { email: 'agent2@example.com', password: 'agent123', id: 4, name: 'Emily Rodriguez', role: 'team_member', department: 'Customer Support', specialization: 'General Inquiry', level: 'Senior' },
+                { email: 'agent3@example.com', password: 'agent123', id: 5, name: 'David Kim', role: 'team_member', department: 'Customer Support', specialization: 'Escalations', level: 'Lead' },
+                { email: 'agent4@example.com', password: 'agent123', id: 6, name: 'Lisa Anderson', role: 'team_member', department: 'Customer Support', specialization: 'Enterprise Accounts', level: 'Senior' }
+            ];
+            
+            const teamMember = teamMembers.find(member => member.email === email && member.password === password);
+            if (teamMember) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: 'Login successful',
+                    user: teamMember,
+                    token: 'demo-token-' + teamMember.id
+                }));
+                return;
+            }
+            
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid credentials' }));
         });
         return;
     }
