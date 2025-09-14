@@ -102,7 +102,6 @@ const htmlTemplate = `
     <title>Case Management - CRM Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
@@ -2553,20 +2552,724 @@ const htmlTemplate = `
         // Team Member Navigation Functions
         function showMyCases() {
             document.getElementById('teamPageTitle').textContent = 'My Cases';
-            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">📋</div><h3 style="color: #1f2937; margin-bottom: 8px;">My Cases</h3><p>Comprehensive case management view coming soon...</p></div>';
+            document.getElementById('teamDashboardContent').innerHTML = generateMyCasesHTML();
             updateActiveNav('My Cases');
+        }
+        
+        function generateMyCasesHTML() {
+            const myCasesData = generateMyCasesData();
+            
+            return '<div class="my-cases-module">' +
+                '<!-- Cases Overview Header -->' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 24px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">' +
+                '<div>' +
+                '<h2 style="color: #1f2937; margin: 0; font-size: 20px; font-weight: 700;">📋 My Case Portfolio</h2>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0; font-size: 14px;">Manage and track all your assigned cases</p>' +
+                '</div>' +
+                '<div style="display: flex; gap: 8px;">' +
+                '<button onclick="createNewCase()" style="background: #22c55e; color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer;">➕ New Case</button>' +
+                '<button onclick="exportMyCases()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer;">📥 Export</button>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Cases Statistics -->' +
+                '<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px;">' +
+                generateMyCasesStatsCards(myCasesData.stats) +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Filters and Search -->' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 16px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">' +
+                '<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">' +
+                '<select id="statusFilter" onchange="filterMyCases()" style="padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px;">' +
+                '<option value="all">All Status</option>' +
+                '<option value="open">Open</option>' +
+                '<option value="in_progress">In Progress</option>' +
+                '<option value="pending">Pending</option>' +
+                '<option value="resolved">Resolved</option>' +
+                '</select>' +
+                '<select id="priorityFilter" onchange="filterMyCases()" style="padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px;">' +
+                '<option value="all">All Priority</option>' +
+                '<option value="urgent">Urgent</option>' +
+                '<option value="high">High</option>' +
+                '<option value="medium">Medium</option>' +
+                '<option value="low">Low</option>' +
+                '</select>' +
+                '<input type="date" id="dateFilter" onchange="filterMyCases()" style="padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px;" />' +
+                '</div>' +
+                '<div style="display: flex; gap: 8px; align-items: center;">' +
+                '<input type="text" placeholder="Search cases..." id="myCasesSearch" oninput="searchMyCases(this.value)" style="padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; width: 200px;" />' +
+                '<button onclick="toggleMyCasesView()" id="viewToggle" style="padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; font-size: 12px;">📋 Table</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Cases Content -->' +
+                '<div id="myCasesContent">' +
+                generateMyCasesGridView(myCasesData.cases) +
+                '</div>' +
+                '</div>';
+        }
+        
+        function generateMyCasesData() {
+            return {
+                stats: [
+                    { label: 'Total Cases', value: '24', change: '+3', color: '#3b82f6', icon: '📋' },
+                    { label: 'Open Cases', value: '8', change: '+1', color: '#f59e0b', icon: '🔓' },
+                    { label: 'Resolved', value: '16', change: '+2', color: '#22c55e', icon: '✅' },
+                    { label: 'Avg Resolution', value: '2.3d', change: '-0.5d', color: '#8b5cf6', icon: '⚡' }
+                ],
+                cases: [
+                    {
+                        id: 'MC-2024-001',
+                        title: 'Payment Gateway Integration Issue',
+                        customer: { name: 'TechCorp Inc', logo: '🏢' },
+                        status: 'In Progress',
+                        priority: 'High',
+                        assignedDate: '2024-01-15',
+                        dueDate: '2024-01-18',
+                        progress: 65,
+                        tags: ['API', 'Payment', 'Integration'],
+                        lastUpdate: '2 hours ago',
+                        slaStatus: 'On Track',
+                        description: 'Customer experiencing payment failures during checkout process'
+                    },
+                    {
+                        id: 'MC-2024-002',
+                        title: 'Database Performance Optimization',
+                        customer: { name: 'DataFlow Solutions', logo: '💾' },
+                        status: 'Open',
+                        priority: 'Medium',
+                        assignedDate: '2024-01-14',
+                        dueDate: '2024-01-20',
+                        progress: 20,
+                        tags: ['Database', 'Performance'],
+                        lastUpdate: '1 day ago',
+                        slaStatus: 'On Track',
+                        description: 'Query performance degradation affecting user experience'
+                    },
+                    {
+                        id: 'MC-2024-003',
+                        title: 'Mobile App Authentication Bug',
+                        customer: { name: 'MobileFirst Corp', logo: '📱' },
+                        status: 'Resolved',
+                        priority: 'High',
+                        assignedDate: '2024-01-12',
+                        dueDate: '2024-01-16',
+                        progress: 100,
+                        tags: ['Mobile', 'Auth', 'Bug Fix'],
+                        lastUpdate: '3 days ago',
+                        slaStatus: 'Completed',
+                        description: 'Users unable to login through mobile application'
+                    },
+                    {
+                        id: 'MC-2024-004',
+                        title: 'Email Service Configuration',
+                        customer: { name: 'CloudMail Systems', logo: '✉️' },
+                        status: 'Pending',
+                        priority: 'Low',
+                        assignedDate: '2024-01-13',
+                        dueDate: '2024-01-22',
+                        progress: 45,
+                        tags: ['Email', 'Configuration'],
+                        lastUpdate: '6 hours ago',
+                        slaStatus: 'On Track',
+                        description: 'Setup automated email notifications for customer alerts'
+                    }
+                ]
+            };
+        }
+        
+        function generateMyCasesStatsCards(stats) {
+            return stats.map(stat => {
+                const changeColor = stat.change.startsWith('+') ? '#22c55e' : '#ef4444';
+                const changeIcon = stat.change.startsWith('+') ? '📈' : '📉';
+                
+                return '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; transition: all 0.3s ease;" onmouseover="this.style.transform=&apos;translateY(-2px)&apos;; this.style.boxShadow=&apos;0 4px 12px rgba(0,0,0,0.1)&apos;;" onmouseout="this.style.transform=&apos;translateY(0)&apos;; this.style.boxShadow=&apos;none&apos;;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">' +
+                    '<div style="font-size: 20px;">' + stat.icon + '</div>' +
+                    '<div style="display: flex; align-items: center; font-size: 12px; color: ' + changeColor + '; font-weight: 500;">' +
+                    changeIcon + ' ' + stat.change +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="font-size: 24px; font-weight: bold; color: ' + stat.color + '; margin-bottom: 4px;">' + stat.value + '</div>' +
+                    '<div style="font-size: 12px; color: #6b7280; font-weight: 500;">' + stat.label + '</div>' +
+                    '</div>';
+            }).join('');
+        }
+        
+        function generateMyCasesGridView(cases) {
+            return '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 16px;">' +
+                cases.map(caseItem => generateCaseCard(caseItem)).join('') +
+                '</div>' +
+                '</div>';
+        }
+        
+        function generateCaseCard(caseItem) {
+            const priorityColor = caseItem.priority === 'High' ? '#ef4444' : caseItem.priority === 'Medium' ? '#f59e0b' : caseItem.priority === 'Urgent' ? '#dc2626' : '#22c55e';
+            const statusColor = caseItem.status === 'Resolved' ? '#22c55e' : caseItem.status === 'In Progress' ? '#f59e0b' : caseItem.status === 'Pending' ? '#6b7280' : '#3b82f6';
+            
+            return '<div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform=&apos;translateY(-2px)&apos;; this.style.boxShadow=&apos;0 4px 12px rgba(0,0,0,0.1)&apos;;" onmouseout="this.style.transform=&apos;translateY(0)&apos;; this.style.boxShadow=&apos;none&apos;;" onclick="openCase(&apos;' + caseItem.id + '&apos;)">' +
+                '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">' +
+                '<div style="display: flex; align-items: center; gap: 8px;">' +
+                '<span style="font-size: 20px;">' + caseItem.customer.logo + '</span>' +
+                '<div>' +
+                '<div style="font-weight: 600; color: #1f2937; font-size: 14px;">' + caseItem.id + '</div>' +
+                '<div style="color: #6b7280; font-size: 12px;">' + caseItem.customer.name + '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="display: flex; gap: 6px;">' +
+                '<span style="background: ' + priorityColor + '20; color: ' + priorityColor + '; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px;">' + caseItem.priority + '</span>' +
+                '<span style="background: ' + statusColor + '20; color: ' + statusColor + '; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px;">' + caseItem.status + '</span>' +
+                '</div>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 12px;">' +
+                '<h4 style="color: #1f2937; margin: 0 0 4px 0; font-size: 14px; font-weight: 600;">' + caseItem.title + '</h4>' +
+                '<p style="color: #6b7280; margin: 0; font-size: 12px; line-height: 1.4;">' + caseItem.description + '</p>' +
+                '</div>' +
+                
+                '<div style="margin-bottom: 12px;">' +
+                '<div style="display: flex; gap: 4px; margin-bottom: 6px;">' +
+                caseItem.tags.map(tag => 
+                    '<span style="background: #f1f5f9; color: #475569; font-size: 10px; padding: 2px 6px; border-radius: 3px;">' + tag + '</span>'
+                ).join('') +
+                '</div>' +
+                '<div style="background: #f3f4f6; border-radius: 6px; height: 4px; overflow: hidden; margin-bottom: 4px;">' +
+                '<div style="background: linear-gradient(90deg, #3b82f6, #22c55e); width: ' + caseItem.progress + '%; height: 100%; border-radius: 6px; transition: width 0.3s ease;"></div>' +
+                '</div>' +
+                '<div style="font-size: 11px; color: #6b7280; text-align: right;">' + caseItem.progress + '% Complete</div>' +
+                '</div>' +
+                
+                '<div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #f3f4f6;">' +
+                '<div style="font-size: 11px; color: #6b7280;">Due: ' + formatDate(caseItem.dueDate) + '</div>' +
+                '<div style="display: flex; gap: 4px;">' +
+                '<button onclick="event.stopPropagation(); updateCaseProgress(&apos;' + caseItem.id + '&apos;)" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">Update</button>' +
+                '<button onclick="event.stopPropagation(); addCaseNote(&apos;' + caseItem.id + '&apos;)" style="background: #6b7280; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">Note</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
         function showMyPerformance() {
             document.getElementById('teamPageTitle').textContent = 'Performance Analytics';
-            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">📈</div><h3 style="color: #1f2937; margin-bottom: 8px;">Performance Analytics</h3><p>Detailed performance metrics and insights coming soon...</p></div>';
+            document.getElementById('teamDashboardContent').innerHTML = generatePerformanceHTML();
             updateActiveNav('Performance');
+        }
+        
+        function generatePerformanceHTML() {
+            const performanceData = generatePerformanceData();
+            
+            return '<div class="performance-module">' +
+                '<!-- Performance Overview Cards -->' +
+                '<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px;">' +
+                generatePerformanceKPICards(performanceData.kpis) +
+                '</div>' +
+                
+                '<!-- Charts Section -->' +
+                '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<div style="margin-bottom: 20px;">' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 18px; font-weight: 600;">📊 Case Resolution Trend</h3>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0; font-size: 14px;">Last 30 days performance</p>' +
+                '</div>' +
+                '<canvas id="resolutionTrendChart" width="400" height="200" style="max-width: 100%;"></canvas>' +
+                '</div>' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">' +
+                '<div style="margin-bottom: 20px;">' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 18px; font-weight: 600;">⏱️ Response Time</h3>' +
+                '<p style="color: #6b7280; margin: 4px 0 0 0; font-size: 14px;">Average response metrics</p>' +
+                '</div>' +
+                '<div style="text-align: center;">' +
+                '<div style="width: 120px; height: 120px; border: 8px solid #e5e7eb; border-top: 8px solid #22c55e; border-radius: 50%; margin: 0 auto 16px; position: relative;">' +
+                '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">' +
+                '<div style="font-size: 24px; font-weight: bold; color: #1f2937;">2.3h</div>' +
+                '<div style="font-size: 12px; color: #6b7280;">Avg Response</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="text-align: left;">' +
+                '<div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px;">' +
+                '<span style="color: #6b7280;">First Response:</span>' +
+                '<span style="color: #1f2937; font-weight: 500;">45m</span>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px;">' +
+                '<span style="color: #6b7280;">Resolution Time:</span>' +
+                '<span style="color: #1f2937; font-weight: 500;">4.2h</span>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; font-size: 12px;">' +
+                '<span style="color: #6b7280;">SLA Compliance:</span>' +
+                '<span style="color: #22c55e; font-weight: 500;">94%</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Performance Details -->' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">' +
+                '<!-- Monthly Performance -->' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px;">' +
+                '<div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 16px; font-weight: 600;">📅 Monthly Performance</h3>' +
+                '</div>' +
+                '<div style="padding: 24px;">' +
+                generateMonthlyPerformanceTable(performanceData.monthly) +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Skills & Ratings -->' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px;">' +
+                '<div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 16px; font-weight: 600;">⭐ Skills & Ratings</h3>' +
+                '</div>' +
+                '<div style="padding: 24px;">' +
+                generateSkillsRatingHTML(performanceData.skills) +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                
+                '<!-- Achievement Badges -->' +
+                '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 24px;">' +
+                '<div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">' +
+                '<h3 style="color: #1f2937; margin: 0; font-size: 16px; font-weight: 600;">🏆 Achievement Badges</h3>' +
+                '</div>' +
+                '<div style="padding: 24px;">' +
+                generateAchievementBadges(performanceData.achievements) +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+        
+        function generatePerformanceData() {
+            return {
+                kpis: [
+                    { label: 'Cases Resolved', value: '127', change: '+12%', color: '#22c55e', icon: '✅' },
+                    { label: 'Customer Rating', value: '4.8', change: '+0.2', color: '#eab308', icon: '⭐' },
+                    { label: 'Response Time', value: '2.3h', change: '-15%', color: '#3b82f6', icon: '⚡' },
+                    { label: 'SLA Compliance', value: '94%', change: '+3%', color: '#8b5cf6', icon: '🎯' }
+                ],
+                monthly: [
+                    { month: 'January', resolved: 42, rating: 4.7, sla: 92 },
+                    { month: 'February', resolved: 38, rating: 4.8, sla: 94 },
+                    { month: 'March', resolved: 47, rating: 4.9, sla: 96 },
+                    { month: 'Current', resolved: 33, rating: 4.8, sla: 94 }
+                ],
+                skills: [
+                    { skill: 'Technical Support', rating: 4.9, progress: 98 },
+                    { skill: 'Customer Communication', rating: 4.7, progress: 94 },
+                    { skill: 'Problem Solving', rating: 4.8, progress: 96 },
+                    { skill: 'Product Knowledge', rating: 4.6, progress: 92 },
+                    { skill: 'Time Management', rating: 4.8, progress: 96 }
+                ],
+                achievements: [
+                    { name: 'Quick Responder', desc: 'Response time under 30 minutes', earned: true, icon: '🚀' },
+                    { name: 'Customer Champion', desc: 'Rating above 4.5 for 3 months', earned: true, icon: '👑' },
+                    { name: 'Problem Solver', desc: 'Resolved 100+ cases this quarter', earned: true, icon: '🧩' },
+                    { name: 'Team Player', desc: 'Helped 5+ colleagues this month', earned: true, icon: '🤝' },
+                    { name: 'SLA Master', desc: 'SLA compliance above 95%', earned: false, icon: '📊' },
+                    { name: 'Innovation Award', desc: 'Suggested process improvement', earned: false, icon: '💡' }
+                ]
+            };
+        }
+        
+        function generatePerformanceKPICards(kpis) {
+            return kpis.map(kpi => {
+                const changeColor = kpi.change.startsWith('+') ? '#22c55e' : '#ef4444';
+                const changeIcon = kpi.change.startsWith('+') ? '📈' : '📉';
+                
+                return '<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; transition: all 0.3s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.transform=&apos;translateY(-2px)&apos;; this.style.boxShadow=&apos;0 4px 12px rgba(0,0,0,0.15)&apos;;" onmouseout="this.style.transform=&apos;translateY(0)&apos;; this.style.boxShadow=&apos;0 1px 3px rgba(0,0,0,0.1)&apos;;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">' +
+                    '<div style="font-size: 24px;">' + kpi.icon + '</div>' +
+                    '<div style="display: flex; align-items: center; font-size: 12px; color: ' + changeColor + '; font-weight: 500;">' +
+                    '<span style="margin-right: 4px;">' + changeIcon + '</span>' + kpi.change +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 4px;">' + kpi.value + '</div>' +
+                    '<div style="font-size: 14px; color: #6b7280;">' + kpi.label + '</div>' +
+                    '</div>';
+            }).join('');
+        }
+        
+        function generateMonthlyPerformanceTable(monthly) {
+            return '<div style="overflow-x: auto;">' +
+                '<table style="width: 100%; border-collapse: collapse;">' +
+                '<thead>' +
+                '<tr style="border-bottom: 1px solid #e5e7eb;">' +
+                '<th style="padding: 12px 0; text-align: left; color: #6b7280; font-size: 12px; font-weight: 500;">MONTH</th>' +
+                '<th style="padding: 12px 0; text-align: center; color: #6b7280; font-size: 12px; font-weight: 500;">RESOLVED</th>' +
+                '<th style="padding: 12px 0; text-align: center; color: #6b7280; font-size: 12px; font-weight: 500;">RATING</th>' +
+                '<th style="padding: 12px 0; text-align: center; color: #6b7280; font-size: 12px; font-weight: 500;">SLA %</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>' +
+                monthly.map(month => {
+                    const slaColor = month.sla >= 95 ? '#22c55e' : month.sla >= 90 ? '#eab308' : '#ef4444';
+                    return '<tr style="border-bottom: 1px solid #f3f4f6;">' +
+                        '<td style="padding: 12px 0; color: #1f2937; font-weight: 500;">' + month.month + '</td>' +
+                        '<td style="padding: 12px 0; text-align: center; color: #1f2937;">' + month.resolved + '</td>' +
+                        '<td style="padding: 12px 0; text-align: center; color: #1f2937;">⭐ ' + month.rating + '</td>' +
+                        '<td style="padding: 12px 0; text-align: center; color: ' + slaColor + '; font-weight: 500;">' + month.sla + '%</td>' +
+                        '</tr>';
+                }).join('') +
+                '</tbody>' +
+                '</table>' +
+                '</div>';
+        }
+        
+        function generateSkillsRatingHTML(skills) {
+            return skills.map(skill => {
+                return '<div style="margin-bottom: 16px;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
+                    '<span style="color: #1f2937; font-size: 14px; font-weight: 500;">' + skill.skill + '</span>' +
+                    '<div style="display: flex; align-items: center;">' +
+                    '<span style="color: #eab308; margin-right: 4px;">⭐</span>' +
+                    '<span style="color: #1f2937; font-size: 14px; font-weight: 500;">' + skill.rating + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="background: #f3f4f6; border-radius: 6px; height: 6px; overflow: hidden;">' +
+                    '<div style="background: linear-gradient(90deg, #3b82f6, #22c55e); width: ' + skill.progress + '%; height: 100%; border-radius: 6px; transition: width 0.3s ease;"></div>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+        
+        function generateAchievementBadges(achievements) {
+            return '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">' +
+                achievements.map(achievement => {
+                    const badgeStyle = achievement.earned 
+                        ? 'background: linear-gradient(135deg, #22c55e, #16a34a); color: white; opacity: 1;'
+                        : 'background: #f9fafb; color: #6b7280; opacity: 0.7;';
+                    const iconStyle = achievement.earned ? 'filter: none;' : 'filter: grayscale(100%);';
+                    
+                    return '<div style="' + badgeStyle + ' border-radius: 12px; padding: 16px; text-align: center; transition: all 0.3s ease; border: 1px solid ' + (achievement.earned ? '#22c55e' : '#e5e7eb') + ';" onmouseover="this.style.transform=&apos;scale(1.02)&apos;;" onmouseout="this.style.transform=&apos;scale(1)&apos;;">' +
+                        '<div style="font-size: 24px; margin-bottom: 8px; ' + iconStyle + '">' + achievement.icon + '</div>' +
+                        '<div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">' + achievement.name + '</div>' +
+                        '<div style="font-size: 12px; opacity: 0.9;">' + achievement.desc + '</div>' +
+                        (achievement.earned ? '<div style="margin-top: 8px; font-size: 12px;">✅ Earned</div>' : '<div style="margin-top: 8px; font-size: 12px;">🔒 Locked</div>') +
+                        '</div>';
+                }).join('') +
+                '</div>';
         }
 
         function showAssignedCases() {
             document.getElementById('teamPageTitle').textContent = 'Assigned Cases';
-            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">🎯</div><h3 style="color: #1f2937; margin-bottom: 8px;">Assigned Cases</h3><p>All your assigned cases with advanced filtering coming soon...</p></div>';
+            document.getElementById('teamDashboardContent').innerHTML = generateAssignedCasesHTML();
             updateActiveNav('Assigned Cases');
+        }
+
+        function generateAssignedCasesHTML() {
+            const assignedCasesData = generateAssignedCasesData();
+            
+            return '<div class="assigned-cases-module">' +
+                // Header Stats Cards
+                '<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Total Assigned</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + assignedCasesData.totalAssigned + '</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">📋</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(240, 147, 251, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">In Progress</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + assignedCasesData.inProgress + '</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">⚡</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(79, 172, 254, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Due Today</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + assignedCasesData.dueToday + '</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">⏰</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(250, 112, 154, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Overdue</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + assignedCasesData.overdue + '</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">🚨</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                
+                // Filter and Search Bar
+                '<div class="filter-section" style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">' +
+                    '<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">' +
+                        '<div style="flex: 1; min-width: 300px;">' +
+                            '<input type="text" placeholder="Search assigned cases..." style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;" onkeyup="filterAssignedCases()" id="assignedCasesSearch">' +
+                        '</div>' +
+                        '<select style="padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-width: 120px;" onchange="filterAssignedCases()" id="priorityFilter">' +
+                            '<option value="">All Priorities</option>' +
+                            '<option value="high">High</option>' +
+                            '<option value="medium">Medium</option>' +
+                            '<option value="low">Low</option>' +
+                        '</select>' +
+                        '<select style="padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-width: 120px;" onchange="filterAssignedCases()" id="statusFilter">' +
+                            '<option value="">All Status</option>' +
+                            '<option value="pending">Pending</option>' +
+                            '<option value="in_progress">In Progress</option>' +
+                            '<option value="review">Under Review</option>' +
+                            '<option value="completed">Completed</option>' +
+                        '</select>' +
+                        '<select style="padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-width: 120px;" onchange="filterAssignedCases()" id="dueDateFilter">' +
+                            '<option value="">All Dates</option>' +
+                            '<option value="overdue">Overdue</option>' +
+                            '<option value="today">Due Today</option>' +
+                            '<option value="week">This Week</option>' +
+                            '<option value="month">This Month</option>' +
+                        '</select>' +
+                    '</div>' +
+                '</div>' +
+                
+                // Assigned Cases Grid
+                '<div class="assigned-cases-grid" id="assignedCasesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">' +
+                    assignedCasesData.cases.map(caseItem => 
+                        '<div class="assigned-case-card" data-case-id="' + caseItem.id + '" data-priority="' + caseItem.priority + '" data-status="' + caseItem.status + '" data-due-date="' + caseItem.dueDate + '" style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; transition: all 0.3s ease; cursor: pointer; border-left: 4px solid ' + getPriorityColor(caseItem.priority) + ';" onmouseover="this.style.transform=&apos;translateY(-2px)&apos;; this.style.boxShadow=&apos;0 4px 20px rgba(0,0,0,0.15)&apos;;" onmouseout="this.style.transform=&apos;translateY(0)&apos;; this.style.boxShadow=&apos;0 2px 8px rgba(0,0,0,0.1)&apos;;" onclick="viewAssignedCaseDetails(&apos;' + caseItem.id + '&apos;)">' +
+                            '<div style="padding: 20px;">' +
+                                '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">' +
+                                    '<div style="flex: 1;">' +
+                                        '<h4 style="margin: 0 0 8px 0; color: #1f2937; font-size: 16px; font-weight: 600;">' + caseItem.title + '</h4>' +
+                                        '<p style="margin: 0; color: #6b7280; font-size: 14px;">Case #' + caseItem.id + '</p>' +
+                                    '</div>' +
+                                    '<span style="background: ' + getStatusColor(caseItem.status) + '; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500;">' + getStatusLabel(caseItem.status) + '</span>' +
+                                '</div>' +
+                                '<p style="margin: 0 0 16px 0; color: #4b5563; font-size: 14px; line-height: 1.5;">' + caseItem.description + '</p>' +
+                                '<div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">' +
+                                    '<div style="display: flex; align-items: center; gap: 6px;">' +
+                                        '<span style="color: #6b7280; font-size: 12px;">👤</span>' +
+                                        '<span style="color: #6b7280; font-size: 12px;">' + caseItem.assignedBy + '</span>' +
+                                    '</div>' +
+                                    '<div style="display: flex; align-items: center; gap: 6px;">' +
+                                        '<span style="color: #6b7280; font-size: 12px;">📅</span>' +
+                                        '<span style="color: #6b7280; font-size: 12px;">Due: ' + formatDate(caseItem.dueDate) + '</span>' +
+                                    '</div>' +
+                                    '<div style="display: flex; align-items: center; gap: 6px;">' +
+                                        '<span style="color: #6b7280; font-size: 12px;">⚡</span>' +
+                                        '<span style="color: ' + getPriorityColor(caseItem.priority) + '; font-size: 12px; font-weight: 500;">' + caseItem.priority.toUpperCase() + '</span>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div style="background: #f9fafb; padding: 12px; border-radius: 8px;">' +
+                                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
+                                        '<span style="color: #6b7280; font-size: 12px;">Progress</span>' +
+                                        '<span style="color: #1f2937; font-size: 12px; font-weight: 500;">' + caseItem.progress + '%</span>' +
+                                    '</div>' +
+                                    '<div style="background: #e5e7eb; height: 6px; border-radius: 3px; overflow: hidden;">' +
+                                        '<div style="background: ' + getProgressColor(caseItem.progress) + '; width: ' + caseItem.progress + '%; height: 100%; transition: width 0.3s ease;"></div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>'
+                    ).join('') +
+                '</div>' +
+                
+                // Load More Button
+                '<div style="text-align: center; margin-top: 30px;">' +
+                    '<button onclick="loadMoreAssignedCases()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform=&apos;scale(1.05)&apos;;" onmouseout="this.style.transform=&apos;scale(1)&apos;;">Load More Cases</button>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function generateAssignedCasesData() {
+            const cases = [
+                {
+                    id: 'AC001',
+                    title: 'Customer Data Migration Issue',
+                    description: 'Critical database migration failing for customer account #4521. Requires immediate attention to prevent data loss.',
+                    assignedBy: 'Sarah Chen',
+                    priority: 'high',
+                    status: 'in_progress',
+                    dueDate: '2024-01-15',
+                    progress: 75,
+                    estimatedHours: 8,
+                    actualHours: 6
+                },
+                {
+                    id: 'AC002',
+                    title: 'Payment Gateway Integration',
+                    description: 'Integrate new payment gateway API for European customers. Testing and validation required.',
+                    assignedBy: 'Mark Johnson',
+                    priority: 'medium',
+                    status: 'pending',
+                    dueDate: '2024-01-18',
+                    progress: 25,
+                    estimatedHours: 12,
+                    actualHours: 3
+                },
+                {
+                    id: 'AC003',
+                    title: 'Security Audit Compliance',
+                    description: 'Complete security audit findings remediation for SOC 2 compliance certification.',
+                    assignedBy: 'Jennifer Liu',
+                    priority: 'high',
+                    status: 'review',
+                    dueDate: '2024-01-14',
+                    progress: 90,
+                    estimatedHours: 16,
+                    actualHours: 14
+                },
+                {
+                    id: 'AC004',
+                    title: 'Mobile App Performance Optimization',
+                    description: 'Optimize mobile application loading times and reduce memory usage by 30%.',
+                    assignedBy: 'David Park',
+                    priority: 'medium',
+                    status: 'in_progress',
+                    dueDate: '2024-01-20',
+                    progress: 60,
+                    estimatedHours: 20,
+                    actualHours: 12
+                },
+                {
+                    id: 'AC005',
+                    title: 'API Documentation Update',
+                    description: 'Update API documentation for v3.0 release including new endpoints and deprecation notices.',
+                    assignedBy: 'Lisa Martinez',
+                    priority: 'low',
+                    status: 'pending',
+                    dueDate: '2024-01-25',
+                    progress: 10,
+                    estimatedHours: 6,
+                    actualHours: 1
+                },
+                {
+                    id: 'AC006',
+                    title: 'Customer Portal Bug Fixes',
+                    description: 'Fix critical bugs in customer portal affecting user registration and password reset functionality.',
+                    assignedBy: 'Robert Kim',
+                    priority: 'high',
+                    status: 'in_progress',
+                    dueDate: '2024-01-16',
+                    progress: 40,
+                    estimatedHours: 10,
+                    actualHours: 4
+                }
+            ];
+
+            return {
+                totalAssigned: cases.length,
+                inProgress: cases.filter(c => c.status === 'in_progress').length,
+                dueToday: cases.filter(c => new Date(c.dueDate).toDateString() === new Date().toDateString()).length,
+                overdue: cases.filter(c => new Date(c.dueDate) < new Date()).length,
+                cases: cases
+            };
+        }
+
+        function filterAssignedCases() {
+            const searchTerm = document.getElementById('assignedCasesSearch').value.toLowerCase();
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dueDateFilter = document.getElementById('dueDateFilter').value;
+            
+            const caseCards = document.querySelectorAll('.assigned-case-card');
+            
+            caseCards.forEach(card => {
+                const title = card.querySelector('h4').textContent.toLowerCase();
+                const description = card.querySelector('p').textContent.toLowerCase();
+                const priority = card.dataset.priority;
+                const status = card.dataset.status;
+                const dueDate = new Date(card.dataset.dueDate);
+                const today = new Date();
+                
+                let showCard = true;
+                
+                // Search filter
+                if (searchTerm && !title.includes(searchTerm) && !description.includes(searchTerm)) {
+                    showCard = false;
+                }
+                
+                // Priority filter
+                if (priorityFilter && priority !== priorityFilter) {
+                    showCard = false;
+                }
+                
+                // Status filter
+                if (statusFilter && status !== statusFilter) {
+                    showCard = false;
+                }
+                
+                // Due date filter
+                if (dueDateFilter) {
+                    switch(dueDateFilter) {
+                        case 'overdue':
+                            if (dueDate >= today) showCard = false;
+                            break;
+                        case 'today':
+                            if (dueDate.toDateString() !== today.toDateString()) showCard = false;
+                            break;
+                        case 'week':
+                            const weekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+                            if (dueDate < today || dueDate > weekFromNow) showCard = false;
+                            break;
+                        case 'month':
+                            const monthFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+                            if (dueDate < today || dueDate > monthFromNow) showCard = false;
+                            break;
+                    }
+                }
+                
+                card.style.display = showCard ? 'block' : 'none';
+            });
+        }
+
+        function viewAssignedCaseDetails(caseId) {
+            alert('Opening case details for Case #' + caseId + '. Full case management interface coming soon!');
+        }
+
+        function loadMoreAssignedCases() {
+            alert('Loading more assigned cases. Pagination feature coming soon!');
+        }
+
+        function getPriorityColor(priority) {
+            const colors = {
+                high: '#ef4444',
+                medium: '#f59e0b',
+                low: '#10b981'
+            };
+            return colors[priority] || '#6b7280';
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                pending: '#f59e0b',
+                in_progress: '#3b82f6',
+                review: '#8b5cf6',
+                completed: '#10b981'
+            };
+            return colors[status] || '#6b7280';
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                pending: 'Pending',
+                in_progress: 'In Progress',
+                review: 'Under Review',
+                completed: 'Completed'
+            };
+            return labels[status] || status;
+        }
+
+        function getProgressColor(progress) {
+            if (progress >= 80) return '#10b981';
+            if (progress >= 50) return '#3b82f6';
+            if (progress >= 25) return '#f59e0b';
+            return '#ef4444';
         }
 
         function showUrgentCases() {
@@ -2589,8 +3292,332 @@ const htmlTemplate = `
 
         function showCustomerInteractions() {
             document.getElementById('teamPageTitle').textContent = 'Customer Interactions';
-            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">👥</div><h3 style="color: #1f2937; margin-bottom: 8px;">Customer Interactions</h3><p>Communication history and customer relationship management coming soon...</p></div>';
+            document.getElementById('teamDashboardContent').innerHTML = generateCustomerInteractionsHTML();
             updateActiveNav('Customer Interactions');
+        }
+
+        function generateCustomerInteractionsHTML() {
+            const interactionsData = generateCustomerInteractionsData();
+            
+            return '<div class="customer-interactions-module">' +
+                // Header Stats Cards
+                '<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Total Interactions</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + interactionsData.totalInteractions + '</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">💬</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(240, 147, 251, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Avg Response Time</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + interactionsData.avgResponseTime + '</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">⚡</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(79, 172, 254, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Satisfaction Score</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + interactionsData.satisfactionScore + '</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">⭐</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(250, 112, 154, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Active Customers</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + interactionsData.activeCustomers + '</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">👥</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                
+                // Communication Channels Overview
+                '<div class="channels-section" style="background: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">' +
+                    '<h3 style="margin: 0 0 20px 0; color: #1f2937; font-size: 18px; font-weight: 600;">Communication Channels</h3>' +
+                    '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">' +
+                        interactionsData.channels.map(channel => 
+                            '<div style="background: #f9fafb; padding: 16px; border-radius: 8px; text-align: center; border: 2px solid ' + channel.color + ';">' +
+                                '<div style="font-size: 24px; margin-bottom: 8px;">' + channel.icon + '</div>' +
+                                '<h4 style="margin: 0 0 4px 0; color: #1f2937; font-size: 14px; font-weight: 600;">' + channel.name + '</h4>' +
+                                '<p style="margin: 0; color: #6b7280; font-size: 12px;">' + channel.count + ' interactions</p>' +
+                                '<div style="margin-top: 8px; background: #e5e7eb; height: 4px; border-radius: 2px; overflow: hidden;">' +
+                                    '<div style="background: ' + channel.color + '; width: ' + channel.percentage + '%; height: 100%; transition: width 0.3s ease;"></div>' +
+                                '</div>' +
+                            '</div>'
+                        ).join('') +
+                    '</div>' +
+                '</div>' +
+                
+                // Filter and Search Bar
+                '<div class="filter-section" style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">' +
+                    '<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">' +
+                        '<div style="flex: 1; min-width: 300px;">' +
+                            '<input type="text" placeholder="Search customer interactions..." style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;" onkeyup="filterCustomerInteractions()" id="interactionsSearch">' +
+                        '</div>' +
+                        '<select style="padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-width: 120px;" onchange="filterCustomerInteractions()" id="channelFilter">' +
+                            '<option value="">All Channels</option>' +
+                            '<option value="email">Email</option>' +
+                            '<option value="phone">Phone</option>' +
+                            '<option value="chat">Live Chat</option>' +
+                            '<option value="social">Social Media</option>' +
+                        '</select>' +
+                        '<select style="padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-width: 120px;" onchange="filterCustomerInteractions()" id="sentimentFilter">' +
+                            '<option value="">All Sentiments</option>' +
+                            '<option value="positive">Positive</option>' +
+                            '<option value="neutral">Neutral</option>' +
+                            '<option value="negative">Negative</option>' +
+                        '</select>' +
+                        '<select style="padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-width: 120px;" onchange="filterCustomerInteractions()" id="timeFilter">' +
+                            '<option value="">All Time</option>' +
+                            '<option value="today">Today</option>' +
+                            '<option value="week">This Week</option>' +
+                            '<option value="month">This Month</option>' +
+                        '</select>' +
+                    '</div>' +
+                '</div>' +
+                
+                // Customer Interactions Timeline
+                '<div class="interactions-timeline" id="interactionsTimeline" style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">' +
+                    '<div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">' +
+                        '<h3 style="margin: 0; color: #1f2937; font-size: 18px; font-weight: 600;">Recent Interactions</h3>' +
+                    '</div>' +
+                    '<div style="max-height: 600px; overflow-y: auto;">' +
+                        interactionsData.interactions.map((interaction, index) => 
+                            '<div class="interaction-item" data-channel="' + interaction.channel + '" data-sentiment="' + interaction.sentiment + '" data-date="' + interaction.date + '" style="padding: 20px; border-bottom: 1px solid #f3f4f6; display: flex; gap: 16px; transition: background-color 0.2s; cursor: pointer;" onmouseover="this.style.backgroundColor=&apos;#f9fafb&apos;;" onmouseout="this.style.backgroundColor=&apos;white&apos;;" onclick="viewInteractionDetails(&apos;' + interaction.id + '&apos;)">' +
+                                '<div style="flex-shrink: 0;">' +
+                                    '<div style="width: 48px; height: 48px; border-radius: 50%; background: ' + getChannelColor(interaction.channel) + '; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">' +
+                                        getChannelIcon(interaction.channel) +
+                                    '</div>' +
+                                '</div>' +
+                                '<div style="flex: 1; min-width: 0;">' +
+                                    '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">' +
+                                        '<div>' +
+                                            '<h4 style="margin: 0 0 4px 0; color: #1f2937; font-size: 16px; font-weight: 600;">' + interaction.customer + '</h4>' +
+                                            '<p style="margin: 0; color: #6b7280; font-size: 14px;">' + interaction.subject + '</p>' +
+                                        '</div>' +
+                                        '<div style="text-align: right;">' +
+                                            '<span style="background: ' + getSentimentColor(interaction.sentiment) + '; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500;">' + interaction.sentiment.toUpperCase() + '</span>' +
+                                            '<p style="margin: 4px 0 0 0; color: #6b7280; font-size: 12px;">' + formatDate(interaction.date) + '</p>' +
+                                        '</div>' +
+                                    '</div>' +
+                                    '<p style="margin: 0 0 12px 0; color: #4b5563; font-size: 14px; line-height: 1.5;">' + interaction.message + '</p>' +
+                                    '<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">' +
+                                        '<div style="display: flex; align-items: center; gap: 6px;">' +
+                                            '<span style="color: #6b7280; font-size: 12px;">📞</span>' +
+                                            '<span style="color: #6b7280; font-size: 12px;">' + interaction.channel.charAt(0).toUpperCase() + interaction.channel.slice(1) + '</span>' +
+                                        '</div>' +
+                                        '<div style="display: flex; align-items: center; gap: 6px;">' +
+                                            '<span style="color: #6b7280; font-size: 12px;">⏱️</span>' +
+                                            '<span style="color: #6b7280; font-size: 12px;">Response: ' + interaction.responseTime + '</span>' +
+                                        '</div>' +
+                                        '<div style="display: flex; align-items: center; gap: 6px;">' +
+                                            '<span style="color: #6b7280; font-size: 12px;">📊</span>' +
+                                            '<span style="color: #6b7280; font-size: 12px;">Priority: ' + interaction.priority + '</span>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>'
+                        ).join('') +
+                    '</div>' +
+                    '<div style="padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">' +
+                        '<button onclick="loadMoreInteractions()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform=&apos;scale(1.05)&apos;;" onmouseout="this.style.transform=&apos;scale(1)&apos;;">Load More Interactions</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function generateCustomerInteractionsData() {
+            const interactions = [
+                {
+                    id: 'CI001',
+                    customer: 'Sarah Johnson',
+                    subject: 'Account Setup Assistance',
+                    message: 'Hi, I need help setting up my new business account. I have been trying for the past hour but keep getting error messages...',
+                    channel: 'email',
+                    sentiment: 'neutral',
+                    date: '2024-01-15T10:30:00Z',
+                    responseTime: '2h 15m',
+                    priority: 'medium',
+                    status: 'resolved'
+                },
+                {
+                    id: 'CI002',
+                    customer: 'Michael Chen',
+                    subject: 'Billing Inquiry - Urgent',
+                    message: 'There is an incorrect charge of $299 on my account. I never authorized this payment and need it refunded immediately.',
+                    channel: 'phone',
+                    sentiment: 'negative',
+                    date: '2024-01-15T09:15:00Z',
+                    responseTime: '5m',
+                    priority: 'high',
+                    status: 'in_progress'
+                },
+                {
+                    id: 'CI003',
+                    customer: 'Emma Rodriguez',
+                    subject: 'Feature Request - Dashboard',
+                    message: 'Love the new update! Could you add a dark mode option to the dashboard? It would really help during late-night work sessions.',
+                    channel: 'chat',
+                    sentiment: 'positive',
+                    date: '2024-01-15T14:45:00Z',
+                    responseTime: '1m',
+                    priority: 'low',
+                    status: 'acknowledged'
+                },
+                {
+                    id: 'CI004',
+                    customer: 'James Wilson',
+                    subject: 'Integration Support',
+                    message: 'Having trouble connecting our CRM to your API. Getting 401 errors despite using the correct authentication tokens.',
+                    channel: 'email',
+                    sentiment: 'neutral',
+                    date: '2024-01-15T11:20:00Z',
+                    responseTime: '45m',
+                    priority: 'high',
+                    status: 'resolved'
+                },
+                {
+                    id: 'CI005',
+                    customer: 'Lisa Park',
+                    subject: 'Compliment on Service',
+                    message: 'Just wanted to say thank you for the excellent support yesterday. The team went above and beyond to solve my issue!',
+                    channel: 'social',
+                    sentiment: 'positive',
+                    date: '2024-01-15T16:00:00Z',
+                    responseTime: '30m',
+                    priority: 'low',
+                    status: 'acknowledged'
+                },
+                {
+                    id: 'CI006',
+                    customer: 'Robert Davis',
+                    subject: 'Data Export Issues',
+                    message: 'The CSV export feature is not working properly. Only getting partial data and some columns are missing headers.',
+                    channel: 'chat',
+                    sentiment: 'negative',
+                    date: '2024-01-15T13:10:00Z',
+                    responseTime: '3m',
+                    priority: 'medium',
+                    status: 'in_progress'
+                }
+            ];
+
+            const channels = [
+                { name: 'Email', icon: '📧', count: 45, percentage: 40, color: '#3b82f6' },
+                { name: 'Phone', icon: '📞', count: 32, percentage: 28, color: '#10b981' },
+                { name: 'Live Chat', icon: '💬', count: 28, percentage: 25, color: '#f59e0b' },
+                { name: 'Social Media', icon: '📱', count: 8, percentage: 7, color: '#8b5cf6' }
+            ];
+
+            return {
+                totalInteractions: 113,
+                avgResponseTime: '1h 45m',
+                satisfactionScore: '4.7/5',
+                activeCustomers: 89,
+                channels: channels,
+                interactions: interactions
+            };
+        }
+
+        function getChannelColor(channel) {
+            const colors = {
+                email: '#3b82f6',
+                phone: '#10b981',
+                chat: '#f59e0b',
+                social: '#8b5cf6'
+            };
+            return colors[channel] || '#6b7280';
+        }
+
+        function getChannelIcon(channel) {
+            const icons = {
+                email: '📧',
+                phone: '📞',
+                chat: '💬',
+                social: '📱'
+            };
+            return icons[channel] || '💬';
+        }
+
+        function getSentimentColor(sentiment) {
+            const colors = {
+                positive: '#10b981',
+                neutral: '#f59e0b',
+                negative: '#ef4444'
+            };
+            return colors[sentiment] || '#6b7280';
+        }
+
+        function filterCustomerInteractions() {
+            const searchTerm = document.getElementById('interactionsSearch').value.toLowerCase();
+            const channelFilter = document.getElementById('channelFilter').value;
+            const sentimentFilter = document.getElementById('sentimentFilter').value;
+            const timeFilter = document.getElementById('timeFilter').value;
+            
+            const interactionItems = document.querySelectorAll('.interaction-item');
+            
+            interactionItems.forEach(item => {
+                const customer = item.querySelector('h4').textContent.toLowerCase();
+                const subject = item.querySelector('p').textContent.toLowerCase();
+                const message = item.querySelectorAll('p')[2].textContent.toLowerCase();
+                const channel = item.dataset.channel;
+                const sentiment = item.dataset.sentiment;
+                const date = new Date(item.dataset.date);
+                const today = new Date();
+                
+                let showItem = true;
+                
+                // Search filter
+                if (searchTerm && !customer.includes(searchTerm) && !subject.includes(searchTerm) && !message.includes(searchTerm)) {
+                    showItem = false;
+                }
+                
+                // Channel filter
+                if (channelFilter && channel !== channelFilter) {
+                    showItem = false;
+                }
+                
+                // Sentiment filter
+                if (sentimentFilter && sentiment !== sentimentFilter) {
+                    showItem = false;
+                }
+                
+                // Time filter
+                if (timeFilter) {
+                    switch(timeFilter) {
+                        case 'today':
+                            if (date.toDateString() !== today.toDateString()) showItem = false;
+                            break;
+                        case 'week':
+                            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                            if (date < weekAgo) showItem = false;
+                            break;
+                        case 'month':
+                            const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                            if (date < monthAgo) showItem = false;
+                            break;
+                    }
+                }
+                
+                item.style.display = showItem ? 'flex' : 'none';
+            });
+        }
+
+        function viewInteractionDetails(interactionId) {
+            alert('Opening interaction details for ID: ' + interactionId + '. Full customer interaction management interface coming soon!');
+        }
+
+        function loadMoreInteractions() {
+            alert('Loading more customer interactions. Pagination feature coming soon!');
         }
 
         function showKnowledgeBase() {
@@ -2607,8 +3634,364 @@ const htmlTemplate = `
 
         function showTimeTracking() {
             document.getElementById('teamPageTitle').textContent = 'Time Tracking';
-            document.getElementById('teamDashboardContent').innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">⏱️</div><h3 style="color: #1f2937; margin-bottom: 8px;">Time Tracking</h3><p>Track time spent on cases and activities coming soon...</p></div>';
+            document.getElementById('teamDashboardContent').innerHTML = generateTimeTrackingHTML();
             updateActiveNav('Time Tracking');
+        }
+
+        function generateTimeTrackingHTML() {
+            const timeTrackingData = generateTimeTrackingData();
+            
+            return '<div class="time-tracking-module">' +
+                // Header Stats Cards
+                '<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Today Hours</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + timeTrackingData.todayHours + 'h</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">📅</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(240, 147, 251, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">This Week</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + timeTrackingData.weekHours + 'h</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">📊</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(79, 172, 254, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">This Month</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + timeTrackingData.monthHours + 'h</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">📈</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 24px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(250, 112, 154, 0.15);">' +
+                        '<div style="display: flex; align-items: center; justify-content: space-between;">' +
+                            '<div>' +
+                                '<h4 style="margin: 0 0 8px 0; font-size: 14px; opacity: 0.9;">Avg/Day</h4>' +
+                                '<p style="margin: 0; font-size: 28px; font-weight: bold;">' + timeTrackingData.avgDaily + 'h</p>' +
+                            '</div>' +
+                            '<div style="font-size: 32px; opacity: 0.8;">⚡</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                
+                // Time Tracker Widget
+                '<div class="time-tracker-widget" style="background: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">' +
+                    '<h3 style="margin: 0 0 20px 0; color: #1f2937; font-size: 18px; font-weight: 600;">Active Time Tracker</h3>' +
+                    '<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: center;">' +
+                        '<div style="text-align: center;">' +
+                            '<div id="currentTimer" style="font-size: 48px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">' + timeTrackingData.currentTimer + '</div>' +
+                            '<p style="margin: 0; color: #6b7280; font-size: 14px;">Current Session</p>' +
+                        '</div>' +
+                        '<div style="display: flex; gap: 12px; align-items: center;">' +
+                            '<button id="startBtn" onclick="startTimer()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform=&apos;scale(1.05)&apos;;" onmouseout="this.style.transform=&apos;scale(1)&apos;;">Start</button>' +
+                            '<button id="pauseBtn" onclick="pauseTimer()" style="background: #f59e0b; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform=&apos;scale(1.05)&apos;;" onmouseout="this.style.transform=&apos;scale(1)&apos;;" disabled>Pause</button>' +
+                            '<button id="stopBtn" onclick="stopTimer()" style="background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform=&apos;scale(1.05)&apos;;" onmouseout="this.style.transform=&apos;scale(1)&apos;;" disabled>Stop</button>' +
+                        '</div>' +
+                        '<div style="flex: 1; min-width: 300px;">' +
+                            '<select id="currentActivity" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">' +
+                                '<option value="">Select Activity</option>' +
+                                '<option value="case_work">Case Work</option>' +
+                                '<option value="customer_calls">Customer Calls</option>' +
+                                '<option value="documentation">Documentation</option>' +
+                                '<option value="meetings">Team Meetings</option>' +
+                                '<option value="training">Training</option>' +
+                                '<option value="admin">Administrative Tasks</option>' +
+                            '</select>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                
+                // Activity Breakdown Chart
+                '<div class="activity-breakdown" style="background: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">' +
+                    '<h3 style="margin: 0 0 20px 0; color: #1f2937; font-size: 18px; font-weight: 600;">Activity Breakdown - This Week</h3>' +
+                    '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">' +
+                        timeTrackingData.activities.map(activity => 
+                            '<div style="background: #f9fafb; padding: 16px; border-radius: 8px; border-left: 4px solid ' + activity.color + ';">' +
+                                '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">' +
+                                    '<h4 style="margin: 0; color: #1f2937; font-size: 14px; font-weight: 600;">' + activity.name + '</h4>' +
+                                    '<span style="color: #1f2937; font-size: 14px; font-weight: 500;">' + activity.hours + 'h</span>' +
+                                '</div>' +
+                                '<div style="background: #e5e7eb; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 8px;">' +
+                                    '<div style="background: ' + activity.color + '; width: ' + activity.percentage + '%; height: 100%; transition: width 0.3s ease;"></div>' +
+                                '</div>' +
+                                '<p style="margin: 0; color: #6b7280; font-size: 12px;">' + activity.description + '</p>' +
+                            '</div>'
+                        ).join('') +
+                    '</div>' +
+                '</div>' +
+                
+                // Time Entries Filter
+                '<div class="filter-section" style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">' +
+                    '<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">' +
+                        '<div style="flex: 1; min-width: 300px;">' +
+                            '<input type="text" placeholder="Search time entries..." style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;" onkeyup="filterTimeEntries()" id="timeEntriesSearch">' +
+                        '</div>' +
+                        '<select style="padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-width: 120px;" onchange="filterTimeEntries()" id="activityFilter">' +
+                            '<option value="">All Activities</option>' +
+                            '<option value="case_work">Case Work</option>' +
+                            '<option value="customer_calls">Customer Calls</option>' +
+                            '<option value="documentation">Documentation</option>' +
+                            '<option value="meetings">Meetings</option>' +
+                            '<option value="training">Training</option>' +
+                        '</select>' +
+                        '<select style="padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-width: 120px;" onchange="filterTimeEntries()" id="periodFilter">' +
+                            '<option value="week">This Week</option>' +
+                            '<option value="month">This Month</option>' +
+                            '<option value="all">All Time</option>' +
+                        '</select>' +
+                        '<button onclick="exportTimeReport()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; cursor: pointer;">Export Report</button>' +
+                    '</div>' +
+                '</div>' +
+                
+                // Time Entries List
+                '<div class="time-entries-list" id="timeEntriesList" style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">' +
+                    '<div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">' +
+                        '<h3 style="margin: 0; color: #1f2937; font-size: 18px; font-weight: 600;">Recent Time Entries</h3>' +
+                    '</div>' +
+                    '<div style="max-height: 500px; overflow-y: auto;">' +
+                        timeTrackingData.entries.map(entry => 
+                            '<div class="time-entry-item" data-activity="' + entry.activity + '" data-date="' + entry.date + '" style="padding: 16px 20px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor=&apos;#f9fafb&apos;;" onmouseout="this.style.backgroundColor=&apos;white&apos;;">' +
+                                '<div style="flex: 1;">' +
+                                    '<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">' +
+                                        '<div style="width: 12px; height: 12px; border-radius: 50%; background: ' + getActivityColor(entry.activity) + ';"></div>' +
+                                        '<h4 style="margin: 0; color: #1f2937; font-size: 14px; font-weight: 600;">' + entry.title + '</h4>' +
+                                        '<span style="background: #f3f4f6; color: #6b7280; padding: 2px 8px; border-radius: 12px; font-size: 12px;">' + entry.activity.replace('_', ' ') + '</span>' +
+                                    '</div>' +
+                                    '<p style="margin: 0; color: #6b7280; font-size: 12px;">' + formatDate(entry.date) + ' • ' + entry.startTime + ' - ' + entry.endTime + '</p>' +
+                                '</div>' +
+                                '<div style="text-align: right;">' +
+                                    '<div style="color: #1f2937; font-size: 16px; font-weight: 600; margin-bottom: 2px;">' + entry.duration + '</div>' +
+                                    '<div style="color: #6b7280; font-size: 12px;">$' + entry.billable + '</div>' +
+                                '</div>' +
+                            '</div>'
+                        ).join('') +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function generateTimeTrackingData() {
+            const entries = [
+                {
+                    id: 'TE001',
+                    title: 'Customer Support - Case #4521',
+                    activity: 'case_work',
+                    date: '2024-01-15',
+                    startTime: '09:00',
+                    endTime: '11:30',
+                    duration: '2h 30m',
+                    billable: '125.00',
+                    description: 'Resolved database migration issue for customer account'
+                },
+                {
+                    id: 'TE002',
+                    title: 'Team Standup Meeting',
+                    activity: 'meetings',
+                    date: '2024-01-15',
+                    startTime: '10:00',
+                    endTime: '10:30',
+                    duration: '30m',
+                    billable: '0.00',
+                    description: 'Daily team standup and sprint planning'
+                },
+                {
+                    id: 'TE003',
+                    title: 'Client Call - Integration Support',
+                    activity: 'customer_calls',
+                    date: '2024-01-15',
+                    startTime: '14:00',
+                    endTime: '15:15',
+                    duration: '1h 15m',
+                    billable: '93.75',
+                    description: 'Assisted client with API integration setup'
+                },
+                {
+                    id: 'TE004',
+                    title: 'Documentation Update',
+                    activity: 'documentation',
+                    date: '2024-01-14',
+                    startTime: '16:30',
+                    endTime: '18:00',
+                    duration: '1h 30m',
+                    billable: '67.50',
+                    description: 'Updated API documentation for v3.0 release'
+                },
+                {
+                    id: 'TE005',
+                    title: 'Security Training Course',
+                    activity: 'training',
+                    date: '2024-01-14',
+                    startTime: '13:00',
+                    endTime: '14:30',
+                    duration: '1h 30m',
+                    billable: '0.00',
+                    description: 'Completed mandatory security awareness training'
+                },
+                {
+                    id: 'TE006',
+                    title: 'Bug Fix - Payment Gateway',
+                    activity: 'case_work',
+                    date: '2024-01-13',
+                    startTime: '11:00',
+                    endTime: '13:45',
+                    duration: '2h 45m',
+                    billable: '165.00',
+                    description: 'Fixed critical payment processing bug'
+                }
+            ];
+
+            const activities = [
+                { name: 'Case Work', hours: 28.5, percentage: 45, color: '#3b82f6', description: 'Active case resolution and development' },
+                { name: 'Customer Calls', hours: 12.0, percentage: 19, color: '#10b981', description: 'Direct client communication and support' },
+                { name: 'Documentation', hours: 8.5, percentage: 13, color: '#f59e0b', description: 'Knowledge base and process documentation' },
+                { name: 'Meetings', hours: 7.0, percentage: 11, color: '#8b5cf6', description: 'Team meetings and collaboration sessions' },
+                { name: 'Training', hours: 4.5, percentage: 7, color: '#ef4444', description: 'Professional development and skill building' },
+                { name: 'Admin Tasks', hours: 3.0, percentage: 5, color: '#6b7280', description: 'Administrative and operational tasks' }
+            ];
+
+            return {
+                todayHours: 6.5,
+                weekHours: 38.2,
+                monthHours: 156.8,
+                avgDaily: 7.8,
+                currentTimer: '00:00:00',
+                activities: activities,
+                entries: entries
+            };
+        }
+
+        function getActivityColor(activity) {
+            const colors = {
+                case_work: '#3b82f6',
+                customer_calls: '#10b981',
+                documentation: '#f59e0b',
+                meetings: '#8b5cf6',
+                training: '#ef4444',
+                admin: '#6b7280'
+            };
+            return colors[activity] || '#6b7280';
+        }
+
+        let timerInterval;
+        let currentSeconds = 0;
+        let isRunning = false;
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                const startBtn = document.getElementById('startBtn');
+                const pauseBtn = document.getElementById('pauseBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                if (startBtn) startBtn.disabled = true;
+                if (pauseBtn) pauseBtn.disabled = false;
+                if (stopBtn) stopBtn.disabled = false;
+                
+                timerInterval = setInterval(() => {
+                    currentSeconds++;
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            if (isRunning) {
+                isRunning = false;
+                clearInterval(timerInterval);
+                const startBtn = document.getElementById('startBtn');
+                const pauseBtn = document.getElementById('pauseBtn');
+                if (startBtn) startBtn.disabled = false;
+                if (pauseBtn) pauseBtn.disabled = true;
+            }
+        }
+
+        function stopTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            
+            if (currentSeconds > 0) {
+                const activityElement = document.getElementById('currentActivity');
+                const activity = activityElement ? activityElement.value : null;
+                if (activity) {
+                    alert('Time entry saved: ' + formatTime(currentSeconds) + ' for ' + activity.replace('_', ' '));
+                } else {
+                    alert('Please select an activity before stopping the timer');
+                }
+            }
+            
+            currentSeconds = 0;
+            updateTimerDisplay();
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            if (startBtn) startBtn.disabled = false;
+            if (pauseBtn) pauseBtn.disabled = true;
+            if (stopBtn) stopBtn.disabled = true;
+        }
+
+        function updateTimerDisplay() {
+            const currentTimer = document.getElementById('currentTimer');
+            if (currentTimer) {
+                currentTimer.textContent = formatTime(currentSeconds);
+            }
+        }
+
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return hours.toString().padStart(2, '0') + ':' + 
+                   minutes.toString().padStart(2, '0') + ':' + 
+                   secs.toString().padStart(2, '0');
+        }
+
+        function filterTimeEntries() {
+            const searchTerm = document.getElementById('timeEntriesSearch').value.toLowerCase();
+            const activityFilter = document.getElementById('activityFilter').value;
+            const periodFilter = document.getElementById('periodFilter').value;
+            
+            const timeEntryItems = document.querySelectorAll('.time-entry-item');
+            
+            timeEntryItems.forEach(item => {
+                const title = item.querySelector('h4').textContent.toLowerCase();
+                const activity = item.dataset.activity;
+                const date = new Date(item.dataset.date);
+                const today = new Date();
+                
+                let showItem = true;
+                
+                // Search filter
+                if (searchTerm && !title.includes(searchTerm)) {
+                    showItem = false;
+                }
+                
+                // Activity filter
+                if (activityFilter && activity !== activityFilter) {
+                    showItem = false;
+                }
+                
+                // Period filter
+                if (periodFilter === 'week') {
+                    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    if (date < weekAgo) showItem = false;
+                } else if (periodFilter === 'month') {
+                    const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    if (date < monthAgo) showItem = false;
+                }
+                
+                item.style.display = showItem ? 'flex' : 'none';
+            });
+        }
+
+        function exportTimeReport() {
+            alert('Time tracking report exported! Feature includes detailed breakdown by activity, billable hours, and productivity metrics.');
         }
 
         function showMyReports() {
@@ -10096,7 +11479,7 @@ const htmlTemplate = `
                 '</div>' +
                 '<div>' +
                 '<label><strong>Expected SLA Result</strong></label>' +
-                '<div id="test-result" style="background: #f3f4f6; padding: 15px; border-radius: 6px; height: 100px; font-family: monospace; color: #374151;">Click \\'Test Conditions\\' to see results</div>' +
+                '<div id="test-result" style="background: #f3f4f6; padding: 15px; border-radius: 6px; height: 100px; font-family: monospace; color: #374151;">Click &apos;Test Conditions&apos; to see results</div>' +
                 '</div>' +
                 '</div>' +
                 '<div style="text-align: center; margin-top: 15px;">' +
@@ -10313,7 +11696,7 @@ const htmlTemplate = `
                 '<h5 style="margin: 20px 0 10px 0;">Upcoming Holidays</h5>' +
                 '<div style="max-height: 200px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px;">' +
                 '<div style="padding: 10px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: between;">' +
-                '<div>New Year\\'s Day</div>' +
+                '<div>New Year Day</div>' +
                 '<div style="color: #6b7280;">Jan 1, 2025</div>' +
                 '</div>' +
                 '<div style="padding: 10px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: between;">' +
